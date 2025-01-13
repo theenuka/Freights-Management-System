@@ -1,10 +1,9 @@
 
-const Home = () => {
+
+const footer = () => {
   return (
-    <div>
-      <p>home</p>
-    </div>
+    <div className="text-2xl text-white">Home</div>
   )
 }
 
-export default Home
+export default footer
