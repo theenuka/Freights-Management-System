@@ -1,6 +1,9 @@
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
-
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../redux/apiCalls";
+import { Navigate} from "react-router-dom";
+import { useState } from "react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -29,6 +32,8 @@ const Login = () => {
       }
     }
   };
+
+  
   
   return (
     <div>
