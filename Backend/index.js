@@ -4,6 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const authRoute=require("./routes/auth")
 const userRoute=require("./routes/user")
+const parcelRoute=require("./routes/parcel")
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.use("/auth", authRoute)
 app.use("/users", userRoute)
+app.use("/parcels", parcelRoute)
 
 const DB = process.env.DB; // Ensure this matches the variable in your .env file
 const PORT = process.env.PORT || 5000;
