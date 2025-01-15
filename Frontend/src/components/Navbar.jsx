@@ -1,93 +1,123 @@
-import React, { useState } from 'react';
 import { Link } from "react-router-dom";
-import { Menu, X, Package, Phone } from 'lucide-react';
+import { useState, useEffect } from "react";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <nav className="bg-gradient-to-r from-blue-900 to-blue-800 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="h-20 flex items-center justify-between">
-          {/* Logo Section */}
-          <Link to="/" className="flex items-center space-x-2 group">
+    <div
+      className={`fixed w-full top-0 z-50 transition-all duration-300 ${
+        scrolled 
+          ? "h-[80px] bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 shadow-lg" 
+          : "h-[100px] bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
+        {/* Logo Section */}
+        <Link 
+          to="/" 
+          className="transform transition-transform duration-300 hover:scale-105"
+        >
+          <div className="flex items-center space-x-3">
             <img 
               src="/logo.png" 
-              className="h-12 w-12 transform transition-transform duration-300 group-hover:scale-110" 
+              height="80px" 
+              width="80px" 
               alt="FMS Logo" 
+              className="rounded-lg shadow-md"
             />
-            <span className="text-2xl font-bold text-white hidden md:block">
-              FMS
-            </span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link to="/services" className="text-blue-100 hover:text-white transition-colors duration-300 flex items-center space-x-1">
-              <Package size={18} />
-              <span>Services</span>
-            </Link>
-            <Link to="/contact" className="text-blue-100 hover:text-white transition-colors duration-300 flex items-center space-x-1">
-              <Phone size={18} />
-              <span>Contact</span>
-            </Link>
-            <Link to="/login">
-              <button className="bg-white text-blue-900 px-6 py-2 rounded-lg font-medium 
-                transform transition-all duration-300 hover:scale-105 hover:bg-blue-50 
-                focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50
-                shadow-md hover:shadow-lg">
-                Login
-              </button>
-            </Link>
+            <div className="hidden md:flex flex-col text-white">
+              <span className="text-xl font-bold">FMS</span>
+              <span className="text-sm opacity-90">Freight Management System</span>
+            </div>
           </div>
+        </Link>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button 
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-white hover:text-blue-200 transition-colors duration-300"
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
+        {/* Center Section - Time */}
+        <div className="hidden md:flex flex-col items-center text-white">
+          <span className="text-sm opacity-80">
+            {currentTime.toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </span>
+          <span className="text-xs opacity-70">
+            {currentTime.toLocaleTimeString()}
+          </span>
         </div>
 
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden py-4 space-y-3 animate-fadeIn">
-            <Link to="/services" 
-              className="block text-blue-100 hover:text-white transition-colors duration-300 py-2 px-4 rounded-lg hover:bg-blue-800"
-              onClick={() => setIsOpen(false)}
-            >
-              <div className="flex items-center space-x-2">
-                <Package size={18} />
-                <span>Services</span>
-              </div>
-            </Link>
-            <Link to="/contact" 
-              className="block text-blue-100 hover:text-white transition-colors duration-300 py-2 px-4 rounded-lg hover:bg-blue-800"
-              onClick={() => setIsOpen(false)}
-            >
-              <div className="flex items-center space-x-2">
-                <Phone size={18} />
-                <span>Contact</span>
-              </div>
-            </Link>
-            <Link to="/login" 
-              className="block"
-              onClick={() => setIsOpen(false)}
-            >
-              <button className="w-full bg-white text-blue-900 px-6 py-2 rounded-lg font-medium 
-                transform transition-all duration-300 hover:bg-blue-50
-                focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+        {/* Right Section */}
+        <div className="flex items-center space-x-4">
+          {/* Navigation Links */}
+          <nav className="hidden md:flex space-x-6 text-white mr-6">
+            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/services" className="nav-link">Services</Link>
+            <Link to="/tracking" className="nav-link">Track</Link>
+            <Link to="/contact" className="nav-link">Contact</Link>
+          </nav>
+
+          {/* Login Button */}
+          <Link to="/login">
+            <button className="relative overflow-hidden group bg-white text-blue-600 px-6 py-2 rounded-full font-semibold transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
+              <span className="relative z-10">Login</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+              <span className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white">
                 Login
-              </button>
-            </Link>
-          </div>
-        )}
+              </span>
+            </button>
+          </Link>
+        </div>
       </div>
-    </nav>
+    </div>
   );
 };
+
+// Add these styles to your CSS file
+const styles = `
+.nav-link {
+  position: relative;
+  opacity: 0.9;
+  transition: all 0.3s;
+}
+
+.nav-link:hover {
+  opacity: 1;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: white;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+`;
 
 export default Navbar;

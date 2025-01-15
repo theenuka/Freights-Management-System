@@ -1,77 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { FaUser, FaBox, FaSignOutAlt, FaFileAlt, FaSearch } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { publicRequest } from "../requestMethods";
 import { logOut } from "../redux/userRedux";
-import { Package, LogOut, List, User, FileText, ChevronDown, MapPin, Weight, Calendar, User as UserIcon } from 'lucide-react';
-
-const ParcelCard = ({ parcel }) => (
-  <Link to={`/parcel/${parcel._id}`}>
-    <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 hover:bg-white/15 transition-all duration-300 
-      transform hover:-translate-y-1 hover:shadow-xl">
-      <div className="flex justify-between items-start">
-        <div className="space-y-4">
-          <div className="flex items-center space-x-3">
-            <MapPin className="text-blue-300" size={20} />
-            <div>
-              <p className="text-sm text-blue-200">From</p>
-              <p className="text-white font-medium">{parcel.from}</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center space-x-2">
-              <Weight className="text-blue-300" size={16} />
-              <div>
-                <p className="text-sm text-blue-200">Weight</p>
-                <p className="text-white">{parcel.weight} kg</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Calendar className="text-blue-300" size={16} />
-              <div>
-                <p className="text-sm text-blue-200">Date</p>
-                <p className="text-white">{parcel.date}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <UserIcon className="text-blue-300" size={16} />
-              <div>
-                <p className="text-sm text-blue-200">Sender</p>
-                <p className="text-white">{parcel.sendername}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-end space-y-3">
-          <div className="flex items-center space-x-2">
-            <MapPin className="text-blue-300" size={16} />
-            <div>
-              <p className="text-sm text-blue-200">To</p>
-              <p className="text-white font-medium">{parcel.to}</p>
-            </div>
-          </div>
-          
-          <span className={`px-4 py-1.5 rounded-full text-sm font-medium ${
-            parcel.status === 1 
-              ? "bg-yellow-500/20 text-yellow-300"
-              : "bg-green-500/20 text-green-300"
-          }`}>
-            {parcel.status === 1 ? "Pending" : "Delivered"}
-          </span>
-        </div>
-      </div>
-    </div>
-  </Link>
-);
 
 const MyParcels = () => {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -79,18 +19,29 @@ const MyParcels = () => {
   useEffect(() => {
     const getParcels = async () => {
       try {
+        setLoading(true);
         const res = await publicRequest.post("/parcels/me", {
           email: user.currentUser.email,
         });
         setData(res.data);
-        setLoading(false);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching parcels:", error);
+      } finally {
         setLoading(false);
       }
     };
     getParcels();
   }, [user.currentUser.email]);
+
+  const filteredParcels = data
+    .filter(parcel => 
+      (parcel.from.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      parcel.to.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      parcel.sendername.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (filterStatus === "all" || 
+       (filterStatus === "pending" && parcel.status === 1) ||
+       (filterStatus === "delivered" && parcel.status === 2))
+    );
 
   const handleLogout = () => {
     dispatch(logOut());
@@ -98,82 +49,133 @@ const MyParcels = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-900 via-blue-800 to-blue-900">
-      {/* Header with User Menu */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex justify-end">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-blue-900 text-white">
+      {/* Header */}
+      <div className="bg-black/20 backdrop-blur-sm border-b border-white/10">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <h1 className="text-2xl font-bold">FMS Dashboard</h1>
+          
+          {/* User Menu */}
           <div className="relative">
             <button
               onClick={() => setOpen(!open)}
-              className="flex items-center space-x-2 text-white bg-white/10 px-4 py-2 rounded-lg
-                hover:bg-white/20 transition-all duration-300"
+              className="flex items-center space-x-2 bg-blue-600/20 hover:bg-blue-600/30 px-4 py-2 rounded-lg transition-all duration-300"
             >
-              <User size={18} />
-              <span>{user.currentUser?.name || 'User'}</span>
-              <ChevronDown size={18} className={`transform transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
+              <FaUser />
+              <span>{user.currentUser?.name || "User"}</span>
             </button>
-
+            
             {open && (
-              <div className="absolute right-0 mt-2 w-48 bg-white/10 backdrop-blur-lg rounded-lg 
-                shadow-lg py-2 animate-fadeIn">
-                <Link to="/allparcels">
-                  <button className="flex items-center space-x-2 w-full px-4 py-2 text-white hover:bg-white/10 transition-colors duration-300">
-                    <List size={18} />
-                    <span>All Parcels</span>
-                  </button>
-                </Link>
-                <button className="flex items-center space-x-2 w-full px-4 py-2 text-white hover:bg-white/10 transition-colors duration-300">
-                  <FileText size={18} />
-                  <span>Statements</span>
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center space-x-2 w-full px-4 py-2 text-red-300 hover:bg-white/10 transition-colors duration-300"
-                >
-                  <LogOut size={18} />
-                  <span>Logout</span>
-                </button>
+              <div className="absolute right-0 mt-2 w-48 rounded-lg bg-white/10 backdrop-blur-lg shadow-xl border border-white/20 overflow-hidden z-50">
+                <div className="p-4 border-b border-white/10">
+                  <p className="text-sm opacity-70">Logged in as</p>
+                  <p className="font-medium">{user.currentUser?.email}</p>
+                </div>
+                <ul>
+                  <Link to="/allparcels">
+                    <li className="flex items-center space-x-2 px-4 py-3 hover:bg-blue-600/20 cursor-pointer transition-colors">
+                      <FaBox />
+                      <span>All Parcels</span>
+                    </li>
+                  </Link>
+                  <li className="flex items-center space-x-2 px-4 py-3 hover:bg-blue-600/20 cursor-pointer transition-colors">
+                    <FaFileAlt />
+                    <span>Statements</span>
+                  </li>
+                  <li 
+                    onClick={handleLogout}
+                    className="flex items-center space-x-2 px-4 py-3 hover:bg-red-600/20 cursor-pointer transition-colors text-red-400"
+                  >
+                    <FaSignOutAlt />
+                    <span>Logout</span>
+                  </li>
+                </ul>
               </div>
             )}
           </div>
         </div>
-
-        {/* Main Content */}
-        <div className="mt-8">
-          <div className="flex items-center space-x-3 mb-6">
-            <Package className="text-white" size={24} />
-            <h1 className="text-2xl font-bold text-white">My Parcels</h1>
-          </div>
-
-          {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-            </div>
-          ) : data.length === 0 ? (
-            <div className="text-center py-12">
-              <Package className="mx-auto text-blue-300 mb-4" size={48} />
-              <p className="text-white text-lg">No parcels found</p>
-            </div>
-          ) : (
-            <div className="grid gap-4">
-              {data.map((parcel, index) => (
-                <ParcelCard key={index} parcel={parcel} />
-              ))}
-            </div>
-          )}
-        </div>
       </div>
 
-      {/* Custom Animations */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out forwards;
-        }
-      `}</style>
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        {/* Filters and Search */}
+        <div className="mb-6 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+          <div className="relative w-full md:w-96">
+            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search parcels..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none transition-all"
+            />
+          </div>
+          
+          <div className="flex space-x-4">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none transition-all"
+            >
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="delivered">Delivered</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Parcels Grid */}
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          </div>
+        ) : filteredParcels.length === 0 ? (
+          <div className="text-center py-12">
+            <FaBox className="mx-auto text-6xl opacity-20 mb-4" />
+            <h3 className="text-xl font-medium">No parcels found</h3>
+            <p className="text-gray-400">Try adjusting your search or filters</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {filteredParcels.map((parcel) => (
+              <Link key={parcel._id} to={`/parcel/${parcel._id}`}>
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:bg-white/10 transition-all duration-300">
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="font-medium mb-1">From: {parcel.from}</h3>
+                        <p className="text-sm opacity-70">To: {parcel.to}</p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-sm ${
+                        parcel.status === 1 
+                          ? 'bg-yellow-500/20 text-yellow-300'
+                          : 'bg-green-500/20 text-green-300'
+                      }`}>
+                        {parcel.status === 1 ? 'Pending' : 'Delivered'}
+                      </span>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <p className="opacity-70">Weight</p>
+                        <p className="font-medium">{parcel.weight} kg</p>
+                      </div>
+                      <div>
+                        <p className="opacity-70">Date</p>
+                        <p className="font-medium">{new Date(parcel.date).toLocaleDateString()}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="opacity-70">Sender</p>
+                        <p className="font-medium">{parcel.sendername}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

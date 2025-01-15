@@ -1,25 +1,30 @@
 const express = require("express");
 const router = express.Router();
-const {createParcel, getAllParcels, updateParcel, getOneParcels, getUserParcel, deleteParcels} = require("../controllers/parcel")
+const {
+  createParcel,
+  getAllParcels,
+  updateParcel,
+  getOneParcels,
+  getUserParcel,
+  deleteParcels,
+} = require("../controllers/parcel");
 
-//add parcel
-router.post("/", createParcel)
+// Add a new parcel
+router.post("/", createParcel);
 
-//get all parcels
-router.get("/", getAllParcels)
+// Get all parcels
+router.get("/", getAllParcels);
 
-//update parcel
-router.put("/:id", updateParcel)
+// Update a parcel
+router.put("/:id", updateParcel);
 
-//get one parcel
-router.get("/find:id", getOneParcels)
+// Get one parcel by ID
+router.get("/find/:id", getOneParcels);
 
-//get users parcels
-router.post("/me", getUserParcel)
+// Get user's parcels
+router.post("/me", getUserParcel);
 
-//delete parcel
-route.delete("/:id", deleteParcels)
+// Delete a parcel
+router.delete("/:id", deleteParcels);
 
-
-
-module.exports=router;
+module.exports = router;

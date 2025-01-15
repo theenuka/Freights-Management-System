@@ -13,9 +13,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/auth", authRoute)
-app.use("/users", userRoute)
-app.use("/parcels", parcelRoute)
+app.use("/api/v1/auth", authRoute)
+app.use("/api/v1/users", userRoute)
+app.use("/api/v1/parcels", parcelRoute)
 
 const DB = process.env.DB; // Ensure this matches the variable in your .env file
 const PORT = process.env.PORT || 5000;

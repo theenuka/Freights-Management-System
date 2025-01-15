@@ -1,103 +1,91 @@
-import React from 'react';
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { Truck, Package, Clock, Shield } from 'lucide-react';
-
-const FeatureCard = ({ icon: Icon, title, description }) => (
-  <div className="bg-white/5 backdrop-blur-lg p-6 rounded-xl hover:transform hover:scale-105 transition-all duration-300">
-    <Icon className="text-blue-400 mb-4" size={32} />
-    <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
-    <p className="text-blue-100">{description}</p>
-  </div>
-);
 
 const Home = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [currentUser] = useState("Theek237");
+  
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-900 via-blue-800 to-blue-900">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-blue-900">
       <Navbar />
       
       {/* Hero Section */}
-      <div className="flex-1">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Main Hero */}
-          <div className="py-20 flex flex-col lg:flex-row items-center justify-between gap-12">
-            <div className="lg:w-1/2 space-y-6 animate-fadeIn">
-              <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-white">
-                  Simple, Fast & Reliable
-                </span>
-                <br />
-                Freight Management System
-              </h1>
-              <p className="text-xl text-blue-100">
-                Streamline your logistics operations with our cutting-edge freight management solutions.
-              </p>
-              <div className="flex gap-4">
-                <button className="bg-white text-blue-900 px-8 py-3 rounded-lg font-medium 
-                  transform transition-all duration-300 hover:scale-105 hover:bg-blue-50 
-                  shadow-lg hover:shadow-xl">
-                  Get Started
-                </button>
-                <button className="border border-white text-white px-8 py-3 rounded-lg font-medium 
-                  transform transition-all duration-300 hover:scale-105 hover:bg-white/10">
-                  Learn More
-                </button>
-              </div>
+      <div className="relative min-h-screen pt-[100px] px-4 md:px-[50px]">
+        {/* Welcome Message */}
+        <div className={`absolute top-4 right-4 text-blue-300 transition-all duration-700 transform ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
+          Welcome, {currentUser}
+        </div>
+
+        {/* Main Content */}
+        <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-8 py-12">
+          {/* Left Section - Text Content */}
+          <div className={`w-full md:w-1/2 transition-all duration-1000 transform ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20'}`}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
+                SIMPLE, FAST AND RELIABLE
+              </span>
+              <br />
+              <span className="text-white">
+                FREIGHT MANAGEMENT SYSTEM
+              </span>
+            </h1>
+
+            {/* Features Grid */}
+            <div className="grid grid-cols-2 gap-4 mt-8">
+              {[
+                { icon: "🚚", text: "Fast Delivery" },
+                { icon: "🌍", text: "Global Reach" },
+                { icon: "📱", text: "Real-time Tracking" },
+                { icon: "🔒", text: "Secure Shipping" }
+              ].map((feature, index) => (
+                <div 
+                  key={index}
+                  className={`bg-blue-900/30 p-4 rounded-lg backdrop-blur-sm transition-all duration-500 transform hover:scale-105 hover:bg-blue-800/40 ${
+                    isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                  }`}
+                  style={{ transitionDelay: `${index * 200}ms` }}
+                >
+                  <span className="text-2xl">{feature.icon}</span>
+                  <p className="text-white mt-2">{feature.text}</p>
+                </div>
+              ))}
             </div>
-            <div className="lg:w-1/2 animate-float">
-              <img 
-                src="/hero.png" 
-                alt="Freight Management Illustration" 
-                className="w-full h-auto max-w-lg mx-auto"
-              />
-            </div>
+
+            {/* CTA Button */}
+            <button className="mt-8 px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-full font-semibold transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:from-blue-600 hover:to-blue-800">
+              Get Started Now
+            </button>
           </div>
 
-          {/* Features Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 py-16">
-            <FeatureCard 
-              icon={Truck}
-              title="Global Shipping"
-              description="Worldwide delivery services with real-time tracking capabilities"
-            />
-            <FeatureCard 
-              icon={Package}
-              title="Cargo Safety"
-              description="Advanced security measures to protect your valuable shipments"
-            />
-            <FeatureCard 
-              icon={Clock}
-              title="Fast Delivery"
-              description="Optimized routes for quick and efficient delivery times"
-            />
-            <FeatureCard 
-              icon={Shield}
-              title="Secure Platform"
-              description="End-to-end encryption for all your shipping data"
-            />
+          {/* Right Section - Image */}
+          <div className={`w-full md:w-1/2 transition-all duration-1000 transform ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'}`}>
+            <div className="relative">
+              <img 
+                src="/hero.png" 
+                alt="Freight Management System" 
+                className="w-full h-auto rounded-lg shadow-2xl transform transition-all duration-500 hover:scale-105"
+              />
+              {/* Floating Elements */}
+              <div className="absolute -top-4 -left-4 w-20 h-20 bg-blue-500/20 rounded-full blur-xl animate-pulse"></div>
+              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-blue-700/20 rounded-full blur-xl animate-pulse"></div>
+            </div>
           </div>
+        </div>
+
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/10 rounded-full filter blur-3xl animate-blob"></div>
+          <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-blue-700/10 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+          <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-blue-600/10 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
         </div>
       </div>
 
       <Footer />
-
-      {/* Add custom animations */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-20px); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        .animate-fadeIn {
-          animation: fadeIn 1s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 };
