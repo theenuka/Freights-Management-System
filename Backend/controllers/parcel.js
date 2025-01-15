@@ -1,55 +1,56 @@
+const express = require("express");
 const router = express.Router();
+const Parcel = require("../models/Parcel"); // Import the Parcel model (adjust path as necessary)
 
-// create a parcel
-
+// CREATE A PARCEL
 const createParcel = async (req, res) => {
   try {
-    const newParcel = Parcel(req.body);
-    const Parcel = await newParcel.save();
-    res.status(201).json(parcel);
+    const newParcel = new Parcel(req.body); // Corrected the Parcel initialization
+    const savedParcel = await newParcel.save(); // Save the parcel
+    res.status(201).json(savedParcel);
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json({ message: "Error creating parcel", error });
   }
 };
 
-//GET ALL PARCELS
+// GET ALL PARCELS
 const getAllParcels = async (req, res) => {
   try {
     const parcels = await Parcel.find().sort({ createdAt: -1 });
     res.status(200).json(parcels);
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json({ message: "Error fetching parcels", error });
   }
 };
 
 // UPDATE PARCEL
-
 const updateParcel = async (req, res) => {
   try {
     const parcel = await Parcel.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
-      { new: true }
+      { new: true } // Returns the updated document
     );
-    res.status(201).json(parcel);
+    res.status(200).json(parcel);
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json({ message: "Error updating parcel", error });
   }
 };
 
 // GET ONE PARCEL
-
 const getOneParcels = async (req, res) => {
   try {
     const parcel = await Parcel.findById(req.params.id);
+    if (!parcel) {
+      return res.status(404).json({ message: "Parcel not found" });
+    }
     res.status(200).json(parcel);
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json({ message: "Error fetching parcel", error });
   }
 };
 
-// GET USERS PARCEL
-
+// GET USER'S PARCELS
 const getUserParcel = async (req, res) => {
   try {
     const parcels = await Parcel.find({ senderemail: req.body.email }).sort({
@@ -57,19 +58,20 @@ const getUserParcel = async (req, res) => {
     });
     res.status(200).json(parcels);
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json({ message: "Error fetching user's parcels", error });
   }
 };
 
-// DELETE SHIFT
-
+// DELETE PARCEL
 const deleteParcels = async (req, res) => {
   try {
-    await Parcel.findByIdAndDelete(req.params.id);
-
+    const parcel = await Parcel.findByIdAndDelete(req.params.id);
+    if (!parcel) {
+      return res.status(404).json({ message: "Parcel not found" });
+    }
     res.status(200).json({ message: "Parcel has been deleted!" });
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json({ message: "Error deleting parcel", error });
   }
 };
 

@@ -1,74 +1,45 @@
-import React from 'react';
-import { Mail, Phone, MapPin, Linkedin, Facebook, Twitter } from 'lucide-react';
-
 const Footer = () => {
   return (
-    <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white">
-      <div className="max-w-7xl mx-auto p-8">
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          {/* Company Info */}
-          <div className="space-y-6">
-            <div className="flex items-center space-x-2">
-              <img src="/logo.png" height="60" width="60" alt="FMS Logo" className="animate-pulse" />
-              <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-white">
-                FMS
-              </span>
-            </div>
-            <p className="text-blue-100 leading-relaxed hover:text-white transition-colors duration-300">
-              We understand that your parcels carry more than just items—they carry
-              your trust. Committed to excellence in freight management solutions.
-            </p>
-          </div>
+    <div className="relative h-[300px] bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600 flex flex-col md:flex-row items-center justify-between p-[30px] text-white transition-all duration-300 hover:shadow-lg">
+      {/* Left Section */}
+      <div className="flex flex-col items-center md:items-start space-y-4 transform transition-all duration-500 hover:scale-105">
+        <img 
+          src="/logo.png" 
+          height="200px" 
+          width="200px" 
+          alt="FMS Logo" 
+          className="animate-fade-in"
+        />
+        <span className="w-[90%] md:w-[70%] text-center md:text-left leading-relaxed hover:text-blue-100 transition-colors duration-300">
+          We understand that your parcels carry more than just items— they carry
+          your trust. Committed to excellence in freight management solutions.
+        </span>
+      </div>
 
-          {/* Contact Info */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold mb-4">Contact Us</h3>
-            <div className="space-y-3">
-              <a href="mailto:contact@fms.com" className="flex items-center space-x-2 text-blue-200 hover:text-white transition-colors duration-300">
-                <Mail size={18} />
-                <span>contact@fms.com</span>
-              </a>
-              <a href="tel:+1234567890" className="flex items-center space-x-2 text-blue-200 hover:text-white transition-colors duration-300">
-                <Phone size={18} />
-                <span>+1 (234) 567-890</span>
-              </a>
-              <div className="flex items-center space-x-2 text-blue-200">
-                <MapPin size={18} />
-                <span>123 Logistics Ave, City</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Social Links */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold mb-4">Connect With Us</h3>
-            <div className="flex space-x-4">
-              <a href="#" className="hover:scale-110 transition-transform duration-300">
-                <Linkedin className="text-blue-200 hover:text-white" />
-              </a>
-              <a href="#" className="hover:scale-110 transition-transform duration-300">
-                <Facebook className="text-blue-200 hover:text-white" />
-              </a>
-              <a href="#" className="hover:scale-110 transition-transform duration-300">
-                <Twitter className="text-blue-200 hover:text-white" />
-              </a>
-            </div>
-          </div>
+      {/* Right Section */}
+      <div className="flex flex-col items-center md:items-end space-y-2 mt-4 md:mt-0">
+        <div className="space-y-2 text-right">
+          <h3 className="font-semibold text-lg">Contact Us</h3>
+          <p className="hover:text-blue-100 transition-colors duration-300">
+            📧 theenukabandara@gmail.com
+          </p>
+          <p className="hover:text-blue-100 transition-colors duration-300">
+            📞 +94 76 273 9681
+          </p>
+          <p className="hover:text-blue-100 transition-colors duration-300">
+            📍 Kadawata, Sri Lanka
+          </p>
         </div>
-
-        {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-blue-700">
-          <div className="flex flex-col md:flex-row justify-between items-center text-blue-200 text-sm">
-            <div>
-              Designed by <span className="font-semibold">Theenuka Bandara</span>
-            </div>
-            <div>
-              &copy; {new Date().getFullYear()} FMS. All rights reserved.
-            </div>
-          </div>
+        <div className="flex flex-col items-center md:items-end mt-4 text-sm opacity-90">
+          <span className="hover:text-blue-100 transition-colors duration-300">
+            Designed by Theenuka Bandara
+          </span>
+          <span>&copy; {new Date().getFullYear()} FMS - All rights reserved</span>
         </div>
       </div>
+
+      {/* Decorative Elements */}
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300"></div>
     </div>
   );
 };
