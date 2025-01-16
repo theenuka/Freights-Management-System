@@ -1,35 +1,33 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const mongoose = require("mongoose");
-const authRoute=require("./routes/auth")
-const userRoute=require("./routes/user")
-const parcelRoute=require("./routes/parcel")
+const authRoute = require("./routes/auth");
+const userRoute = require("./routes/user");
+const parcelRoute = require("./routes/parcel");
 
-dotenv.config(); // Load environment variables from .env file
-
+dotenv.config();
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/v1/auth", authRoute)
-app.use("/api/v1/users", userRoute)
-app.use("/api/v1/parcels", parcelRoute)
+// ROUTES
 
-const DB = process.env.DB; // Ensure this matches the variable in your .env file
-const PORT = process.env.PORT || 5000;
+app.use("/api/v1/auth", authRoute);
+app.use("/api/v1/users", userRoute);
+app.use("/api/v1/parcels", parcelRoute);
 
-// Log environment variables for debugging
-console.log(`DB: ${DB}, PORT: ${PORT}`);
+const PORT = process.env.PORT;
 
-mongoose.connect(DB)
-    .then(() => {
-        console.log("DB connection is successful");
-    })
-    .catch((err) => {
-        console.error("DB Connection Error: ", err);
-    });
+mongoose
+  .connect(process.env.DB)
+  .then(() => {
+    console.log("DB connection is successfull");
+  })
+  .catch((e) => {
+    console.log(e);
+  });
 
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`)});
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
