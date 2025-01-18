@@ -5,7 +5,7 @@ import Menu from "./components/Menu";
 import Home from "./pages/Home";
 import Parcels from "./pages/Parcels";
 import Users from "./pages/Users";
-import NewParcel from "./pages/NewParcel";
+import NewParcel from "./pages/Newparcel";
 import NewUsers from "./pages/NewUsers";
 import Parcel from "./pages/Parcel";
 import Login from "./pages/Login";

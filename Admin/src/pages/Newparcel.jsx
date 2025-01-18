@@ -2,163 +2,274 @@ import { useState } from "react";
 import { publicRequest } from "../requestMethods";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+import { FaBox, FaMapMarkerAlt, FaUser, FaEnvelope, FaWeight, FaDollarSign, FaCalendar, FaStickyNote } from "react-icons/fa";
 
 const NewParcel = () => {
-  const [inputs, setInputs] = useState({});
+  const navigate = useNavigate();
+  
+  // Individual state for each field
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [senderName, setSenderName] = useState("");
+  const [recipientName, setRecipientName] = useState("");
+  const [senderEmail, setSenderEmail] = useState("");
+  const [recipientEmail, setRecipientEmail] = useState("");
+  const [weight, setWeight] = useState("");
+  const [cost, setCost] = useState("");
+  const [date, setDate] = useState("");
+  const [note, setNote] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (e) => {
-    setInputs((prev) => {
-      return { ...prev, [e.target.name]: e.target.value };
-    });
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    
+    if (!from || !to || !senderName || !recipientName || !senderEmail || !recipientEmail) {
+      toast.error("Please fill in all required fields", { theme: "dark" });
+      return;
+    }
 
-  const handleSubmit = async () => {
+    setIsSubmitting(true);
     try {
-      await publicRequest.post("/parcels", inputs);
+      const parcelData = {
+        from,
+        to,
+        sendername: senderName,
+        recipientname: recipientName,
+        senderemail: senderEmail,
+        recipientemail: recipientEmail,
+        weight: weight ? Number(weight) : undefined,
+        cost: cost ? Number(cost) : undefined,
+        date,
+        note,
+        status: 1
+      };
 
-      // Clear the input fields
-      setInputs({});
-
-      // Show success toast
-      toast.success(
-        "Parcel has been successfully posted and emails has been sent to the Sender and Recipient!"
-      );
+      await publicRequest.post("/parcels", parcelData);
+      toast.success("Parcel created successfully!", { theme: "dark" });
+      setTimeout(() => navigate("/parcels"), 2000);
     } catch (error) {
       console.log(error);
-      toast.error("Failed to post the parcel. Please try again.");
+      toast.error(error.response?.data?.message || "Failed to create parcel", { theme: "dark" });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="m-[30px] bg-[#fff] p-[20px]">
-      <h2 className="font-semibold">New Parcel</h2>
-
-      <div className="flex">
-        <div className="m-[20px]">
-          <div className="flex flex-col my-[20px]">
-            <label htmlFor="">From</label>
-            <input
-              type="text"
-              placeholder="Antorio, USA"
-              name="from"
-              value={inputs.from || ""}
-              onChange={handleChange}
-              className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-            />
-          </div>
-          <div className="flex flex-col my-[20px]">
-            <label htmlFor="">To</label>
-            <input
-              type="text"
-              placeholder="Saint Mary, USA"
-              name="to"
-              value={inputs.to || ""}
-              onChange={handleChange}
-              className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-            />
-          </div>
-          <div className="flex flex-col my-[20px]">
-            <label htmlFor="">Sender Name</label>
-            <input
-              type="text"
-              placeholder="James Doe"
-              name="sendername"
-              value={inputs.sendername || ""}
-              onChange={handleChange}
-              className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-            />
-          </div>
-          <div className="flex flex-col my-[20px]">
-            <label htmlFor="">Recipient Name</label>
-            <input
-              type="text"
-              placeholder="James Doe"
-              name="recipientname"
-              value={inputs.recipientname || ""}
-              onChange={handleChange}
-              className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-            />
-          </div>
-          <div className="flex flex-col my-[20px]">
-            <label htmlFor="">Sender Email</label>
-            <input
-              type="email"
-              required
-              placeholder="jamesdoe@gmail.com"
-              name="senderemail"
-              value={inputs.senderemail || ""}
-              onChange={handleChange}
-              className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-            />
-          </div>
-          <div className="flex flex-col my-[20px]">
-            <label htmlFor="">Recipient Email</label>
-            <input
-              type="email"
-              placeholder="jamesdoe@gmail.com"
-              name="recipientemail"
-              value={inputs.recipientemail || ""}
-              onChange={handleChange}
-              className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="m-[20px]">
-          <div className="flex flex-col my-[20px]">
-            <label htmlFor="">Weight</label>
-            <input
-              type="Number"
-              placeholder="20g"
-              name="weight"
-              value={inputs.weight || ""}
-              onChange={handleChange}
-              className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-            />
-          </div>
-          <div className="flex flex-col my-[20px]">
-            <label htmlFor="">Cost</label>
-            <input
-              type="Number"
-              placeholder="$50"
-              name="cost"
-              value={inputs.cost || ""}
-              onChange={handleChange}
-              className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-            />
-          </div>
-          <div className="flex flex-col my-[20px]">
-            <label htmlFor="">Date</label>
-            <input
-              type="date"
-              placeholder="25/06/2024"
-              name="date"
-              value={inputs.date || ""}
-              onChange={handleChange}
-              className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-            />
-          </div>
-          <div className="flex flex-col my-[20px]">
-            <label htmlFor="">Note</label>
-            <textarea
-              placeholder="Perishable goods"
-              name="note"
-              value={inputs.note || ""}
-              onChange={handleChange}
-              type="text"
-              className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-            />
-          </div>
-          <button
-            className="bg-[#1E1E1E] cursor-pointer text-white p-[10px] w-[300px]"
-            onClick={handleSubmit}
-          >
-            Create
-          </button>
-          <ToastContainer />
+    <div className="p-6">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-white mb-2">Create New Parcel</h1>
+        <div className="text-gray-400 text-sm">
+          2025-01-18 17:43:11 UTC | User: Theek237
         </div>
       </div>
+
+      {/* Form Container */}
+      <div className="bg-gray-800 rounded-xl shadow-xl p-6">
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left Column */}
+            <div className="space-y-4">
+              {/* From Location */}
+              <div className="flex flex-col space-y-2">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaMapMarkerAlt className="text-gray-400" />
+                  <span>From Location*</span>
+                </label>
+                <input
+                  type="text"
+                  value={from}
+                  onChange={(e) => setFrom(e.target.value)}
+                  placeholder="Antorio, USA"
+                  required
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+
+              {/* To Location */}
+              <div className="flex flex-col space-y-2">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaMapMarkerAlt className="text-gray-400" />
+                  <span>To Location*</span>
+                </label>
+                <input
+                  type="text"
+                  value={to}
+                  onChange={(e) => setTo(e.target.value)}
+                  placeholder="Saint Mary, USA"
+                  required
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+
+              {/* Sender Name */}
+              <div className="flex flex-col space-y-2">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaUser className="text-gray-400" />
+                  <span>Sender Name*</span>
+                </label>
+                <input
+                  type="text"
+                  value={senderName}
+                  onChange={(e) => setSenderName(e.target.value)}
+                  placeholder="James Doe"
+                  required
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+
+              {/* Sender Email */}
+              <div className="flex flex-col space-y-2">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaEnvelope className="text-gray-400" />
+                  <span>Sender Email*</span>
+                </label>
+                <input
+                  type="email"
+                  value={senderEmail}
+                  onChange={(e) => setSenderEmail(e.target.value)}
+                  placeholder="jamesdoe@gmail.com"
+                  required
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+
+              {/* Recipient Name */}
+              <div className="flex flex-col space-y-2">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaUser className="text-gray-400" />
+                  <span>Recipient Name*</span>
+                </label>
+                <input
+                  type="text"
+                  value={recipientName}
+                  onChange={(e) => setRecipientName(e.target.value)}
+                  placeholder="John Smith"
+                  required
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+
+              {/* Recipient Email */}
+              <div className="flex flex-col space-y-2">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaEnvelope className="text-gray-400" />
+                  <span>Recipient Email*</span>
+                </label>
+                <input
+                  type="email"
+                  value={recipientEmail}
+                  onChange={(e) => setRecipientEmail(e.target.value)}
+                  placeholder="johnsmith@gmail.com"
+                  required
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-4">
+              {/* Weight */}
+              <div className="flex flex-col space-y-2">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaWeight className="text-gray-400" />
+                  <span>Weight (g)</span>
+                </label>
+                <input
+                  type="number"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  placeholder="20"
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+
+              {/* Cost */}
+              <div className="flex flex-col space-y-2">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaDollarSign className="text-gray-400" />
+                  <span>Cost ($)</span>
+                </label>
+                <input
+                  type="number"
+                  value={cost}
+                  onChange={(e) => setCost(e.target.value)}
+                  placeholder="50"
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+
+              {/* Date */}
+              <div className="flex flex-col space-y-2">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaCalendar className="text-gray-400" />
+                  <span>Date</span>
+                </label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+
+              {/* Note */}
+              <div className="flex flex-col space-y-2">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaStickyNote className="text-gray-400" />
+                  <span>Note</span>
+                </label>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Perishable goods"
+                  rows="4"
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`mt-6 w-full py-3 px-4 rounded-lg flex items-center justify-center space-x-2
+                  bg-gradient-to-r from-[#1e3c72] to-[#2a5298] text-white font-medium
+                  transform transition-all duration-300 hover:scale-[1.02]
+                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800
+                  ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
+              >
+                <FaBox className="text-lg" />
+                <span>{isSubmitting ? 'Creating...' : 'Create Parcel'}</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <ToastContainer position="top-right" theme="dark" />
     </div>
   );
 };

@@ -3,11 +3,107 @@
 @tailwind utilities;
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
-
-body {
-  margin: 0px;
-  padding: 0px;
-  font-family: "Poppins", sans-serif;
-  background-color: rgb(60 60 60);;
+:root {
+  --primary-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  --secondary-gradient: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+  --accent-gradient: linear-gradient(135deg, #373B44 0%, #4286f4 100%);
+  --surface-color: #1a1a1a;
+  --text-primary: #ffffff;
+  --text-secondary: #a0aec0;
 }
 
+/* Base styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  background-color: var(--surface-color);
+  color: var(--text-primary);
+}
+
+/* Custom utility classes */
+@layer components {
+  .fms-card {
+    @apply bg-gray-800 rounded-lg shadow-lg p-6 transition-all duration-300 hover:shadow-xl;
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(10px);
+  }
+
+  .fms-button {
+    @apply px-4 py-2 rounded-md transition-all duration-300 transform hover:scale-105;
+    background: var(--primary-gradient);
+  }
+
+  .fms-input {
+    @apply bg-gray-700 border-gray-600 text-white rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300;
+  }
+
+  .fms-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+.slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+.scale-in {
+  animation: scaleIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* Glass morphism effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
