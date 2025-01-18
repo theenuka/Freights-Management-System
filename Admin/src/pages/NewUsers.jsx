@@ -2,129 +2,195 @@ import { useState } from "react";
 import { publicRequest } from "../requestMethods";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from "react-router-dom";
+import { FaUser, FaEnvelope, FaBirthdayCake, FaGlobe, FaMapMarkedAlt, FaUserPlus } from "react-icons/fa";
 
 const NewUsers = () => {
-  const [inputs, setInputs] = useState({});
-
-  const handleChange = (e) => {
-    setInputs((prev) => {
-      return { ...prev, [e.target.name]: e.target.value };
-    });
-  };
+  const navigate = useNavigate();
+  
+  // Simple string state for each field
+  const [fullname, setFullname] = useState("");
+  const [email, setEmail] = useState("");
+  const [age, setAge] = useState("");
+  const [country, setCountry] = useState("");
+  const [address, setAddress] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const generatePassword = (length) => {
-    const lowerCaseChars = "abcdefghijklmnopqrstuvwxyz";
-    const upperCaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const numberChars = "0123456789";
-    const specialChars = "!@#$%^&*";
-
-    const allChars = lowerCaseChars + upperCaseChars + numberChars + specialChars;
-
-    let password = "";
-
-    // Ensure the password contains at least one of each required type
-    password += lowerCaseChars[Math.floor(Math.random() * lowerCaseChars.length)];
-    password += upperCaseChars[Math.floor(Math.random() * upperCaseChars.length)];
-    password += numberChars[Math.floor(Math.random() * numberChars.length)];
-    password += specialChars[Math.floor(Math.random() * specialChars.length)];
-
-    // Fill the rest of the password length with random characters from all types
-    for (let i = password.length; i < length; i++) {
-      password += allChars[Math.floor(Math.random() * allChars.length)];
-    }
-
-    // Shuffle the characters to ensure a random order
-    password = password.split("").sort(() => 0.5 - Math.random()).join("");
-
-    return password;
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    return Array(length)
+      .fill(chars)
+      .map(x => x[Math.floor(Math.random() * x.length)])
+      .join('');
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    if (!fullname || !email) {
+      toast.error("Name and email are required!", { theme: "dark" });
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      const password = generatePassword(12);
+      const userData = {
+        fullname,
+        email,
+        age: age ? parseInt(age) : undefined,
+        country,
+        address,
+        password: generatePassword(12),
+        role: "user"
+      };
 
-      await publicRequest.post("/auth/register", { ...inputs, password });
-
-      // Clear the input fields
-      setInputs({});
-
-      // Show success toast
-      toast.success("User has been successfully registered and an email has been sent to them!");
-
+      await publicRequest.post("/auth/register", userData);
+      toast.success("User created successfully!", { theme: "dark" });
+      setTimeout(() => navigate("/users"), 2000);
     } catch (error) {
       console.log(error);
-      toast.error("Failed to register the user. Please try again.");
+      toast.error(error.response?.data?.message || "Failed to create user", { theme: "dark" });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="m-[30px] bg-[#fff] p-[20px]">
-      <h2 className="font-semibold">New User</h2>
-
-      <div className="flex flex-col my-[20px]">
-        <label htmlFor="">Full Name</label>
-        <input
-          type="text"
-          placeholder="James Doe"
-          name="fullname"
-          value={inputs.fullname || ''}
-          onChange={handleChange}
-          className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-        />
-      </div>
-      <div className="flex flex-col my-[20px]">
-        <label htmlFor="">Email</label>
-        <input
-          type="text"
-          placeholder="jamesdoe@gmail.com"
-          name="email"
-          value={inputs.email || ''}
-          onChange={handleChange}
-          className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-        />
-      </div>
-      <div className="flex flex-col my-[20px]">
-        <label htmlFor="">Age</label>
-        <input
-          type="Number"
-          placeholder="30"
-          name="age"
-          value={inputs.age || ''}
-          onChange={handleChange}
-          className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-        />
-      </div>
-      <div className="flex flex-col my-[20px]">
-        <label htmlFor="">Country</label>
-        <input
-          type="text"
-          placeholder="Australia"
-          name="country"
-          value={inputs.country || ''}
-          onChange={handleChange}
-          className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-        />
-      </div>
-      <div className="flex flex-col my-[20px]">
-        <label htmlFor="">Address</label>
-        <input
-          type="text"
-          placeholder="Laura Avenue, Sydney, Australia"
-          name="address"
-          value={inputs.address || ''}
-          onChange={handleChange}
-          className="border-2 border-[#555] border-solid p-[10px] w-[300px]"
-        />
+    <div className="p-6">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-white mb-2">Create New User</h1>
+        <div className="text-gray-400 text-sm">
+          2025-01-18 17:40:50 UTC | User: Theek237
+        </div>
       </div>
 
-      <button
-        className="bg-[#1E1E1E] cursor-pointer text-white p-[10px] w-[200px]"
-        onClick={handleSubmit}
-      >
-        Create
-      </button>
+      {/* Form Container */}
+      <div className="bg-gray-800 rounded-xl shadow-xl p-6 max-w-2xl">
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left Column */}
+            <div>
+              {/* Full Name Input */}
+              <div className="flex flex-col space-y-2 mb-6">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaUser className="text-gray-400" />
+                  <span>Full Name</span>
+                </label>
+                <input
+                  type="text"
+                  value={fullname}
+                  onChange={(e) => setFullname(e.target.value)}
+                  placeholder="James Doe"
+                  required
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
 
-      <ToastContainer />
+              {/* Email Input */}
+              <div className="flex flex-col space-y-2 mb-6">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaEnvelope className="text-gray-400" />
+                  <span>Email Address</span>
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="jamesdoe@gmail.com"
+                  required
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+
+              {/* Age Input */}
+              <div className="flex flex-col space-y-2 mb-6">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaBirthdayCake className="text-gray-400" />
+                  <span>Age</span>
+                </label>
+                <input
+                  type="number"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  placeholder="30"
+                  min="18"
+                  max="100"
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div>
+              {/* Country Input */}
+              <div className="flex flex-col space-y-2 mb-6">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaGlobe className="text-gray-400" />
+                  <span>Country</span>
+                </label>
+                <input
+                  type="text"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  placeholder="Australia"
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+
+              {/* Address Input */}
+              <div className="flex flex-col space-y-2 mb-6">
+                <label className="text-gray-300 text-sm font-medium flex items-center space-x-2">
+                  <FaMapMarkedAlt className="text-gray-400" />
+                  <span>Address</span>
+                </label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Laura Avenue, Sydney, Australia"
+                  className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-white 
+                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    focus:border-transparent transition-all duration-300"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`mt-8 w-full py-3 px-4 rounded-lg flex items-center justify-center space-x-2
+                  bg-gradient-to-r from-[#1e3c72] to-[#2a5298] text-white font-medium
+                  transform transition-all duration-300 hover:scale-[1.02]
+                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800
+                  ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
+              >
+                <FaUserPlus className="text-lg" />
+                <span>{isSubmitting ? 'Creating...' : 'Create User'}</span>
+              </button>
+            </div>
+          </div>
+        </form>
+
+        {/* Information Note */}
+        <div className="mt-6 p-4 bg-gray-700/50 rounded-lg">
+          <p className="text-sm text-gray-300">
+            <span className="font-medium">Note:</span> A secure password will be automatically generated
+            and sent to the user's email address along with their login credentials.
+          </p>
+        </div>
+      </div>
+
+      <ToastContainer position="top-right" theme="dark" />
     </div>
   );
 };
