@@ -1,11 +1,11 @@
 import { HiArrowSmallUp, HiArrowLongDown } from "react-icons/hi2";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { useState, useEffect } from "react";
+import '../pages/home.css';
 
 const Home = () => {
   const [currentTime, setCurrentTime] = useState("");
   
-  // Update UTC time
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -17,53 +17,49 @@ const Home = () => {
   }, []);
 
   const StatCard = ({ title, value, increase }) => (
-    <div className="flex flex-col bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-xl 
-      h-[250px] w-[350px] m-[20px] transform transition-all duration-300 hover:scale-105">
-      <div className="flex flex-col items-center justify-center h-full p-6">
-        <h1 className="text-[22px] font-bold text-white mb-4">{title}</h1>
-        <div className="flex items-center space-x-2 mb-4">
+    <div className="stat-card">
+      <div className="stat-card-content">
+        <h1 className="stat-card-title">{title}</h1>
+        <div className="stat-card-trend">
           {increase ? (
-            <HiArrowSmallUp className="text-[28px] text-green-400" />
+            <HiArrowSmallUp className="trend-icon-up" />
           ) : (
-            <HiArrowLongDown className="text-[28px] text-red-400" />
+            <HiArrowLongDown className="trend-icon-down" />
           )}
-          <span className="text-gray-400 text-sm">
+          <span className="trend-text">
             {increase ? '+12%' : '-5%'} from last month
           </span>
         </div>
-        <span className="text-[32px] font-bold bg-clip-text text-transparent 
-          bg-gradient-to-r from-blue-400 to-cyan-300">
-          {value}
-        </span>
+        <span className="stat-card-value">{value}</span>
       </div>
     </div>
   );
 
   return (
-    <div className="p-6">
+    <div className="home-container">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Dashboard Overview</h1>
-        <div className="flex items-center text-gray-400 text-sm">
+      <div className="home-header">
+        <h1 className="home-title">Dashboard Overview</h1>
+        <div className="home-meta">
           <span>Current UTC Time: {currentTime}</span>
-          <span className="mx-2">•</span>
+          <span className="home-meta-dot">•</span>
           <span>Welcome back, Theenuka Bandara</span>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="flex flex-wrap items-center justify-center lg:justify-between">
+      <div className="stats-container">
         <StatCard title="Total Users" value="200" increase={true} />
         <StatCard title="Delivered Parcels" value="2,000" increase={true} />
         <StatCard title="Pending Parcels" value="100" increase={false} />
       </div>
 
       {/* Charts Section */}
-      <div className="flex flex-wrap items-stretch mt-8 gap-6">
+      <div className="charts-container">
         {/* Pie Chart */}
-        <div className="flex-1 min-w-[500px] bg-gray-800 rounded-xl p-6">
-          <h2 className="text-xl font-bold text-white mb-4">Parcel Status Distribution</h2>
-          <div className="h-[400px]">
+        <div className="chart-card">
+          <h2 className="chart-title">Parcel Status Distribution</h2>
+          <div className="chart-content">
             <PieChart
               series={[
                 {
@@ -87,28 +83,25 @@ const Home = () => {
         </div>
 
         {/* Recent Users Card */}
-        <div className="flex-1 min-w-[300px] bg-gray-800 rounded-xl p-6">
-          <h2 className="text-xl font-bold text-white mb-4">Recent Users</h2>
-          <div className="space-y-4">
+        <div className="users-card">
+          <h2 className="chart-title">Recent Users</h2>
+          <div className="user-list">
             {[
               { name: "John Doe", time: "2 minutes ago", status: "Active" },
               { name: "Alex Doe", time: "5 minutes ago", status: "Idle" },
               { name: "Jane Doe", time: "15 minutes ago", status: "Active" },
             ].map((user, index) => (
-              <div key={index} className="flex items-center justify-between p-3 
-                bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 
-                    flex items-center justify-center text-white font-bold">
+              <div key={index} className="user-item">
+                <div className="user-info">
+                  <div className="user-avatar">
                     {user.name[0]}
                   </div>
-                  <div>
-                    <div className="text-white font-medium">{user.name}</div>
-                    <div className="text-gray-400 text-xs">{user.time}</div>
+                  <div className="user-details">
+                    <div className="user-name">{user.name}</div>
+                    <div className="user-time">{user.time}</div>
                   </div>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs 
-                  ${user.status === 'Active' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                <span className={`user-status ${user.status === 'Active' ? 'status-active' : 'status-idle'}`}>
                   {user.status}
                 </span>
               </div>

@@ -1,95 +1,43 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
-:root {
-  --primary-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-  --secondary-gradient: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
-  --accent-gradient: linear-gradient(135deg, #373B44 0%, #4286f4 100%);
-  --surface-color: #1a1a1a;
-  --text-primary: #ffffff;
-  --text-secondary: #a0aec0;
-}
-
-/* Base styles */
-body {
+/* Reset and Base Styles */
+* {
   margin: 0;
   padding: 0;
-  font-family: "Poppins", sans-serif;
-  background-color: var(--surface-color);
-  color: var(--text-primary);
+  box-sizing: border-box;
 }
 
-/* Custom utility classes */
-@layer components {
-  .fms-card {
-    @apply bg-gray-800 rounded-lg shadow-lg p-6 transition-all duration-300 hover:shadow-xl;
-    background: rgba(30, 41, 59, 0.8);
-    backdrop-filter: blur(10px);
-  }
-
-  .fms-button {
-    @apply px-4 py-2 rounded-md transition-all duration-300 transform hover:scale-105;
-    background: var(--primary-gradient);
-  }
-
-  .fms-input {
-    @apply bg-gray-700 border-gray-600 text-white rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300;
-  }
-
-  .fms-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #111827;
+  color: white;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Animation classes */
-.fade-in {
-  animation: fadeIn 0.5s ease-in;
+/* Remove default button styles */
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
 }
 
-.slide-up {
-  animation: slideUp 0.5s ease-out;
+/* Remove default link styles */
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
-.scale-in {
-  animation: scaleIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Scrollbar styling */
+/* Scrollbar Styles */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: #1f2937;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -101,9 +49,183 @@ body {
   background: #4b5563;
 }
 
-/* Glass morphism effect */
-.glass-effect {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* Import Component Styles */
+@import './components/menu.css';
+@import './components/navbar.css';
+@import './components/footer.css';
+
+/* Import Page Styles */
+@import './pages/home.css';
+@import './pages/login.css';
+@import './pages/newparcel.css';
+@import './pages/newusers.css';
+@import './pages/parcel.css';
+@import './pages/parcels.css';
+@import './pages/users.css';
+
+/* Common Utility Classes */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Global Animation Classes */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Common Layout Classes */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Common Text Colors */
+.text-primary { color: #60a5fa; }
+.text-success { color: #34d399; }
+.text-warning { color: #fbbf24; }
+.text-error { color: #f87171; }
+.text-muted { color: #9ca3af; }
+
+/* Common Background Colors */
+.bg-primary { background-color: #1e3c72; }
+.bg-secondary { background-color: #1f2937; }
+.bg-success { background-color: rgba(52, 211, 153, 0.2); }
+.bg-warning { background-color: rgba(251, 191, 36, 0.2); }
+.bg-error { background-color: rgba(248, 113, 113, 0.2); }
+
+/* Common Border Styles */
+.border-primary { border-color: #1e3c72; }
+.border-secondary { border-color: #374151; }
+
+/* Common Shadow Styles */
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Common Gradient Backgrounds */
+.gradient-primary {
+  background: linear-gradient(to right, #1e3c72, #2a5298);
+}
+
+.gradient-secondary {
+  background: linear-gradient(to right, #60a5fa, #3b82f6);
+}
+
+/* Common Border Radius */
+.rounded-sm { border-radius: 0.25rem; }
+.rounded-md { border-radius: 0.375rem; }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-full { border-radius: 9999px; }
+
+/* Common Transitions */
+.transition-all {
+  transition: all 300ms ease;
+}
+
+.transition-colors {
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+
+.transition-transform {
+  transition: transform 200ms ease;
+}
+
+/* Common Focus States */
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus {
+  box-shadow: 0 0 0 2px #3b82f6;
+}
+
+/* Common Grid Layouts */
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Common Flex Layouts */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Toast Customization */
+.Toastify__toast-container {
+  --toastify-color-dark: #1f2937;
+  --toastify-color-success: #34d399;
+  --toastify-color-error: #ef4444;
+  --toastify-font-family: inherit;
+}
+
+/* DataGrid Global Styles */
+.MuiDataGrid-root {
+  border: none !important;
+  color: white !important;
+  background-color: transparent !important;
+}
+
+.MuiDataGrid-cell {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.MuiDataGrid-columnHeaders {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.MuiDataGrid-footerContainer {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.MuiCheckbox-root {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.MuiDataGrid-row:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
 }

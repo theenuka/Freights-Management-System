@@ -3,87 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome SendIT</title>
+    <title>Welcome to FMS</title>
     <style type="text/css">
-        body{
-            margin:0;
+        body {
+            margin: 0;
             padding: 0;
-            min-width:100%;
-            font-family: Arial,sans-serif;
-            font-size:16px;
-            line-height: 1.5;
-            background-color: #FAFAFA;
-            color:#222222;
+            min-width: 100%;
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
         }
-        a{
-            color:#000;
-            text-decoration: none;
-        }
-
-        h1{
-            font-size:24px;
-            font-weight:700;
-            line-height:1.25;
-            margin-top:0;
-            margin-bottom:15px;
-            text-align:center;
-        }
-
-        p{
-            margin-top: 0;
-            margin-bottom: 24px;
-            text-decoration: none;
-        }
-        table td{
-            vertical-align: top;
-        }
-        .email-wrapper{
-            max-width:700px;
+        
+        .email-wrapper {
+            max-width: 600px;
             margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
-        .email-header{
-            background-color: #1E1E1E;
+        
+        .email-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        
+        .header-title {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .email-body {
+            padding: 40px 30px;
+            background-color: #ffffff;
+        }
+        
+        .credentials-box {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .credentials-title {
+            color: #1e3c72;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .credential-item {
+            margin-bottom: 10px;
+        }
+        
+        .credential-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .login-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            padding: 12px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .features-list {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+        
+        .features-list li {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        .warning-text {
+            color: #dc3545;
+            font-size: 14px;
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #dc3545;
+            background-color: #fff5f5;
+        }
+        
+        .email-footer {
+            background-color: #f8f9fa;
             padding: 30px;
-            color: #fff;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
         }
-
-        .email-body{
-            padding:14px;
-            background-color: #E9EB77;
-         
+        
+        .footer-text {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 0;
         }
-        .email-footer{
-            background-color: #E9EB77;        
-            padding: 14px;
+        
+        .social-links {
+            margin-top: 20px;
         }
-
-        img{
-            background-color: #1E1E1E;
-            padding: 24px; 
+        
+        .social-link {
+            display: inline-block;
+            margin: 0 10px;
+            color: #1e3c72;
+            text-decoration: none;
+        }
+        
+        @media only screen and (max-width: 600px) {
+            .email-wrapper {
+                width: 100% !important;
+            }
+            
+            .email-body {
+                padding: 20px 15px !important;
+            }
         }
     </style>
 </head>
 <body>
-
     <div class="email-wrapper">
-
         <div class="email-header">
-            <h1>Welcome to SendIT</h1>
-        </div>         
-        <div class="email-body">  
-        <p>Hello <%= fullname %>,</p>
-        <p>Your login credentials:</p>
-        <p>Email: <%= email %></p>
-        <p>Password: <%= password %></p> 
-        <p>To login go to: <a href="http://localhost:5173/login">https://www.sendit.com/login</a></p>
-        <img src="https://res.cloudinary.com/dap91fhxh/image/upload/v1717495157/hero_r5lgvq.png" alt="" height="250px" width="500px">
-        <h3>Note:</h3>
-        <p>Please Keep this credentials privately. Don't share with Anyone</p>
-        <p>If you did not register for a SendIT account, Please ignore this email</p>
+            <img src="https://your-domain.com/fms-logo.png" alt="FMS Logo" class="logo">
+            <h1 class="header-title">Welcome to FMS</h1>
         </div>
+        
+        <div class="email-body">
+            <p>Dear <%= fullname %>,</p>
+            <p>Welcome to FMS - Your Complete Freight Management Solution! We're excited to have you join our platform.</p>
+            
+            <div class="credentials-box">
+                <h3 class="credentials-title">Your Login Credentials</h3>
+                <p class="credential-item">
+                    <span class="credential-label">Email:</span><br>
+                    <%= email %>
+                </p>
+                <p class="credential-item">
+                    <span class="credential-label">Password:</span><br>
+                    <%= password %>
+                </p>
+            </div>
+            
+            <a href="http://localhost:5173/login" class="login-button">
+                Login to Your Account
+            </a>
+            
+            <h3>With FMS, you can:</h3>
+            <ul class="features-list">
+                <li>Track shipments in real-time</li>
+                <li>Manage freight documentation efficiently</li>
+                <li>Generate comprehensive reports</li>
+                <li>Coordinate with shipping partners</li>
+                <li>Access analytics and insights</li>
+            </ul>
+            
+            <div class="warning-text">
+                <strong>Important:</strong> For security reasons, please change your password after your first login. 
+                Never share your login credentials with anyone.
+            </div>
+        </div>
+        
         <div class="email-footer">
-            <p>If you have any questions, please don't hesitate to contact us at <a href="mailto:alokmondala199@gmail.com">sendit@outlook.com</a></a></p>
+            <p class="footer-text">
+                Need assistance? Contact our support team:<br>
+                <a href="mailto:support@fms-system.com">support@fms-system.com</a><br>
+                +1 (555) 123-4567
+            </p>
+            
+            <div class="social-links">
+                <a href="#" class="social-link">Facebook</a>
+                <a href="#" class="social-link">Twitter</a>
+                <a href="#" class="social-link">LinkedIn</a>
+            </div>
+            
+            <p class="footer-text" style="margin-top: 20px;">
+                © <%= new Date().getFullYear() %> FMS - Freight Management System.<br>
+                All rights reserved.
+            </p>
         </div>
-    </div>    
+    </div>
 </body>
 </html>
