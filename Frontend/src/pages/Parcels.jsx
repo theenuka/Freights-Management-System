@@ -1,57 +1,18 @@
-import { useEffect, useState } from "react";
-import { FaArrowLeft, FaUser, FaDownload, FaFilter } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaArrowLeft, FaSpinner, FaDownload, FaFilter } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
 import { useSelector } from "react-redux";
 import { publicRequest } from "../requestMethods";
-import { createTheme, ThemeProvider } from "@mui/material";
+import "./Parcels.css";
 
 const Parcels = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedRows, setSelectedRows] = useState([]);
   const user = useSelector((state) => state.user);
-  const [currentTime, setCurrentTime] = useState("2025-01-18 08:50:49");
-
-  // Custom theme for DataGrid
-  const darkTheme = createTheme({
-    palette: {
-      mode: 'dark',
-      primary: {
-        main: '#0ea5e9',
-      },
-    },
-    components: {
-      MuiDataGrid: {
-        styleOverrides: {
-          root: {
-            border: 'none',
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(12px)',
-            borderRadius: '0.5rem',
-            '& .MuiDataGrid-cell': {
-              borderColor: 'rgba(255, 255, 255, 0.1)',
-            },
-            '& .MuiDataGrid-columnHeaders': {
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              borderRadius: '0.5rem 0.5rem 0 0',
-            },
-            '& .MuiDataGrid-footerContainer': {
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              borderRadius: '0 0 0.5rem 0.5rem',
-            },
-          },
-        },
-      },
-    },
-  });
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date();
-      const utcString = now.toISOString().slice(0, 19).replace('T', ' ');
-      setCurrentTime(utcString);
-    }, 1000);
-
     const getParcels = async () => {
       try {
         setLoading(true);
@@ -66,9 +27,12 @@ const Parcels = () => {
       }
     };
     getParcels();
-
-    return () => clearInterval(timer);
   }, [user.currentUser.email]);
+
+  const handleExport = () => {
+    // Implement export functionality
+    console.log("Exporting selected rows:", selectedRows);
+  };
 
   const columns = [
     { 
@@ -76,109 +40,118 @@ const Parcels = () => {
       headerName: "From", 
       width: 150,
       renderCell: (params) => (
-        <div className="flex items-center">
-          <span>{params.value}</span>
+        <div className="cell-content">
+          {params.value}
         </div>
-      ),
+      )
     },
     { 
       field: "date", 
       headerName: "Date", 
       width: 120,
       renderCell: (params) => (
-        <div className="text-gray-300">{params.value}</div>
-      ),
+        <div className="cell-content date-cell">
+          {params.value}
+        </div>
+      )
     },
     { 
       field: "recipientname", 
       headerName: "Recipient", 
       width: 150,
       renderCell: (params) => (
-        <div className="flex items-center space-x-2">
-          <FaUser className="text-primary-400 text-sm" />
-          <span>{params.value}</span>
+        <div className="cell-content">
+          {params.value}
         </div>
-      ),
+      )
     },
     { 
       field: "to", 
       headerName: "To", 
-      width: 150 
+      width: 150,
+      renderCell: (params) => (
+        <div className="cell-content">
+          {params.value}
+        </div>
+      )
     },
     { 
       field: "note", 
       headerName: "Note", 
       width: 300,
       renderCell: (params) => (
-        <div className="truncate text-gray-300">{params.value}</div>
-      ),
+        <div className="cell-content note-cell">
+          {params.value}
+        </div>
+      )
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-900 to-secondary-800 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <Link to="/myparcels" className="text-gray-400 hover:text-white transition-colors">
-              <FaArrowLeft className="text-xl" />
-            </Link>
-            <h1 className="text-2xl font-bold text-white">All Parcels</h1>
-          </div>
-          
-          <div className="flex items-center space-x-6">
-            <div className="text-sm text-gray-400">
-              System Time (UTC): {currentTime}
+    <div className="parcels-page">
+      <div className="parcels-container">
+        <div className="header-section">
+          <Link to="/myparcels" className="back-button">
+            <FaArrowLeft />
+            <span>Back to Dashboard</span>
+          </Link>
+
+          <div className="header-content">
+            <div className="title-section">
+              <h1>All Parcels</h1>
+              <span className="user-name">Alok Mondala</span>
             </div>
-            <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-lg">
-              <FaUser className="text-primary-400" />
-              <span className="text-white">Theek237</span>
+
+            <div className="action-buttons">
+              <button 
+                className="filter-button"
+                onClick={() => console.log("Filter")}
+              >
+                <FaFilter />
+                <span>Filter</span>
+              </button>
+              
+              <button 
+                className={`export-button ${selectedRows.length === 0 ? 'disabled' : ''}`}
+                onClick={handleExport}
+                disabled={selectedRows.length === 0}
+              >
+                <FaDownload />
+                <span>Export Selected</span>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="mb-6 flex justify-between items-center">
-          <div className="flex space-x-4">
-            <button className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg 
-                           transition-all duration-200 flex items-center space-x-2">
-              <FaFilter />
-              <span>Filter</span>
-            </button>
-            <button className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg 
-                           transition-all duration-200 flex items-center space-x-2">
-              <FaDownload />
-              <span>Export</span>
-            </button>
-          </div>
-          
-          <div className="text-gray-400 text-sm">
-            Total Parcels: {data.length}
-          </div>
-        </div>
-
-        {/* DataGrid */}
-        <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 shadow-xl animate-fade-in">
-          <ThemeProvider theme={darkTheme}>
-            <div style={{ height: 600 }}>
-              <DataGrid
-                rows={data}
-                columns={columns}
-                getRowId={(row) => row._id}
-                disableSelectionOnClick
-                pageSize={10}
-                checkboxSelection
-                loading={loading}
-                sx={{
-                  border: 'none',
-                  '& .MuiDataGrid-cell:hover': {
-                    color: 'primary.main',
-                  },
-                }}
-              />
+        <div className="data-grid-container">
+          {loading ? (
+            <div className="loading-state">
+              <FaSpinner className="spinner" />
+              <p>Loading parcels...</p>
             </div>
-          </ThemeProvider>
+          ) : (
+            <DataGrid
+              rows={data}
+              columns={columns}
+              getRowId={(row) => row._id}
+              pageSize={10}
+              rowsPerPageOptions={[10, 25, 50]}
+              checkboxSelection
+              disableSelectionOnClick
+              onSelectionModelChange={(newSelection) => {
+                setSelectedRows(newSelection);
+              }}
+              className="custom-data-grid"
+              autoHeight
+              components={{
+                NoRowsOverlay: () => (
+                  <div className="no-rows-overlay">
+                    <p>No parcels found</p>
+                  </div>
+                ),
+              }}
+            />
+          )}
         </div>
       </div>
     </div>
