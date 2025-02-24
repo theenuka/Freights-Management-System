@@ -1,0 +1,84 @@
+.footer {
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+    color: white;
+  }
+  
+  .footer-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  
+  .footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100px;
+  }
+  
+  @media (min-width: 768px) {
+    .footer-content {
+      flex-direction: row;
+    }
+  }
+  
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .footer-brand-text {
+    font-weight: 700;
+    font-size: 1.25rem;
+  }
+  
+  .footer-brand-logo {
+    background-color: white;
+    color: #1e3c72;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+  }
+  
+  .footer-brand-subtitle {
+    font-size: 0.75rem;
+    color: #d1d5db;
+    margin-left: 0.5rem;
+  }
+  
+  .footer-center {
+    text-align: center;
+    font-size: 0.875rem;
+  }
+  
+  .footer-copyright {
+    color: #d1d5db;
+  }
+  
+  .footer-copyright-year {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+  
+  .footer-user {
+    text-align: right;
+    font-size: 0.875rem;
+  }
+  
+  .footer-user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  
+  .footer-username {
+    color: white;
+    font-weight: 500;
+  }
+  
+  .footer-role {
+    color: #d1d5db;
+    font-size: 0.75rem;
+  }

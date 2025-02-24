@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import '../components/menu.css';
 
 const Menu = () => {
   const location = useLocation();
@@ -33,104 +34,95 @@ const Menu = () => {
   }, []);
 
   return (
-    <div className="h-[90vh] bg-gray-900 shadow-xl flex flex-col justify-between">
+    <div className="menu">
       {/* User Info Section */}
-      <div className="bg-gradient-to-r from-[#1e3c72] to-[#2a5298] p-4 text-white">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium">Theeuka Bandara</span>
-          <span className="text-xs opacity-75">Administrator</span>
+      <div className="menu-header">
+        <div className="menu-user-info">
+          <span className="menu-username">Theeuka Bandara</span>
+          <span className="menu-role">Administrator</span>
         </div>
-        <div className="flex items-center text-xs opacity-75">
-          <FaClock className="mr-2" />
+        <div className="menu-time">
+          <FaClock className="menu-time-icon" />
           {currentTime} UTC
         </div>
       </div>
 
       {/* Menu Items */}
-      <ul className="flex-1 overflow-y-auto px-2">
+      <ul className="menu-items">
         <Link to="/">
-          <li className={`flex items-center text-[16px] cursor-pointer p-3 rounded-lg mt-2
-            ${location.pathname === "/" 
-              ? "bg-[#1e3c72] text-white" 
-              : "text-[#D7D7D7] hover:bg-[#1e3c72] hover:text-white"}`}>
-            <FaHome className="mr-[15px]" />
+          <li className={`menu-item ${location.pathname === "/" ? "active" : ""}`}>
+            <FaHome className="menu-item-icon" />
             Home
           </li>
         </Link>
 
-        <li className="flex items-center text-[16px] cursor-pointer p-3 rounded-lg mt-2 text-[#D7D7D7] hover:bg-[#1e3c72] hover:text-white">
-          <FaUser className="mr-[15px]" />
+        <li className="menu-item">
+          <FaUser className="menu-item-icon" />
           Profile
         </li>
 
-        <div className="my-3 border-t border-gray-700 opacity-30" />
+        <div className="menu-divider" />
 
         <Link to="/parcels">
-          <li className={`flex items-center text-[16px] cursor-pointer p-3 rounded-lg mt-2
-            ${location.pathname === "/parcels" 
-              ? "bg-[#1e3c72] text-white" 
-              : "text-[#D7D7D7] hover:bg-[#1e3c72] hover:text-white"}`}>
-            <FaBox className="mr-[15px]" />
+          <li className={`menu-item ${location.pathname === "/parcels" ? "active" : ""}`}>
+            <FaBox className="menu-item-icon" />
             Parcels
           </li>
         </Link>
 
         <Link to="/users">
-          <li className={`flex items-center text-[16px] cursor-pointer p-3 rounded-lg mt-2
-            ${location.pathname === "/users" 
-              ? "bg-[#1e3c72] text-white" 
-              : "text-[#D7D7D7] hover:bg-[#1e3c72] hover:text-white"}`}>
-            <FaUsers className="mr-[15px]" />
+          <li className={`menu-item ${location.pathname === "/users" ? "active" : ""}`}>
+            <FaUsers className="menu-item-icon" />
             Users
           </li>
         </Link>
 
-        <li className="flex items-center text-[16px] cursor-pointer p-3 rounded-lg mt-2 text-[#D7D7D7] hover:bg-[#1e3c72] hover:text-white">
-          <FaClipboardList className="mr-[15px]" />
+        <li className="menu-item">
+          <FaClipboardList className="menu-item-icon" />
           Orders
         </li>
 
-        <div className="my-3 border-t border-gray-700 opacity-30" />
+        <div className="menu-divider" />
 
-        <li className="flex items-center text-[16px] cursor-pointer p-3 rounded-lg mt-2 text-[#D7D7D7] hover:bg-[#1e3c72] hover:text-white">
-          <FaElementor className="mr-[15px]" />
+        <li className="menu-item">
+          <FaElementor className="menu-item-icon" />
           Elements
         </li>
 
-        <li className="flex items-center text-[16px] cursor-pointer p-3 rounded-lg mt-2 text-[#D7D7D7] hover:bg-[#1e3c72] hover:text-white">
-          <FaCog className="mr-[15px]" />
+        <li className="menu-item">
+          <FaCog className="menu-item-icon" />
           Settings
         </li>
 
-        <li className="flex items-center text-[16px] cursor-pointer p-3 rounded-lg mt-2 text-[#D7D7D7] hover:bg-[#1e3c72] hover:text-white">
-          <FaHdd className="mr-[15px]" />
+        <li className="menu-item">
+          <FaHdd className="menu-item-icon" />
           Backups
         </li>
 
-        <div className="my-3 border-t border-gray-700 opacity-30" />
+        <div className="menu-divider" />
 
-        <li className="flex items-center text-[16px] cursor-pointer p-3 rounded-lg mt-2 text-[#D7D7D7] hover:bg-[#1e3c72] hover:text-white">
-          <FaChartBar className="mr-[15px]" />
+        <li className="menu-item">
+          <FaChartBar className="menu-item-icon" />
           Charts
         </li>
 
-        <li className="flex items-center text-[16px] cursor-pointer p-3 rounded-lg mt-2 text-[#D7D7D7] hover:bg-[#1e3c72] hover:text-white">
-          <FaClipboard className="mr-[15px]" />
+        <li className="menu-item">
+          <FaClipboard className="menu-item-icon" />
           All Logs
         </li>
 
-        <li className="flex items-center text-[16px] cursor-pointer p-3 rounded-lg mt-2 text-[#D7D7D7] hover:bg-[#1e3c72] hover:text-white">
-          <FaCalendarAlt className="mr-[15px]" />
+        <li className="menu-item">
+          <FaCalendarAlt className="menu-item-icon" />
           Calendar
         </li>
       </ul>
 
       {/* Status Bar */}
-      <div className="p-4 border-t border-gray-800 bg-gray-900">
-        <div className="flex items-center justify-between text-sm text-gray-400">
+      <div className="menu-status">
+        <div className="menu-status-content">
           <span>System Status</span>
-          <div className="flex items-center">
-            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+          <div className="menu-status-indicator">
+            <div className="menu-status-dot"></div>
             <span>Online</span>
           </div>
         </div>

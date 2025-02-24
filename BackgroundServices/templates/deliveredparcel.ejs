@@ -3,112 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delivered Parcel</title>
+    <title>Parcel Delivered - FMS</title>
     <style type="text/css">
         body {
             margin: 0;
             padding: 0;
             min-width: 100%;
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             font-size: 16px;
-            line-height: 1.5;
-            background-color: #FAFAFA;
-            color: #222222;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
         }
-
-        a {
-            color: #000;
-            text-decoration: none;
+        
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            line-height: 1.25;
-            margin-top: 0;
-            margin-bottom: 15px;
+        
+        .email-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 30px 20px;
             text-align: center;
         }
+        
+        .header-title {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 1px;
+        }
 
-        .status {
-            background-color: #1E1E1E;
+        .success-badge {
+            display: inline-block;
+            background-color: #28a745;
             color: #fff;
-            width: 70px;
-            padding: 10px;
-            animation: blink 1s infinite;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            margin: 15px 0;
+            animation: pulse 2s infinite;
         }
 
-        @keyframes blink {
-            from{
-                opacity: 0;
-            }
-
-            to{
-                opacity:1;
-            }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
-
-        p {
-            margin-top: 0;
-            margin-bottom: 24px;
-        }
-
-        table td {
-            vertical-align: top;
-        }
-
-        .email-wrapper {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .email-header {
-            background-color: #1E1E1E;
-            padding: 30px;
-            color: #fff;
-        }
-
+        
         .email-body {
-            padding: 14px;
-            background-color: #E9EB77;
+            padding: 30px;
+            background-color: #ffffff;
+        }
+        
+        .delivery-confirmation {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8fff8;
+            border-radius: 8px;
+            border: 1px solid #28a745;
         }
 
+        .confirmation-icon {
+            font-size: 48px;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .parcel-details {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 12px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 120px;
+        }
+        
+        .detail-value {
+            color: #333;
+            text-align: right;
+        }
+
+        .tracking-image {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            margin: 20px auto;
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .notice-box {
+            background-color: #e8f4ff;
+            border-left: 4px solid #1e3c72;
+            padding: 15px;
+            margin: 20px 0;
+            color: #1e3c72;
+        }
+        
         .email-footer {
-            background-color: #E9EB77;
-            padding: 14px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .contact-info {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        
+        .footer-links {
+            margin-top: 15px;
+        }
+        
+        .footer-link {
+            color: #1e3c72;
+            text-decoration: none;
+            margin: 0 10px;
         }
 
-        img {
-            background-color: #1E1E1E;
-            padding: 24px;
+        .timestamp {
+            color: #6c757d;
+            font-size: 12px;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .email-wrapper {
+                width: 100% !important;
+            }
+            
+            .email-body {
+                padding: 20px 15px !important;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                text-align: left;
+            }
+            
+            .detail-value {
+                text-align: left;
+                margin-top: 5px;
+            }
         }
     </style>
 </head>
 <body>
-
     <div class="email-wrapper">
-
         <div class="email-header">
-            <h1>Delivered Parcel</h1>
+            <h1 class="header-title">Delivery Confirmation</h1>
+            <div class="success-badge">✓ Delivered</div>
         </div>
+        
         <div class="email-body">
-            <p>Hello <%= sendername %>,</p>
-            <p>Your parcel has been delivered:</p>
-            <p>Here are the details:</p>
-            <p>From: <%= from %></p>
-            <p>To: <%= to %></p>
-            <p>Sender: <%= sendername %></p>
-            <p>Recipient: <%= recipientname %></p>
-            <p>Cost: $<%= cost %></p>
-            <p>Weight: <%= weight %></p>
-            <p>Note: <%= note %></p>
-            <p class="status">Delivered</p>
-            <img src="https://res.cloudinary.com/dap91fhxh/image/upload/v1717495157/hero_r5lgvq.png" alt="" height="250px" width="500px">
-            <h3>Note:</h3>
-            <p>Please if you were not sending or receiving the parcel ignore this email.</p>
+            <div class="delivery-confirmation">
+                <div class="confirmation-icon">✓</div>
+                <h2>Package Successfully Delivered!</h2>
+                <p>Your shipment has reached its destination</p>
+            </div>
+
+            <p>Dear <%= sendername %>,</p>
+            <p>We're pleased to inform you that your parcel has been successfully delivered. Here are the delivery details:</p>
+            
+            <div class="parcel-details">
+                <div class="detail-row">
+                    <span class="detail-label">From:</span>
+                    <span class="detail-value"><%= from %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">To:</span>
+                    <span class="detail-value"><%= to %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Sender:</span>
+                    <span class="detail-value"><%= sendername %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Recipient:</span>
+                    <span class="detail-value"><%= recipientname %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Cost:</span>
+                    <span class="detail-value">$<%= cost %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Weight:</span>
+                    <span class="detail-value"><%= weight %> g</span>
+                </div>
+                <div class="detail-row" style="border-bottom: none;">
+                    <span class="detail-label">Note:</span>
+                    <span class="detail-value"><%= note %></span>
+                </div>
+            </div>
+
+            <img class="tracking-image" 
+                 src="https://res.cloudinary.com/dap91fhxh/image/upload/v1717495157/hero_r5lgvq.png" 
+                 alt="Delivery Confirmation">
+            
+            <div class="notice-box">
+                <strong>Delivery Note:</strong><br>
+                If you have any concerns about this delivery or weren't expecting this package, 
+                please contact our support team immediately.
+            </div>
+
+            <div class="timestamp">
+                Delivered on: <%= new Date().toISOString().replace('T', ' ').slice(0, 19) %> UTC
+            </div>
         </div>
+        
         <div class="email-footer">
-            <p>If you have any questions, please don't hesitate to contact us at <a href="mailto:alokmondala199@gmail.com">sendit@outlook.com</a></p>
+            <div class="contact-info">
+                <strong>Need assistance?</strong><br>
+                Contact our support team:<br>
+                Email: <a href="mailto:support@fms-system.com">support@fms-system.com</a><br>
+                Phone: +1 (555) 123-4567
+            </div>
+            
+            <div class="footer-links">
+                <a href="#" class="footer-link">Track Another Parcel</a>
+                <a href="#" class="footer-link">View Delivery History</a>
+                <a href="#" class="footer-link">Contact Support</a>
+            </div>
+            
+            <p style="color: #6c757d; font-size: 12px; margin-top: 20px;">
+                © <%= new Date().getFullYear() %> FMS - Freight Management System. All rights reserved.
+            </p>
         </div>
     </div>
 </body>

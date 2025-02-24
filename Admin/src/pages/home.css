@@ -1,0 +1,210 @@
+.home-container {
+    padding: 1.5rem;
+  }
+  
+  /* Header Styles */
+  .home-header {
+    margin-bottom: 2rem;
+  }
+  
+  .home-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+  }
+  
+  .home-meta {
+    display: flex;
+    align-items: center;
+    color: #9ca3af;
+    font-size: 0.875rem;
+  }
+  
+  .home-meta-dot {
+    margin: 0 0.5rem;
+  }
+  
+  /* Stats Cards Section */
+  .stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  @media (min-width: 1024px) {
+    .stats-container {
+      justify-content: space-between;
+    }
+  }
+  
+  /* Stat Card Component */
+  .stat-card {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(to bottom right, #1f2937, #111827);
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    height: 250px;
+    width: 350px;
+    margin: 20px;
+    transform: translateZ(0);
+    transition: all 300ms ease;
+  }
+  
+  .stat-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .stat-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 1.5rem;
+  }
+  
+  .stat-card-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+  }
+  
+  .stat-card-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .trend-icon-up {
+    font-size: 28px;
+    color: #34d399;
+  }
+  
+  .trend-icon-down {
+    font-size: 28px;
+    color: #f87171;
+  }
+  
+  .trend-text {
+    color: #9ca3af;
+    font-size: 0.875rem;
+  }
+  
+  .stat-card-value {
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(to right, #60a5fa, #67e8f9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  /* Charts Section */
+  .charts-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+    gap: 1.5rem;
+  }
+  
+  .chart-card {
+    flex: 1;
+    min-width: 500px;
+    background-color: #1f2937;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+  }
+  
+  .chart-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+  }
+  
+  .chart-content {
+    height: 400px;
+  }
+  
+  /* Recent Users Card */
+  .users-card {
+    flex: 1;
+    min-width: 300px;
+    background-color: #1f2937;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+  }
+  
+  .user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background-color: #374151;
+    border-radius: 0.5rem;
+    transition: background-color 300ms ease;
+  }
+  
+  .user-item:hover {
+    background-color: #4b5563;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .user-avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background: linear-gradient(to right, #60a5fa, #3b82f6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+  }
+  
+  .user-details {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user-name {
+    color: white;
+    font-weight: 500;
+  }
+  
+  .user-time {
+    color: #9ca3af;
+    font-size: 0.75rem;
+  }
+  
+  .user-status {
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+  }
+  
+  .status-active {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+  }
+  
+  .status-idle {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+  }

@@ -29,7 +29,7 @@ const Home = () => {
               <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
                 SIMPLE, FAST AND RELIABLE
                 <span className="bg-gradient-to-r from-primary-400 to-accent-500 text-transparent bg-clip-text">
-                  {" "}PARCEL DELIVERY SYSTEM
+                  {" "}FREIGHTS MANAGEMENT SYSTEM
                 </span>
               </h1>
               
