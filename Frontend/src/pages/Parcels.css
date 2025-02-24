@@ -1,0 +1,242 @@
+.parcels-page {
+    min-height: 100vh;
+    padding: 3rem 5%;
+    background: linear-gradient(135deg, #1a2a3a, #2a4a6a);
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .parcels-container {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Header Section */
+  .header-section {
+    margin-bottom: 2rem;
+  }
+  
+  .back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #2C3E50;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .back-button:hover {
+    background: rgba(0, 0, 0, 0.05);
+    transform: translateX(-5px);
+  }
+  
+  .header-content {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .title-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .title-section h1 {
+    font-size: 1.8rem;
+    color: #2C3E50;
+    font-weight: 600;
+  }
+  
+  .user-name {
+    color: #3498DB;
+    font-weight: 500;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .filter-button,
+  .export-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .filter-button {
+    background: #f8f9fa;
+    color: #2C3E50;
+  }
+  
+  .export-button {
+    background: #3498DB;
+    color: white;
+  }
+  
+  .filter-button:hover,
+  .export-button:hover:not(.disabled) {
+    transform: translateY(-2px);
+  }
+  
+  .export-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  /* DataGrid Customization */
+  .data-grid-container {
+    height: 600px;
+    width: 100%;
+  }
+  
+  .custom-data-grid {
+    border: none !important;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .custom-data-grid .MuiDataGrid-columnHeaders {
+    background: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+  }
+  
+  .custom-data-grid .MuiDataGrid-cell {
+    border-bottom: 1px solid #f1f3f5;
+  }
+  
+  .cell-content {
+    padding: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .date-cell {
+    color: #666;
+    font-weight: 500;
+  }
+  
+  .note-cell {
+    color: #666;
+  }
+  
+  /* Loading State */
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    gap: 1rem;
+    color: #2C3E50;
+  }
+  
+  .spinner {
+    animation: spin 1s linear infinite;
+    font-size: 2rem;
+    color: #3498DB;
+  }
+  
+  /* No Rows Overlay */
+  .no-rows-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #666;
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .parcels-page {
+      padding: 2rem 3%;
+    }
+  
+    .header-content {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+  
+    .action-buttons {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .parcels-container {
+      padding: 1rem;
+    }
+  
+    .action-buttons {
+      flex-wrap: wrap;
+    }
+  
+    .filter-button,
+    .export-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  /* Dark Mode Support */
+  @media (prefers-color-scheme: dark) {
+    .parcels-container {
+      background: #2a3a4a;
+    }
+  
+    .back-button,
+    .title-section h1 {
+      color: #fff;
+    }
+  
+    .filter-button {
+      background: #3a4a5a;
+      color: #fff;
+    }
+  
+    .custom-data-grid {
+      color: #fff;
+    }
+  
+    .custom-data-grid .MuiDataGrid-columnHeaders {
+      background: #1a2a3a;
+      color: #fff;
+    }
+  
+    .cell-content {
+      color: #fff;
+    }
+  
+    .date-cell,
+    .note-cell {
+      color: #aaa;
+    }
+  
+    .loading-state {
+      color: #fff;
+    }
+  }

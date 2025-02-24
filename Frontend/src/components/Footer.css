@@ -1,0 +1,101 @@
+.footer {
+    height: 300px;
+    background: linear-gradient(135deg, #2C3E50, #3498DB);
+    color: white;
+    padding: 30px;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+  }
+  
+  .footer-message {
+    max-width: 500px;
+    opacity: 0;
+    animation: slideIn 0.5s ease-in-out 0.3s forwards;
+  }
+  
+  .footer-message p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    transition: transform 0.3s ease;
+  }
+  
+  .footer-message p:hover {
+    transform: translateY(-5px);
+  }
+  
+  .footer-copyright {
+    opacity: 0;
+    animation: slideIn 0.5s ease-in-out 0.5s forwards;
+  }
+  
+  .footer-copyright span {
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .footer {
+      height: auto;
+      min-height: 300px;
+    }
+  
+    .footer-content {
+      flex-direction: column;
+      text-align: center;
+      gap: 20px;
+    }
+  
+    .footer-message {
+      margin-bottom: 20px;
+    }
+  }
+  
+  /* Modern hover effects */
+  .footer-content > div {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .footer-content > div::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #ffffff;
+    transition: width 0.3s ease;
+  }
+  
+  .footer-content > div:hover::after {
+    width: 100%;
+  }
