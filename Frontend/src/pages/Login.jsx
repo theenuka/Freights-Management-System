@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
-import { login } from "../redux/apiCalls";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../redux/apiCalls";
+import { Navigate } from "react-router-dom";
+import { useState } from "react";
 import "./Login.css";
 
 const Login = () => {
@@ -25,75 +25,72 @@ const Login = () => {
       try {
         setLoading(true);
         await login(dispatch, { email, password });
-        setLoading(false);
+        setLoading(false); // Navigate on successful login
       } catch (error) {
         setLoading(false);
+        // Handle login error (e.g., display an error message)
       }
     }
   };
-
+  
   return (
     <div className="login-page">
       <Navbar />
-      <main className="login-container">
-        <div className="login-content">
-          <div className="login-image-container">
-            <img src="/hero.png" alt="Login Illustration" className="login-image" />
-          </div>
-          
-          <div className="login-form-container">
-            <div className="login-form">
-              <h2 className="login-title">Welcome Back</h2>
-              
-              <div className="input-group">
+      
+      <div className="login-container">
+        <div className="login-image">
+          <img src="/hero.png" alt="Login" />
+        </div>
+        
+        <div className="login-form-wrapper">
+          <div className="login-form">
+            <h2 className="login-title">Welcome Back</h2>
+            <p className="login-subtitle">Sign in to your account</p>
+            
+            <div className="input-group">
+              <label htmlFor="email">Email</label>
+              <div className="input-field">
+                <i className="fas fa-envelope"></i>
                 <input
                   type="text"
-                  className="login-input"
+                  id="email"
                   placeholder="Enter your email"
                   onChange={(e) => setEmail(e.target.value.replace(/\s/g, ''))}
                 />
-                <span className="input-focus-border"></span>
               </div>
-
-              <div className="input-group password-group">
+            </div>
+            
+            <div className="input-group">
+              <label htmlFor="password">Password</label>
+              <div className="input-field">
+                <i className="fas fa-lock"></i>
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="login-input"
+                  id="password"
                   placeholder="Enter your password"
                   onChange={(e) => setPassword(e.target.value.replace(/\s/g, ''))}
                 />
-                <button 
-                  className="password-toggle"
-                  onClick={handleTogglePassword}
-                  type="button"
-                >
-                  {showPassword ? "👁️" : "🔒"}
+                <button className="toggle-password" onClick={handleTogglePassword}>
+                  <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
                 </button>
-                <span className="input-focus-border"></span>
               </div>
-
-              <button 
-                className={`login-button ${loading ? 'loading' : ''}`}
-                onClick={handleLogin}
-                disabled={loading}
-              >
-                <span className="button-text">
-                  {loading ? "Logging in..." : "Login"}
-                </span>
-                {loading && <div className="spinner"></div>}
-              </button>
-
-              {error && (
-                <div className="error-message">
-                  Please ensure that your staff ID and password are entered correctly.
-                </div>
-              )}
-
-              {user.currentUser && <Navigate to="/myparcels" />}
             </div>
+            
+            <button className="login-button" onClick={handleLogin} disabled={loading}>
+              {loading ? "Loading..." : "Login"}
+              {user.currentUser ? <Navigate to="/myparcels" /> : ""}
+            </button>
+            
+            {error && (
+              <div className="error-message">
+                <i className="fas fa-exclamation-circle"></i>
+                <span>Please ensure that your staff ID and password are entered correctly before attempting to log in. Double-check your credentials and try again.</span>
+              </div>
+            )}
           </div>
         </div>
-      </main>
+      </div>
+      
       <Footer />
     </div>
   );
