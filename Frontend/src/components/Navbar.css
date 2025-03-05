@@ -1,141 +1,219 @@
 .navbar {
-    height: 100px;
-    background: linear-gradient(135deg, #2C3E50, #3498DB);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 0.5s ease-in-out;
+    height: 80px;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
   }
   
   .navbar-container {
-    max-width: 1200px;
-    height: 100%;
-    margin: 0 auto;
-    padding: 0 2rem;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
   }
   
-  .navbar-brand {
+  .navbar-logo {
+    display: flex;
+    align-items: center;
     text-decoration: none;
-    transition: transform 0.3s ease;
   }
   
-  .navbar-brand:hover {
-    transform: scale(1.05);
+  .logo-text {
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
   }
   
-  .brand-text {
-    font-size: 2rem;
-    font-weight: bold;
-    color: white;
-    letter-spacing: 2px;
+  .logo-dot {
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    border-radius: 50%;
+    margin-left: 5px;
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  
+  .navbar-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .navbar-item {
+    margin: 0 15px;
+  }
+  
+  .navbar-link {
+    color: #1e293b;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 5px 0;
     position: relative;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
   }
   
-  .brand-text::after {
+  .navbar-link::after {
     content: '';
     position: absolute;
-    bottom: -5px;
+    bottom: 0;
     left: 0;
     width: 0;
     height: 2px;
-    background-color: white;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
     transition: width 0.3s ease;
   }
   
-  .navbar-brand:hover .brand-text::after {
+  .navbar-link:hover {
+    color: #6366f1;
+  }
+  
+  .navbar-link:hover::after {
     width: 100%;
   }
   
-  .nav-login-link {
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+  }
+  
+  .navbar-button {
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
     text-decoration: none;
+    transition: all 0.3s ease;
+    margin-left: 15px;
   }
   
   .login-button {
-    position: relative;
-    padding: 10px 20px;
-    font-size: 1rem;
-    color: white;
-    background-color: transparent;
-    border: 2px solid white;
-    border-radius: 5px;
-    cursor: pointer;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    z-index: 1;
-  }
-  
-  .button-highlight {
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
     background-color: white;
-    transition: left 0.3s ease;
-    z-index: -1;
+    color: #6366f1;
+    border: 1px solid #e2e8f0;
   }
   
   .login-button:hover {
-    color: #2C3E50;
+    background-color: #f8fafc;
+    border-color: #6366f1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.1);
   }
   
-  .login-button:hover .button-highlight {
-    left: 0;
+  .register-button {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border: none;
   }
   
-  /* Animations */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
+  .register-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+  }
+  
+  .navbar-menu-toggle {
+    display: none;
+    cursor: pointer;
+  }
+  
+  .hamburger {
+    width: 24px;
+    height: 24px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+  
+  .hamburger span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background-color: #1e293b;
+    transition: all 0.3s ease;
+  }
+  
+  .hamburger.active span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  
+  .hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .hamburger.active span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 992px) {
+    .navbar-menu-toggle {
+      display: block;
+      order: 3;
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+  
+    .navbar-menu {
+      position: fixed;
+      top: 80px;
+      left: -100%;
+      flex-direction: column;
+      background-color: #f8f9fa;
+      width: 100%;
+      text-align: center;
+      transition: 0.3s;
+      box-shadow: 0 10px 10px rgba(0, 0, 0, 0.05);
+      padding: 20px 0;
+    }
+  
+    .navbar-menu.active {
+      left: 0;
+    }
+  
+    .navbar-item {
+      margin: 15px 0;
+    }
+  
+    .navbar-actions {
+      order: 2;
+    }
+  
+    .login-button, .register-button {
+      padding: 6px 15px;
+      font-size: 0.85rem;
     }
   }
   
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .navbar {
-      height: 80px;
+  @media (max-width: 576px) {
+    .navbar-actions {
+      display: none;
     }
-  
+    
+    .navbar-menu.active {
+      padding-bottom: 80px;
+    }
+    
+    .navbar-menu.active .navbar-item:last-child {
+      margin-bottom: 20px;
+    }
+    
     .navbar-container {
-      padding: 0 1rem;
-    }
-  
-    .brand-text {
-      font-size: 1.5rem;
-    }
-  
-    .login-button {
-      padding: 8px 16px;
-      font-size: 0.9rem;
-    }
-  }
-  
-  /* Dark mode support */
-  @media (prefers-color-scheme: dark) {
-    .navbar {
-      background: linear-gradient(135deg, #1a2a3a, #2a4a6a);
-    }
-  }
-  
-  /* Add a subtle animation when the navbar first appears */
-  .navbar {
-    animation: navbarAppear 0.5s ease-out;
-  }
-  
-  @keyframes navbarAppear {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+      padding: 0 15px;
     }
   }

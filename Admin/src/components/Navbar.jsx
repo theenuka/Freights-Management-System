@@ -1,68 +1,56 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import '../components/navbar.css';
+import { FiUser, FiSearch, FiBell, FiSettings, FiLogOut, FiChevronDown } from "react-icons/fi";
+import "./Navbar.css";
 
 const Navbar = () => {
-  const [currentTime, setCurrentTime] = useState("");
-
-  // Update time every second
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date();
-      setCurrentTime(now.toLocaleTimeString());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [notifications, setNotifications] = useState(3); // Example notification count
 
   return (
-    <div className="navbar">
-      <div className="navbar-container">
-        {/* Logo and Company Name */}
-        <div className="navbar-brand">
-          <div className="navbar-logo">
-            <span className="navbar-logo-highlight">F</span>
-            <span>MS</span>
-          </div>
-          <div className="navbar-designer">
-            Designed by Theenuka Bandara
-          </div>
-        </div>
-
-        {/* Center Section - DateTime */}
-        <div className="navbar-datetime">
-          <div className="navbar-date">
-            {new Date().toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric'
-            })}
-          </div>
-          <div className="navbar-time">{currentTime}</div>
-        </div>
-
-        {/* Right Section */}
-        <Link to="/login">
-          <button className="navbar-logout">
-            <span className="navbar-logout-text">Logout</span>
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="navbar-logout-icon" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
-              />
-            </svg>
-          </button>
-        </Link>
+    <nav className="navbar">
+      <div className="navbar-brand">
+        <div className="brand-name">FMS</div>
       </div>
-    </div>
+      
+      <div className="search-bar">
+        <FiSearch className="search-icon" />
+        <input type="text" placeholder="Search..." />
+      </div>
+      
+      <div className="navbar-actions">
+        <div className="notification-bell">
+          <FiBell />
+          {notifications > 0 && <span className="notification-badge">{notifications}</span>}
+        </div>
+        
+        <div className="user-profile" onClick={() => setShowDropdown(!showDropdown)}>
+          <div className="avatar">
+            <FiUser />
+          </div>
+          <span className="username">Admin</span>
+          <FiChevronDown className={`dropdown-arrow ${showDropdown ? 'active' : ''}`} />
+          
+          {showDropdown && (
+            <div className="dropdown-menu">
+              <Link to="/profile" className="dropdown-item">
+                <FiUser className="dropdown-icon" />
+                <span>My Profile</span>
+              </Link>
+              <Link to="/settings" className="dropdown-item">
+                <FiSettings className="dropdown-icon" />
+                <span>Settings</span>
+              </Link>
+              <hr className="dropdown-divider" />
+              <Link to="/login" className="dropdown-item logout">
+                <FiLogOut className="dropdown-icon" />
+                <span>Logout</span>
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
   );
 };
 

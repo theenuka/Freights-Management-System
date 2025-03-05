@@ -10,122 +10,90 @@ import {
   FaChartBar,
   FaClipboard,
   FaCalendarAlt,
-  FaClock,
 } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
-import '../components/menu.css';
+import "./Menu.css";
 
 const Menu = () => {
   const location = useLocation();
-  const [currentTime, setCurrentTime] = useState("");
-
-  // Update UTC time
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const formatted = now.toISOString().slice(0, 19).replace('T', ' ');
-      setCurrentTime(formatted);
-    };
-
-    updateTime();
-    const timer = setInterval(updateTime, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
+  const currentPath = location.pathname;
+  
   return (
-    <div className="menu">
-      {/* User Info Section */}
-      <div className="menu-header">
-        <div className="menu-user-info">
-          <span className="menu-username">Theeuka Bandara</span>
-          <span className="menu-role">Administrator</span>
-        </div>
-        <div className="menu-time">
-          <FaClock className="menu-time-icon" />
-          {currentTime} UTC
-        </div>
+    <div className="sidebar">
+      <div className="sidebar-brand">
+        <h2>FMS</h2>
+        <p>Admin</p>
       </div>
-
-      {/* Menu Items */}
-      <ul className="menu-items">
-        <Link to="/">
-          <li className={`menu-item ${location.pathname === "/" ? "active" : ""}`}>
-            <FaHome className="menu-item-icon" />
-            Home
+      
+      <div className="menu-section">
+        <h3 className="menu-title">Main Menu</h3>
+        <ul className="menu-list">
+          <li className={currentPath === "/" ? "active" : ""}>
+            <Link to="/">
+              <FaHome className="menu-icon" />
+              <span>Dashboard</span>
+            </Link>
           </li>
-        </Link>
-
-        <li className="menu-item">
-          <FaUser className="menu-item-icon" />
-          Profile
-        </li>
-
-        <div className="menu-divider" />
-
-        <Link to="/parcels">
-          <li className={`menu-item ${location.pathname === "/parcels" ? "active" : ""}`}>
-            <FaBox className="menu-item-icon" />
-            Parcels
+          
+          <li className={currentPath === "/profile" ? "active" : ""}>
+            <Link to="/profile">
+              <FaUser className="menu-icon" />
+              <span>Profile</span>
+            </Link>
           </li>
-        </Link>
-
-        <Link to="/users">
-          <li className={`menu-item ${location.pathname === "/users" ? "active" : ""}`}>
-            <FaUsers className="menu-item-icon" />
-            Users
+          
+          <li className={currentPath.includes("/user") ? "active" : ""}>
+            <Link to="/users">
+              <FaUsers className="menu-icon" />
+              <span>Users</span>
+            </Link>
           </li>
-        </Link>
-
-        <li className="menu-item">
-          <FaClipboardList className="menu-item-icon" />
-          Orders
-        </li>
-
-        <div className="menu-divider" />
-
-        <li className="menu-item">
-          <FaElementor className="menu-item-icon" />
-          Elements
-        </li>
-
-        <li className="menu-item">
-          <FaCog className="menu-item-icon" />
-          Settings
-        </li>
-
-        <li className="menu-item">
-          <FaHdd className="menu-item-icon" />
-          Backups
-        </li>
-
-        <div className="menu-divider" />
-
-        <li className="menu-item">
-          <FaChartBar className="menu-item-icon" />
-          Charts
-        </li>
-
-        <li className="menu-item">
-          <FaClipboard className="menu-item-icon" />
-          All Logs
-        </li>
-
-        <li className="menu-item">
-          <FaCalendarAlt className="menu-item-icon" />
-          Calendar
-        </li>
-      </ul>
-
-      {/* Status Bar */}
-      <div className="menu-status">
-        <div className="menu-status-content">
-          <span>System Status</span>
-          <div className="menu-status-indicator">
-            <div className="menu-status-dot"></div>
-            <span>Online</span>
-          </div>
-        </div>
+          
+          <li className={currentPath.includes("/parcel") ? "active" : ""}>
+            <Link to="/parcels">
+              <FaBox className="menu-icon" />
+              <span>Parcels</span>
+            </Link>
+          </li>
+        </ul>
+      </div>
+      
+      <div className="menu-section">
+        <h3 className="menu-title">Management</h3>
+        <ul className="menu-list">
+          <li className={currentPath.includes("/reports") ? "active" : ""}>
+            <Link to="/reports">
+              <FaChartBar className="menu-icon" />
+              <span>Reports</span>
+            </Link>
+          </li>
+          
+          <li className={currentPath.includes("/schedule") ? "active" : ""}>
+            <Link to="/schedule">
+              <FaCalendarAlt className="menu-icon" />
+              <span>Schedule</span>
+            </Link>
+          </li>
+          
+          <li className={currentPath.includes("/inventory") ? "active" : ""}>
+            <Link to="/inventory">
+              <FaHdd className="menu-icon" />
+              <span>Inventory</span>
+            </Link>
+          </li>
+        </ul>
+      </div>
+      
+      <div className="menu-section">
+        <h3 className="menu-title">System</h3>
+        <ul className="menu-list">
+          <li className={currentPath.includes("/settings") ? "active" : ""}>
+            <Link to="/settings">
+              <FaCog className="menu-icon" />
+              <span>Settings</span>
+            </Link>
+          </li>
+        </ul>
       </div>
     </div>
   );

@@ -1,96 +1,104 @@
 .my-parcels-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #1a2a3a, #2a4a6a);
-    padding: 2rem;
-  }
-  
-  /* Header Styles */
-  .user-header {
-    position: relative;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 20%;
-    margin-bottom: 2rem;
-  }
-  
-  .user-profile {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .user-profile:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-  }
-  
-  .user-icon {
-    font-size: 1.2rem;
-    color: #fff;
-  }
-  
-  .user-name {
-    color: #fff;
-    font-weight: 500;
-  }
-  
-  /* Dropdown Menu */
-  .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 20%;
-    width: 250px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    animation: slideDown 0.3s ease-out;
-    z-index: 1000;
-  }
-  
-  .dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    padding: 1rem;
-    color: #2C3E50;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    text-decoration: none;
-  }
-  
-  .dropdown-item:hover {
-    background: #f5f5f5;
-    color: #3498DB;
-  }
-  
-  .dropdown-icon {
-    font-size: 1.1rem;
-  }
-  
-  /* Main Content */
-  .parcels-container {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  .section-title {
-    color: #fff;
-    font-size: 1.5rem;
-    margin-bottom: 2rem;
-    font-weight: 500;
-  }
-  
-  /* Parcel Cards */
-  .parcels-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    background-color: #f8f9fa;
+  }
+  
+  .my-parcels-container {
+    flex: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px 60px;
+    width: 100%;
+  }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  
+  .logout-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background-color: white;
+    color: #6366f1;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .logout-button:hover {
+    background-color: #f1f5f9;
+    border-color: #6366f1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 0;
+  }
+  
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(99, 102, 241, 0.3);
+    border-radius: 50%;
+    border-top-color: #6366f1;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 15px;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .loading-container p {
+    color: #64748b;
+    font-size: 1rem;
+  }
+  
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 0;
+    color: #64748b;
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    color: #8b5cf6;
+    margin-bottom: 15px;
+  }
+  
+  .empty-state h2 {
+    font-size: 1.5rem;
+    color: #1e293b;
+    margin-bottom: 8px;
+  }
+  
+  .parcels-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
   }
   
   .parcel-card-link {
@@ -99,167 +107,121 @@
   }
   
   .parcel-card {
-    background: white;
+    background-color: white;
     border-radius: 12px;
-    padding: 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #f1f5f9;
   }
   
   .parcel-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
   }
   
-  .parcel-info ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .parcel-info li {
-    margin: 0.5rem 0;
-    color: #2C3E50;
-  }
-  
-  .info-label {
-    font-weight: 600;
-    color: #3498DB;
-    margin-right: 0.5rem;
-  }
-  
-  .parcel-status {
+  .parcel-header {
+    padding: 15px;
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
   }
   
-  .destination {
-    color: #2C3E50;
+  .tracking-number {
+    font-family: monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
   }
   
   .status-badge {
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
     font-weight: 500;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
   }
   
   .status-badge.pending {
-    background: #f39c12;
-    color: white;
+    background-color: #fff7ed;
+    color: #f59e0b;
   }
   
   .status-badge.delivered {
-    background: #2ecc71;
-    color: white;
+    background-color: #ecfdf5;
+    color: #10b981;
   }
   
-  /* Loading State */
-  .loading-state {
+  .parcel-details {
+    padding: 15px;
+  }
+  
+  .detail-group {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    color: white;
+    margin-bottom: 10px;
   }
   
-  .loader {
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: white;
-    animation: spin 1s linear infinite;
+  .detail-group:last-child {
+    margin-bottom: 0;
   }
   
-  /* Empty State */
-  .empty-state {
+  .detail-group .label {
+    width: 80px;
+    color: #64748b;
+    font-size: 0.9rem;
+  }
+  
+  .detail-group .value {
+    color: #1e293b;
+    font-weight: 500;
+  }
+  
+  .parcel-actions {
+    padding: 15px;
     display: flex;
-    flex-direction: column;
+    gap: 10px;
+    border-top: 1px solid #f1f5f9;
+  }
+  
+  .action-button {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
     align-items: center;
-    gap: 1rem;
-    color: white;
-    padding: 3rem;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #f1f5f9;
+    color: #475569;
+    border: none;
   }
   
-  .empty-icon {
-    font-size: 3rem;
-    opacity: 0.7;
+  .action-button:hover {
+    background-color: #e2e8f0;
   }
   
-  /* Animations */
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .action-button.track {
+    background-color: #eff6ff;
+    color: #3b82f6;
   }
   
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
+  .action-button.track:hover {
+    background-color: #dbeafe;
   }
   
-  /* Responsive Design */
-  @media (max-width: 1024px) {
-    .user-header {
-      padding-right: 5%;
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
     }
     
-    .dropdown-menu {
-      right: 5%;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .my-parcels-page {
-      padding: 1rem;
-    }
-  
-    .parcel-card {
-      flex-direction: column;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-  
-    .parcel-status {
-      width: 100%;
-      align-items: flex-start;
-    }
-  }
-  
-  /* Dark Mode Support */
-  @media (prefers-color-scheme: dark) {
-    .dropdown-menu {
-      background: #2a3a4a;
-    }
-  
-    .dropdown-item {
-      color: #fff;
-    }
-  
-    .dropdown-item:hover {
-      background: #3a4a5a;
-      color: #64B5F6;
-    }
-  
-    .parcel-card {
-      background: #2a3a4a;
-    }
-  
-    .parcel-info li,
-    .destination {
-      color: #fff;
+    .parcels-grid {
+      grid-template-columns: 1fr;
     }
   }

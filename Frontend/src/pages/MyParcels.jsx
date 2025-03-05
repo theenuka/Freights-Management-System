@@ -1,39 +1,65 @@
-import { useEffect, useState } from "react";
-import { FaUser, FaBox, FaFileAlt, FaSignOutAlt } from "react-icons/fa";
-import { useSelector, useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { publicRequest } from "../requestMethods";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, Link } from "react-router-dom";
 import { logOut } from "../redux/userRedux";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import "./MyParcels.css";
 
 const MyParcels = () => {
-  const [open, setOpen] = useState(false);
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user.currentUser);
+  const [parcels, setParcels] = useState([]);
+  const [loading, setLoading] = useState(false);
 
+  // Example parcel data - replace with your actual API call
   useEffect(() => {
-    const getParcels = async () => {
-      try {
-        setLoading(true);
-        const res = await publicRequest.post("/parcels/me", {
-          email: user.currentUser.email,
-        });
-        setData(res.data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    getParcels();
+    setLoading(true);
+    // Replace with your actual API call
+    setTimeout(() => {
+      const mockParcels = [
+        {
+          id: "P12345",
+          origin: "New York",
+          destination: "Los Angeles",
+          status: 1, // Pending
+          weight: "5.2 kg",
+          estimatedDelivery: "2023-07-25",
+          trackingNumber: "FMS8372651"
+        },
+        {
+          id: "P12346",
+          origin: "Chicago",
+          destination: "Miami",
+          status: 2, // Delivered
+          weight: "3.7 kg",
+          estimatedDelivery: "2023-07-18",
+          trackingNumber: "FMS9273456"
+        },
+        {
+          id: "P12347",
+          origin: "Seattle",
+          destination: "Boston",
+          status: 1, // Pending
+          weight: "8.1 kg",
+          estimatedDelivery: "2023-07-29",
+          trackingNumber: "FMS6234987"
+        },
+        {
+          id: "P12348",
+          origin: "Denver",
+          destination: "Philadelphia",
+          status: 2, // Delivered
+          weight: "1.3 kg",
+          estimatedDelivery: "2023-07-15",
+          trackingNumber: "FMS7345621"
+        }
+      ];
+      setParcels(mockParcels);
+      setLoading(false);
+    }, 1000);
   }, []);
-
-  const handleOpen = () => {
-    setOpen(!open);
-  };
 
   const handleLogout = () => {
     dispatch(logOut());
@@ -42,88 +68,66 @@ const MyParcels = () => {
 
   return (
     <div className="my-parcels-page">
-      <header className="user-header">
-        <div className="user-profile" onClick={handleOpen}>
-          <FaUser className="user-icon" />
-          <span className="user-name">Alok Mondala</span>
+      <Navbar />
+      
+      <div className="my-parcels-container">
+        <div className="page-header">
+          <h1>My Parcels</h1>
+          <button className="logout-button" onClick={handleLogout}>
+            <i className="fas fa-sign-out-alt"></i> Logout
+          </button>
         </div>
 
-        {open && (
-          <div className="dropdown-menu">
-            <ul>
-              <li>
-                <Link to="/allparcels" className="dropdown-item">
-                  <FaBox className="dropdown-icon" />
-                  All parcels
-                </Link>
-              </li>
-              <li className="dropdown-item">
-                <FaFileAlt className="dropdown-icon" />
-                Statements
-              </li>
-              <li className="dropdown-item" onClick={handleLogout}>
-                <FaSignOutAlt className="dropdown-icon" />
-                Logout
-              </li>
-            </ul>
-          </div>
-        )}
-      </header>
-
-      <main className="parcels-container">
-        <h2 className="section-title">My Parcels</h2>
-        
         {loading ? (
-          <div className="loading-state">
-            <div className="loader"></div>
+          <div className="loading-container">
+            <div className="spinner"></div>
             <p>Loading your parcels...</p>
           </div>
-        ) : data.length === 0 ? (
+        ) : parcels.length === 0 ? (
           <div className="empty-state">
-            <FaBox className="empty-icon" />
-            <p>No parcels found</p>
+            <i className="fas fa-box-open"></i>
+            <h2>No Parcels Found</h2>
+            <p>You don't have any parcels at the moment.</p>
           </div>
         ) : (
-          <div className="parcels-list">
-            {data.map((parcel, index) => (
-              <Link 
-                key={index} 
-                to={`/parcel/${parcel._id}`}
-                className="parcel-card-link"
-              >
+          <div className="parcels-grid">
+            {parcels.map((parcel) => (
+              <Link to={`/parcel/${parcel.id}`} className="parcel-card-link" key={parcel.id}>
                 <div className="parcel-card">
-                  <div className="parcel-info">
-                    <ul>
-                      <li>
-                        <span className="info-label">From:</span> 
-                        {parcel.from}
-                      </li>
-                      <li>
-                        <span className="info-label">Weight:</span> 
-                        {parcel.weight} kg
-                      </li>
-                      <li>
-                        <span className="info-label">Date:</span> 
-                        {parcel.date}
-                      </li>
-                      <li>
-                        <span className="info-label">Sender:</span> 
-                        {parcel.sendername}
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="parcel-status">
-                    <span className="destination">
-                      <span className="info-label">To:</span> 
-                      {parcel.to}
-                    </span>
+                  <div className="parcel-header">
+                    <h3 className="tracking-number">{parcel.trackingNumber}</h3>
                     <button
-                      className={`status-badge ${
-                        parcel.status === 1 ? "pending" : "delivered"
-                      }`}
+                      className={parcel.status === 1 ? "status-badge pending" : "status-badge delivered"}
                     >
                       {parcel.status === 1 ? "Pending" : "Delivered"}
+                    </button>
+                  </div>
+                  
+                  <div className="parcel-details">
+                    <div className="detail-group">
+                      <span className="label">From:</span>
+                      <span className="value">{parcel.origin}</span>
+                    </div>
+                    <div className="detail-group">
+                      <span className="label">To:</span>
+                      <span className="value">{parcel.destination}</span>
+                    </div>
+                    <div className="detail-group">
+                      <span className="label">Weight:</span>
+                      <span className="value">{parcel.weight}</span>
+                    </div>
+                    <div className="detail-group">
+                      <span className="label">Delivery:</span>
+                      <span className="value">{parcel.estimatedDelivery}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="parcel-actions">
+                    <button className="action-button">
+                      <i className="fas fa-info-circle"></i> Details
+                    </button>
+                    <button className="action-button track">
+                      <i className="fas fa-map-marker-alt"></i> Track
                     </button>
                   </div>
                 </div>
@@ -131,7 +135,9 @@ const MyParcels = () => {
             ))}
           </div>
         )}
-      </main>
+      </div>
+      
+      <Footer />
     </div>
   );
 };

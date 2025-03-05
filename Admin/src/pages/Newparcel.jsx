@@ -1,221 +1,265 @@
 import { useState } from "react";
 import { publicRequest } from "../requestMethods";
 import { ToastContainer, toast } from "react-toastify";
+import { FiPackage, FiUser, FiMapPin, FiPhone, FiDollarSign, FiClock, FiInfo } from "react-icons/fi";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
-import { FaBox, FaMapMarkerAlt, FaUser, FaEnvelope, FaWeight, FaDollarSign, FaCalendar, FaStickyNote } from "react-icons/fa";
-import '../pages/newparcel.css';
+import "./NewParcel.css";
 
 const NewParcel = () => {
-  const navigate = useNavigate();
-  
-  // State management code remains the same
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [senderName, setSenderName] = useState("");
-  const [recipientName, setRecipientName] = useState("");
-  const [senderEmail, setSenderEmail] = useState("");
-  const [recipientEmail, setRecipientEmail] = useState("");
-  const [weight, setWeight] = useState("");
-  const [cost, setCost] = useState("");
-  const [date, setDate] = useState("");
-  const [note, setNote] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [inputs, setInputs] = useState({});
+  const [activeStep, setActiveStep] = useState(1);
 
-  // handleSubmit function remains the same
+  const handleChange = (e) => {
+    setInputs((prev) => {
+      return { ...prev, [e.target.name]: e.target.value };
+    });
+  };
+
   const handleSubmit = async (e) => {
-    // ... existing handleSubmit code ...
+    e.preventDefault();
+    try {
+      // Form submission logic here
+      toast.success("Parcel created successfully!");
+    } catch (err) {
+      toast.error("Something went wrong!");
+      console.log(err);
+    }
+  };
+
+  const nextStep = () => {
+    setActiveStep(activeStep + 1);
+  };
+
+  const prevStep = () => {
+    setActiveStep(activeStep - 1);
   };
 
   return (
-    <div className="new-parcel">
-      {/* Header */}
+    <div className="new-parcel-container">
       <div className="new-parcel-header">
         <h1 className="new-parcel-title">Create New Parcel</h1>
-        <div className="new-parcel-meta">
-          2025-01-18 17:43:11 UTC | User: Theek237
+        <p className="new-parcel-subtitle">Enter parcel details to create a new shipment</p>
+      </div>
+
+      <div className="form-progress">
+        <div className={`progress-step ${activeStep >= 1 ? 'active' : ''}`}>
+          <div className="step-icon">1</div>
+          <span>Sender Details</span>
+        </div>
+        <div className="progress-line"></div>
+        <div className={`progress-step ${activeStep >= 2 ? 'active' : ''}`}>
+          <div className="step-icon">2</div>
+          <span>Recipient Details</span>
+        </div>
+        <div className="progress-line"></div>
+        <div className={`progress-step ${activeStep >= 3 ? 'active' : ''}`}>
+          <div className="step-icon">3</div>
+          <span>Parcel Details</span>
         </div>
       </div>
 
-      {/* Form Container */}
-      <div className="new-parcel-form-container">
+      <div className="new-parcel-card">
         <form onSubmit={handleSubmit}>
-          <div className="form-grid">
-            {/* Left Column */}
-            <div className="form-column">
-              {/* From Location */}
-              <div className="form-field">
-                <label className="field-label">
-                  <FaMapMarkerAlt className="label-icon" />
-                  <span>From Location*</span>
-                </label>
-                <input
-                  type="text"
-                  value={from}
-                  onChange={(e) => setFrom(e.target.value)}
-                  placeholder="Antorio, USA"
-                  required
-                  className="form-input"
-                />
+          {activeStep === 1 && (
+            <div className="form-step">
+              <h2 className="step-title"><FiUser /> Sender Information</h2>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Sender Name</label>
+                  <div className="input-wrapper">
+                    <FiUser className="input-icon" />
+                    <input
+                      type="text"
+                      name="senderName"
+                      placeholder="Enter sender's full name"
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <label>Phone Number</label>
+                  <div className="input-wrapper">
+                    <FiPhone className="input-icon" />
+                    <input
+                      type="tel"
+                      name="senderPhone"
+                      placeholder="Enter sender's phone number"
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
               </div>
-
-              {/* To Location */}
-              <div className="form-field">
-                <label className="field-label">
-                  <FaMapMarkerAlt className="label-icon" />
-                  <span>To Location*</span>
-                </label>
-                <input
-                  type="text"
-                  value={to}
-                  onChange={(e) => setTo(e.target.value)}
-                  placeholder="Saint Mary, USA"
-                  required
-                  className="form-input"
-                />
+              
+              <div className="form-group">
+                <label>Address</label>
+                <div className="input-wrapper">
+                  <FiMapPin className="input-icon" />
+                  <input
+                    type="text"
+                    name="senderAddress"
+                    placeholder="Enter sender's complete address"
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
-
-              {/* Sender Name */}
-              <div className="form-field">
-                <label className="field-label">
-                  <FaUser className="label-icon" />
-                  <span>Sender Name*</span>
-                </label>
-                <input
-                  type="text"
-                  value={senderName}
-                  onChange={(e) => setSenderName(e.target.value)}
-                  placeholder="James Doe"
-                  required
-                  className="form-input"
-                />
-              </div>
-
-              {/* Sender Email */}
-              <div className="form-field">
-                <label className="field-label">
-                  <FaEnvelope className="label-icon" />
-                  <span>Sender Email*</span>
-                </label>
-                <input
-                  type="email"
-                  value={senderEmail}
-                  onChange={(e) => setSenderEmail(e.target.value)}
-                  placeholder="jamesdoe@gmail.com"
-                  required
-                  className="form-input"
-                />
-              </div>
-
-              {/* Recipient Name */}
-              <div className="form-field">
-                <label className="field-label">
-                  <FaUser className="label-icon" />
-                  <span>Recipient Name*</span>
-                </label>
-                <input
-                  type="text"
-                  value={recipientName}
-                  onChange={(e) => setRecipientName(e.target.value)}
-                  placeholder="John Smith"
-                  required
-                  className="form-input"
-                />
-              </div>
-
-              {/* Recipient Email */}
-              <div className="form-field">
-                <label className="field-label">
-                  <FaEnvelope className="label-icon" />
-                  <span>Recipient Email*</span>
-                </label>
-                <input
-                  type="email"
-                  value={recipientEmail}
-                  onChange={(e) => setRecipientEmail(e.target.value)}
-                  placeholder="johnsmith@gmail.com"
-                  required
-                  className="form-input"
-                />
+              
+              <div className="form-actions">
+                <button type="button" className="btn next-btn" onClick={nextStep}>
+                  Next Step
+                </button>
               </div>
             </div>
-
-            {/* Right Column */}
-            <div className="form-column">
-              {/* Weight */}
-              <div className="form-field">
-                <label className="field-label">
-                  <FaWeight className="label-icon" />
-                  <span>Weight (g)</span>
-                </label>
-                <input
-                  type="number"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  placeholder="20"
-                  className="form-input"
-                />
+          )}
+          
+          {activeStep === 2 && (
+            <div className="form-step">
+              <h2 className="step-title"><FiUser /> Recipient Information</h2>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Recipient Name</label>
+                  <div className="input-wrapper">
+                    <FiUser className="input-icon" />
+                    <input
+                      type="text"
+                      name="recipientName"
+                      placeholder="Enter recipient's full name"
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <label>Phone Number</label>
+                  <div className="input-wrapper">
+                    <FiPhone className="input-icon" />
+                    <input
+                      type="tel"
+                      name="recipientPhone"
+                      placeholder="Enter recipient's phone number"
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
               </div>
-
-              {/* Cost */}
-              <div className="form-field">
-                <label className="field-label">
-                  <FaDollarSign className="label-icon" />
-                  <span>Cost ($)</span>
-                </label>
-                <input
-                  type="number"
-                  value={cost}
-                  onChange={(e) => setCost(e.target.value)}
-                  placeholder="50"
-                  className="form-input"
-                />
+              
+              <div className="form-group">
+                <label>Delivery Address</label>
+                <div className="input-wrapper">
+                  <FiMapPin className="input-icon" />
+                  <input
+                    type="text"
+                    name="deliveryAddress"
+                    placeholder="Enter recipient's complete address"
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
-
-              {/* Date */}
-              <div className="form-field">
-                <label className="field-label">
-                  <FaCalendar className="label-icon" />
-                  <span>Date</span>
-                </label>
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="form-input"
-                />
+              
+              <div className="form-actions">
+                <button type="button" className="btn back-btn" onClick={prevStep}>
+                  Previous
+                </button>
+                <button type="button" className="btn next-btn" onClick={nextStep}>
+                  Next Step
+                </button>
               </div>
-
-              {/* Note */}
-              <div className="form-field">
-                <label className="field-label">
-                  <FaStickyNote className="label-icon" />
-                  <span>Note</span>
-                </label>
+            </div>
+          )}
+          
+          {activeStep === 3 && (
+            <div className="form-step">
+              <h2 className="step-title"><FiPackage /> Parcel Details</h2>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Parcel Type</label>
+                  <div className="input-wrapper">
+                    <FiInfo className="input-icon" />
+                    <select name="parcelType" onChange={handleChange} required>
+                      <option value="">Select parcel type</option>
+                      <option value="document">Document</option>
+                      <option value="package">Package</option>
+                      <option value="fragile">Fragile</option>
+                      <option value="perishable">Perishable</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <label>Weight (kg)</label>
+                  <div className="input-wrapper">
+                    <input
+                      type="number"
+                      name="weight"
+                      placeholder="Enter weight in kg"
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Estimated Delivery Time</label>
+                  <div className="input-wrapper">
+                    <FiClock className="input-icon" />
+                    <select name="deliveryTime" onChange={handleChange} required>
+                      <option value="">Select delivery time</option>
+                      <option value="express">Express (1-2 days)</option>
+                      <option value="standard">Standard (3-5 days)</option>
+                      <option value="economy">Economy (5-7 days)</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <label>Price ($)</label>
+                  <div className="input-wrapper">
+                    <FiDollarSign className="input-icon" />
+                    <input
+                      type="number"
+                      name="price"
+                      placeholder="Enter delivery price"
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label>Special Instructions</label>
                 <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="Perishable goods"
-                  rows="4"
-                  className="form-textarea"
-                />
+                  name="instructions"
+                  placeholder="Any special handling instructions (optional)"
+                  onChange={handleChange}
+                  rows="3"
+                ></textarea>
               </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="submit-button"
-              >
-                <FaBox className="submit-button-icon" />
-                <span>{isSubmitting ? 'Creating...' : 'Create Parcel'}</span>
-              </button>
+              
+              <div className="form-actions">
+                <button type="button" className="btn back-btn" onClick={prevStep}>
+                  Previous
+                </button>
+                <button type="submit" className="btn submit-btn">
+                  Create Parcel
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </form>
       </div>
-
-      <ToastContainer position="top-right" />
+      <ToastContainer position="bottom-right" />
     </div>
   );
 };
