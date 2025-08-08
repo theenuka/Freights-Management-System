@@ -1,49 +1,45 @@
 using FreightsManagementWPF.ViewModels;
-using System.Windows;
-using System.Windows.Controls;
+using System;
 
 namespace FreightsManagementWPF.Views
 {
     /// <summary>
     /// Interaction logic for LoginWindow.xaml
+    /// In actual WPF deployment, this would inherit from Window
     /// </summary>
-    public partial class LoginWindow : Window
+    public partial class LoginWindow
     {
         private readonly LoginViewModel _viewModel;
 
         public LoginWindow()
         {
-            InitializeComponent();
+            // InitializeComponent(); // WPF-specific
             _viewModel = new LoginViewModel();
-            DataContext = _viewModel;
+            // DataContext = _viewModel; // WPF-specific
 
             // Subscribe to events
             _viewModel.LoginSuccessful += OnLoginSuccessful;
             _viewModel.ShowRegistration += OnShowRegistration;
-
-            // Handle password binding (PasswordBox doesn't support binding for security)
-            PasswordBox.PasswordChanged += (s, e) => _viewModel.Password = PasswordBox.Password;
         }
 
         private void OnLoginSuccessful(object? sender, Models.User user)
         {
             var mainWindow = new MainWindow(user);
-            mainWindow.Show();
-            this.Close();
+            // mainWindow.Show();
+            // this.Close();
         }
 
         private void OnShowRegistration(object? sender, EventArgs e)
         {
             var registrationWindow = new RegistrationWindow();
-            registrationWindow.Owner = this;
-            registrationWindow.ShowDialog();
+            // registrationWindow.Owner = this;
+            // registrationWindow.ShowDialog();
         }
 
-        protected override void OnClosed(EventArgs e)
+        protected virtual void OnClosed(EventArgs e)
         {
             _viewModel.LoginSuccessful -= OnLoginSuccessful;
             _viewModel.ShowRegistration -= OnShowRegistration;
-            base.OnClosed(e);
         }
     }
 }

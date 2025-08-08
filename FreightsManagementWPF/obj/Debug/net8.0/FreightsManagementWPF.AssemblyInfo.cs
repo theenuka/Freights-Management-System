@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FreightsManagementWPF")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c9e60a55dc63da2e7eef2f8306fee2bbd0da0680")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6b9364d9a69ada32c47d4975cec074e3d87fa019")]
 [assembly: System.Reflection.AssemblyProductAttribute("FreightsManagementWPF")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FreightsManagementWPF")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

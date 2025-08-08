@@ -1,2 +1,8 @@
 .env
 node_modules
+bin/
+obj/
+*.dll
+*.pdb
+*.db
+*.log
