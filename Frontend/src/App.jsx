@@ -6,10 +6,9 @@ import Parcels from "./pages/Parcels";
 import Parcel from "./pages/Parcel";
 import { useSelector } from "react-redux";
 
-
-
 function App() {
   const user = useSelector((state) => state.user);
+  
   const router = createBrowserRouter([
     {
       path: "/",
@@ -24,7 +23,7 @@ function App() {
       element: user.currentUser ? <MyParcels /> : <Navigate to="/login"/>,
     },
     {
-      path: "/allparcels",
+      path: "/parcels",
       element: user.currentUser ? <Parcels /> : <Navigate to="/login"/>,
     },
     {
@@ -32,9 +31,19 @@ function App() {
       element: user.currentUser ? <Parcel /> : <Navigate to="/login"/>,
     },
   ]);
+
   return (
-    <div>
-      <RouterProvider router={router} />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="relative">
+        <RouterProvider router={router} />
+        
+        {/* Background Decorations */}
+        <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 -left-20 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+          <div className="absolute top-3/4 -right-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
+          <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-4000"></div>
+        </div>
+      </div>
     </div>
   );
 }

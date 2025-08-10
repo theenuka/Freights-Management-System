@@ -1,237 +1,324 @@
-import { useEffect, useState } from "react";
+import { FaArrowLeft, FaBox, FaFilter, FaDownload, FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { DataGrid } from "@mui/x-data-grid";
+import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import { publicRequest } from "../requestMethods";
+import { toast } from "react-toastify";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import "./Parcels.css";
 
 const Parcels = () => {
-  const [parcels, setParcels] = useState([]);
+  const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: "date", direction: "desc" });
-  const [currentPage, setCurrentPage] = useState(1);
-  const parcelsPerPage = 10;
+  const [statusFilter, setStatusFilter] = useState("all");
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
     const getParcels = async () => {
       try {
         setLoading(true);
-        // Replace with your actual API call
-        // const res = await publicRequest.get("/parcels");
-        // setParcels(res.data);
-        
-        // Mock data for demonstration
-        setTimeout(() => {
-          const mockParcels = Array(25).fill().map((_, index) => ({
-            id: `P${10000 + index}`,
-            from: ["New York", "Chicago", "Seattle", "Miami", "Boston"][Math.floor(Math.random() * 5)],
-            to: ["Los Angeles", "San Francisco", "Denver", "Portland", "Austin"][Math.floor(Math.random() * 5)],
-            date: new Date(2023, 6, Math.floor(Math.random() * 30) + 1).toISOString().split('T')[0],
-            recipientname: ["John Smith", "Jane Doe", "Robert Johnson", "Emily Wilson", "Michael Brown"][Math.floor(Math.random() * 5)],
-            status: ["Pending", "In Transit", "Delivered", "Processing"][Math.floor(Math.random() * 4)],
-            weight: (Math.random() * 10 + 1).toFixed(1) + " kg",
-            trackingNumber: `FMS${Math.floor(Math.random() * 10000000)}`
-          }));
-          setParcels(mockParcels);
-          setLoading(false);
-        }, 1000);
-        
-      } catch (err) {
-        setError(err);
-        setLoading(false);
+        const res = await publicRequest.post("/parcels/me", {
+          email: user.currentUser.email,
+        });
+        setData(res.data);
+        setFilteredData(res.data);
+      } catch (error) {
         console.log(error);
+        toast.error("Failed to load shipments");
+      } finally {
+        setLoading(false);
       }
     };
     getParcels();
-  }, []);
+  }, [user.currentUser.email]);
 
-  const columns = [
-    { field: "from", headerName: "From", width: 150 },
-    { field: "date", headerName: "Date", width: 120 },
-    { field: "recipientname", headerName: "Recipient", width: 150 },
-    { field: "to", headerName: "To", width: 150 },
-    { field: "status", headerName: "Status", width: 120 },
-    { field: "weight", headerName: "Weight", width: 100 },
-    { field: "trackingNumber", headerName: "Tracking #", width: 150 }
-  ];
+  useEffect(() => {
+    let filtered = data;
 
-  // Filter parcels based on search term
-  const filteredParcels = parcels.filter(parcel => {
-    return (
-      parcel.from.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      parcel.to.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      parcel.recipientname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      parcel.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
-
-  // Sort parcels
-  const sortedParcels = [...filteredParcels].sort((a, b) => {
-    if (a[sortConfig.key] < b[sortConfig.key]) {
-      return sortConfig.direction === 'asc' ? -1 : 1;
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (parcel) =>
+          parcel.from.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          parcel.to.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          parcel.recipientname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          parcel.sendername.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
-    if (a[sortConfig.key] > b[sortConfig.key]) {
-      return sortConfig.direction === 'asc' ? 1 : -1;
-    }
-    return 0;
-  });
 
-  // Request sort
-  const requestSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
+    // Filter by status
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((parcel) => {
+        if (statusFilter === "pending") return parcel.status === 1;
+        if (statusFilter === "in-transit") return parcel.status === 2;
+        if (statusFilter === "delivered") return parcel.status === 3;
+        return true;
+      });
     }
-    setSortConfig({ key, direction });
+
+    setFilteredData(filtered);
+  }, [data, searchTerm, statusFilter]);
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 1:
+        return "Pending";
+      case 2:
+        return "In Transit";
+      case 3:
+        return "Delivered";
+      default:
+        return "Unknown";
+    }
   };
 
-  // Get current parcels for pagination
-  const indexOfLastParcel = currentPage * parcelsPerPage;
-  const indexOfFirstParcel = indexOfLastParcel - parcelsPerPage;
-  const currentParcels = sortedParcels.slice(indexOfFirstParcel, indexOfLastParcel);
-  const totalPages = Math.ceil(filteredParcels.length / parcelsPerPage);
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 1:
+        return "#f59e0b";
+      case 2:
+        return "#8b5cf6";
+      case 3:
+        return "#10b981";
+      default:
+        return "#6b7280";
+    }
+  };
+
+  const columns = [
+    { 
+      field: "from", 
+      headerName: "Origin", 
+      width: 150,
+      renderCell: (params) => (
+        <div className="flex items-center space-x-2">
+          <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+          <span>{params.value}</span>
+        </div>
+      )
+    },
+    { 
+      field: "to", 
+      headerName: "Destination", 
+      width: 150,
+      renderCell: (params) => (
+        <div className="flex items-center space-x-2">
+          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+          <span>{params.value}</span>
+        </div>
+      )
+    },
+    { 
+      field: "date", 
+      headerName: "Ship Date", 
+      width: 120,
+      renderCell: (params) => (
+        <span>{new Date(params.value).toLocaleDateString()}</span>
+      )
+    },
+    { 
+      field: "recipientname", 
+      headerName: "Recipient", 
+      width: 150,
+      renderCell: (params) => (
+        <div className="font-medium text-gray-900">{params.value}</div>
+      )
+    },
+    { 
+      field: "weight", 
+      headerName: "Weight", 
+      width: 100,
+      renderCell: (params) => (
+        <span className="font-medium">{params.value} kg</span>
+      )
+    },
+    { 
+      field: "status", 
+      headerName: "Status", 
+      width: 130,
+      renderCell: (params) => (
+        <div 
+          className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+          style={{ 
+            backgroundColor: `${getStatusColor(params.value)}20`,
+            color: getStatusColor(params.value),
+            border: `1px solid ${getStatusColor(params.value)}40`
+          }}
+        >
+          {getStatusText(params.value)}
+        </div>
+      )
+    },
+    { 
+      field: "note", 
+      headerName: "Notes", 
+      width: 250,
+      renderCell: (params) => (
+        <div className="text-gray-600 truncate">{params.value || "No notes"}</div>
+      )
+    },
+  ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="fms-card text-center p-8">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <span className="text-white font-bold text-xl">F</span>
+            </div>
+            <h3 className="text-xl font-semibold fms-gradient-text mb-2">Loading shipments...</h3>
+            <p className="text-gray-600">Please wait while we fetch your data</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
-    <div className="parcels-page">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <Navbar />
       
-      <div className="parcels-container">
-        <div className="parcels-header">
-          <h1>All Parcels</h1>
-          <div className="header-actions">
-            <div className="search-container">
-              <i className="fas fa-search"></i>
-              <input 
-                type="text" 
-                placeholder="Search parcels..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center space-x-4 mb-6">
+            <Link 
+              to="/myparcels"
+              className="flex items-center justify-center w-10 h-10 bg-white/80 backdrop-blur-md hover:bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-gray-200"
+            >
+              <FaArrowLeft className="text-gray-600" />
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">All Shipments</h1>
+              <p className="text-gray-600">Comprehensive view of your freight shipments</p>
             </div>
-            <button className="add-parcel-button">
-              <i className="fas fa-plus"></i> Add Parcel
-            </button>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="fms-card text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <FaBox className="text-white text-xl" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900">{data.length}</h3>
+              <p className="text-gray-600">Total Shipments</p>
+            </div>
+            
+            <div className="fms-card text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <span className="text-white text-xl">⏳</span>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900">
+                {data.filter(p => p.status === 1).length}
+              </h3>
+              <p className="text-gray-600">Pending</p>
+            </div>
+            
+            <div className="fms-card text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <span className="text-white text-xl">🚛</span>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900">
+                {data.filter(p => p.status === 2).length}
+              </h3>
+              <p className="text-gray-600">In Transit</p>
+            </div>
+            
+            <div className="fms-card text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <span className="text-white text-xl">✅</span>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900">
+                {data.filter(p => p.status === 3).length}
+              </h3>
+              <p className="text-gray-600">Delivered</p>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="fms-card mb-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search shipments..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="fms-input pl-10 w-64"
+                  />
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <FaFilter className="text-gray-500" />
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="fms-input w-40"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="in-transit">In Transit</option>
+                    <option value="delivered">Delivered</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-600">
+                  Showing {filteredData.length} of {data.length} shipments
+                </span>
+                <button className="fms-button-secondary flex items-center space-x-2">
+                  <FaDownload />
+                  <span>Export</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="parcels-content">
-          {loading ? (
-            <div className="loading-container">
-              <div className="spinner"></div>
-              <p>Loading parcels...</p>
-            </div>
-          ) : error ? (
-            <div className="error-container">
-              <i className="fas fa-exclamation-circle"></i>
-              <p>Error loading parcels. Please try again later.</p>
-            </div>
-          ) : filteredParcels.length === 0 ? (
-            <div className="empty-state">
-              <i className="fas fa-box-open"></i>
-              <h3>No parcels found</h3>
-              <p>Try adjusting your search criteria.</p>
-            </div>
-          ) : (
-            <>
-              <div className="parcels-table-container">
-                <table className="parcels-table">
-                  <thead>
-                    <tr>
-                      {columns.map((column) => (
-                        <th 
-                          key={column.field}
-                          style={{ width: column.width }}
-                          onClick={() => requestSort(column.field)}
-                          className={sortConfig.key === column.field ? `sorted-${sortConfig.direction}` : ''}
-                        >
-                          {column.headerName}
-                          {sortConfig.key === column.field && (
-                            <span className="sort-icon">
-                              {sortConfig.direction === 'asc' ? ' ↑' : ' ↓'}
-                            </span>
-                          )}
-                        </th>
-                      ))}
-                      <th style={{ width: 100 }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentParcels.map((parcel) => (
-                      <tr key={parcel.id}>
-                        <td>{parcel.from}</td>
-                        <td>{parcel.date}</td>
-                        <td>{parcel.recipientname}</td>
-                        <td>{parcel.to}</td>
-                        <td>
-                          <span className={`status-badge ${parcel.status.toLowerCase().replace(" ", "-")}`}>
-                            {parcel.status}
-                          </span>
-                        </td>
-                        <td>{parcel.weight}</td>
-                        <td>
-                          <span className="tracking-number">{parcel.trackingNumber}</span>
-                        </td>
-                        <td>
-                          <div className="action-buttons">
-                            <Link to={`/parcel/${parcel.id}`} className="view-button">
-                              <i className="fas fa-eye"></i>
-                            </Link>
-                            <button className="edit-button">
-                              <i className="fas fa-edit"></i>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              
-              <div className="pagination-container">
-                <div className="pagination-info">
-                  Showing {indexOfFirstParcel + 1} to {Math.min(indexOfLastParcel, filteredParcels.length)} of {filteredParcels.length} parcels
-                </div>
-                <div className="pagination-controls">
-                  <button 
-                    className="pagination-button" 
-                    onClick={() => setCurrentPage(1)} 
-                    disabled={currentPage === 1}
-                  >
-                    <i className="fas fa-angle-double-left"></i>
-                  </button>
-                  <button 
-                    className="pagination-button" 
-                    onClick={() => setCurrentPage(currentPage - 1)} 
-                    disabled={currentPage === 1}
-                  >
-                    <i className="fas fa-angle-left"></i>
-                  </button>
-                  <span className="pagination-pages">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <button 
-                    className="pagination-button" 
-                    onClick={() => setCurrentPage(currentPage + 1)} 
-                    disabled={currentPage === totalPages}
-                  >
-                    <i className="fas fa-angle-right"></i>
-                  </button>
-                  <button 
-                    className="pagination-button" 
-                    onClick={() => setCurrentPage(totalPages)} 
-                    disabled={currentPage === totalPages}
-                  >
-                    <i className="fas fa-angle-double-right"></i>
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
+        {/* Data Grid */}
+        <div className="fms-card p-0 overflow-hidden">
+          <div style={{ height: 600, width: '100%' }}>
+            <DataGrid
+              rows={filteredData}
+              columns={columns}
+              getRowId={(row) => row._id}
+              disableSelectionOnClick
+              pageSize={10}
+              rowsPerPageOptions={[10, 25, 50]}
+              checkboxSelection
+              disableColumnMenu
+              density="comfortable"
+              sx={{
+                border: 'none',
+                '& .MuiDataGrid-cell': {
+                  borderBottom: '1px solid rgba(148, 163, 184, 0.1)',
+                },
+                '& .MuiDataGrid-columnHeaders': {
+                  backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                  borderBottom: '2px solid rgba(59, 130, 246, 0.1)',
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  fontWeight: 600,
+                  color: '#1e40af',
+                },
+                '& .MuiDataGrid-row:hover': {
+                  backgroundColor: 'rgba(59, 130, 246, 0.02)',
+                },
+              }}
+            />
+          </div>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );
