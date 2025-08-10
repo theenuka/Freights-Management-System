@@ -13,19 +13,30 @@ import Login from "./pages/Login";
 function App() {
   const Layout = () => {
     return (
-      <div className="flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex flex-col">
+        {/* Header */}
         <Navbar />
 
-        <div className="flex">
-          <div className="w-[20%]">
+        {/* Main Content Area */}
+        <div className="flex flex-1">
+          {/* Sidebar */}
+          <div className="w-[280px] flex-shrink-0">
             <Menu />
           </div>
 
-          <div className="w-[80%]">
-            <Outlet />
+          {/* Content Area */}
+          <div className="flex-1 overflow-hidden">
+            <div className="h-full bg-white/50 backdrop-blur-sm border-l border-slate-200/50">
+              <div className="p-6 h-full overflow-y-auto">
+                <div className="max-w-7xl mx-auto">
+                  <Outlet />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
+        {/* Footer */}
         <Footer />
       </div>
     );
@@ -40,17 +51,14 @@ function App() {
           path: "/",
           element: <Home />,
         },
-
         {
           path: "/parcels",
           element: <Parcels />,
         },
-        
         {
           path: "/users",
           element: <Users />,
         },
-        
         {
           path: "/newparcel",
           element: <NewParcel />,
@@ -64,17 +72,22 @@ function App() {
           element: <Parcel />,
         },
       ],
-     
     },
     {
       path: "/login",
-      element: <Login />,
+      element: (
+        <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
+          <Login />
+        </div>
+      ),
     },
-
-  
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <div className="font-inter antialiased">
+      <RouterProvider router={router} />
+    </div>
+  );
 }
 
 export default App;

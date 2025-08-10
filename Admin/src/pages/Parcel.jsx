@@ -1,271 +1,333 @@
 import { useLocation } from "react-router-dom";
 import { publicRequest } from "../requestMethods";
 import { useEffect, useState } from "react";
-import { FiPackage, FiUser, FiMapPin, FiPhone, FiDollarSign, FiTruck, FiCalendar, FiEdit, FiInfo } from "react-icons/fi";
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
-import "./Parcel.css";
+import "react-toastify/dist/ReactToastify.css";
 
 const Parcel = () => {
   const location = useLocation();
   const parcelId = location.pathname.split("/")[2];
   const [parcel, setParcel] = useState({});
   const [inputs, setInputs] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
-  // Status colors mapping
-  const statusColors = {
-    pending: "status-pending",
-    shipping: "status-shipping",
-    delivered: "status-delivered",
-    cancelled: "status-cancelled"
-  };
-  
-  useEffect(() => {
-    const getParcel = async () => {
-      try {
-        setLoading(true);
-        const res = await publicRequest.get(`/parcels/${parcelId}`);
-        setParcel(res.data);
-        setInputs(res.data);
-        setLoading(false);
-      } catch (err) {
-        console.log(err);
-        toast.error("Failed to load parcel details");
-        setLoading(false);
-      }
-    };
-    getParcel();
-  }, [parcelId]);
-  
   const handleChange = (e) => {
     setInputs((prev) => {
       return { ...prev, [e.target.name]: e.target.value };
     });
   };
-  
-  const handleUpdate = async (e) => {
-    e.preventDefault();
+
+  useEffect(() => {
+    const getParcel = async () => {
+      try {
+        const res = await publicRequest.get("/parcels/find/" + parcelId);
+        setParcel(res.data);
+      } catch (error) {
+        console.log(error);
+        toast.error("Failed to load freight details");
+      }
+    };
+    getParcel();
+  }, [parcelId]);
+
+  const handleUpdate = async () => {
+    setLoading(true);
     try {
-      // Update API call
-      await publicRequest.put(`/parcels/${parcelId}`, inputs);
-      setParcel(inputs);
-      setEditing(false);
-      toast.success("Parcel updated successfully");
-    } catch (err) {
-      console.log(err);
-      toast.error("Failed to update parcel");
+      if (Object.keys(inputs).length > 0) {
+        await publicRequest.put(`/parcels/${parcel._id}`, inputs);
+        toast.success("Freight details updated successfully!");
+      } else {
+        await publicRequest.put(`/parcels/${parcel._id}`, {
+          status: 2,
+        });
+        toast.success("Freight status updated to delivered!");
+      }
+      
+      // Refresh parcel data
+      const res = await publicRequest.get("/parcels/find/" + parcelId);
+      setParcel(res.data);
+      setInputs({});
+      setIsEditing(false);
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to update freight details");
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading parcel details...</p>
-      </div>
-    );
-  }
+  const handleMarkAsDelivered = async () => {
+    setLoading(true);
+    try {
+      await publicRequest.put(`/parcels/${parcel._id}`, { status: 2 });
+      toast.success("Freight marked as delivered!");
+      
+      // Refresh parcel data
+      const res = await publicRequest.get("/parcels/find/" + parcelId);
+      setParcel(res.data);
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to update freight status");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    if (status === 1) {
+      return (
+        <span className="fms-badge fms-badge-warning">
+          🚛 In Transit
+        </span>
+      );
+    } else if (status === 2) {
+      return (
+        <span className="fms-badge fms-badge-success">
+          ✅ Delivered
+        </span>
+      );
+    } else {
+      return (
+        <span className="fms-badge fms-badge-error">
+          ❌ Cancelled
+        </span>
+      );
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const formSections = [
+    {
+      title: "Route Information",
+      fields: [
+        { name: "from", label: "Origin", current: parcel.from },
+        { name: "to", label: "Destination", current: parcel.to },
+      ]
+    },
+    {
+      title: "Sender Details",
+      fields: [
+        { name: "sendername", label: "Sender Name", current: parcel.sendername },
+        { name: "senderemail", label: "Sender Email", current: parcel.senderemail, type: "email" },
+      ]
+    },
+    {
+      title: "Recipient Details",
+      fields: [
+        { name: "recipientname", label: "Recipient Name", current: parcel.recipientname },
+        { name: "recipientemail", label: "Recipient Email", current: parcel.recipientemail, type: "email" },
+      ]
+    },
+    {
+      title: "Freight Specifications",
+      fields: [
+        { name: "weight", label: "Weight (kg)", current: parcel.weight, type: "number" },
+        { name: "cost", label: "Cost ($)", current: parcel.cost, type: "number" },
+        { name: "date", label: "Shipping Date", current: parcel.date, type: "date" },
+        { name: "note", label: "Special Instructions", current: parcel.note, type: "textarea" },
+      ]
+    }
+  ];
 
   return (
-    <div className="parcel-detail-container">
-      <div className="parcel-header">
-        <div>
-          <h1 className="parcel-title">
-            <FiPackage className="title-icon" />
-            Parcel #{parcel._id}
-          </h1>
-          <p className="parcel-subtitle">Created on {new Date(parcel.createdAt).toLocaleDateString()}</p>
-        </div>
-        
-        <div className="parcel-actions">
-          <button 
-            className="edit-button"
-            onClick={() => setEditing(!editing)}
-          >
-            <FiEdit /> {editing ? "Cancel" : "Edit Parcel"}
-          </button>
-          <div className={`status-badge ${statusColors[parcel.status] || "status-pending"}`}>
-            {parcel.status || "pending"}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">📦</span>
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Freight Details
+              </h1>
+              <p className="text-gray-600">ID: {parcelId}</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            {getStatusBadge(parcel.status)}
           </div>
         </div>
       </div>
 
-      {editing ? (
-        <form onSubmit={handleUpdate} className="edit-form">
-          <div className="parcel-card">
-            <h2 className="card-title">Edit Parcel Details</h2>
-            
-            <div className="form-row">
-              <div className="form-group">
-                <label>Status</label>
-                <select 
-                  name="status" 
-                  value={inputs.status || ""}
-                  onChange={handleChange}
+      {/* Status & Actions Card */}
+      <div className="mb-8 fms-card p-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Freight Status</h2>
+            <p className="text-gray-600">
+              {parcel.status === 1 
+                ? "This freight is currently in transit to its destination" 
+                : parcel.status === 2 
+                ? "This freight has been successfully delivered"
+                : "This freight has been cancelled"
+              }
+            </p>
+          </div>
+          <div className="flex space-x-3">
+            {!isEditing ? (
+              <>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="fms-button-secondary"
+                  disabled={loading}
                 >
-                  <option value="pending">Pending</option>
-                  <option value="shipping">Shipping</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label>Estimated Delivery</label>
-                <input 
-                  type="date" 
-                  name="estimatedDelivery" 
-                  value={inputs.estimatedDelivery?.split('T')[0] || ""}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
+                  Edit Details
+                </button>
+                {parcel.status === 1 && (
+                  <button
+                    onClick={handleMarkAsDelivered}
+                    disabled={loading}
+                    className="fms-button-primary"
+                  >
+                    {loading ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="fms-spinner"></div>
+                        <span>Updating...</span>
+                      </div>
+                    ) : (
+                      'Mark as Delivered'
+                    )}
+                  </button>
+                )}
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => {
+                    setIsEditing(false);
+                    setInputs({});
+                  }}
+                  className="fms-button-secondary"
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdate}
+                  disabled={loading}
+                  className="fms-button-primary"
+                >
+                  {loading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="fms-spinner"></div>
+                      <span>Saving...</span>
+                    </div>
+                  ) : (
+                    'Save Changes'
+                  )}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Form Sections */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        {formSections.map((section, sectionIndex) => (
+          <div key={sectionIndex} className="fms-card p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+              <div className="w-2 h-6 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full mr-3"></div>
+              {section.title}
+            </h2>
             
-            <div className="form-row">
-              <div className="form-group">
-                <label>Weight (kg)</label>
-                <input 
-                  type="number" 
-                  name="weight" 
-                  value={inputs.weight || ""}
-                  onChange={handleChange}
-                />
-              </div>
-              
-              <div className="form-group">
-                <label>Price</label>
-                <input 
-                  type="number" 
-                  name="price" 
-                  value={inputs.price || ""}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-            
-            <div className="form-actions">
-              <button type="button" className="cancel-btn" onClick={() => setEditing(false)}>
-                Cancel
-              </button>
-              <button type="submit" className="save-btn">
-                Save Changes
-              </button>
+            <div className="space-y-4">
+              {section.fields.map((field) => (
+                <div key={field.name}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {field.label}
+                  </label>
+                  
+                  {isEditing ? (
+                    field.type === "textarea" ? (
+                      <textarea
+                        name={field.name}
+                        value={inputs[field.name] || ""}
+                        onChange={handleChange}
+                        placeholder={field.current || `Enter ${field.label.toLowerCase()}`}
+                        rows={3}
+                        className="fms-input resize-none"
+                      />
+                    ) : (
+                      <input
+                        type={field.type || "text"}
+                        name={field.name}
+                        value={inputs[field.name] || ""}
+                        onChange={handleChange}
+                        placeholder={field.current || `Enter ${field.label.toLowerCase()}`}
+                        step={field.type === "number" ? "0.01" : undefined}
+                        className="fms-input"
+                      />
+                    )
+                  ) : (
+                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <span className="text-gray-800">
+                        {field.type === "date" 
+                          ? formatDate(field.current)
+                          : field.current || "Not specified"
+                        }
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
-        </form>
-      ) : (
-        <div className="parcel-content">
-          <div className="parcel-grid">
-            <div className="parcel-card">
-              <h2 className="card-title"><FiUser /> Sender Information</h2>
-              <div className="info-list">
-                <div className="info-item">
-                  <span className="info-label">Name</span>
-                  <span className="info-value">{parcel.senderName || "N/A"}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Phone</span>
-                  <span className="info-value">{parcel.senderPhone || "N/A"}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Address</span>
-                  <span className="info-value">{parcel.senderAddress || "N/A"}</span>
-                </div>
-              </div>
+        ))}
+      </div>
+
+      {/* Feedback Section */}
+      <div className="fms-card p-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+          <div className="w-2 h-6 bg-gradient-to-b from-green-500 to-blue-600 rounded-full mr-3"></div>
+          Delivery Feedback
+        </h2>
+        
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-sm">💬</span>
             </div>
-            
-            <div className="parcel-card">
-              <h2 className="card-title"><FiUser /> Recipient Information</h2>
-              <div className="info-list">
-                <div className="info-item">
-                  <span className="info-label">Name</span>
-                  <span className="info-value">{parcel.recipientName || "N/A"}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Phone</span>
-                  <span className="info-value">{parcel.recipientPhone || "N/A"}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Address</span>
-                  <span className="info-value">{parcel.deliveryAddress || "N/A"}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="parcel-card">
-            <h2 className="card-title"><FiInfo /> Parcel Details</h2>
-            <div className="parcel-info-grid">
-              <div className="info-tile">
-                <FiDollarSign className="tile-icon" />
-                <div className="tile-content">
-                  <span className="tile-label">Price</span>
-                  <span className="tile-value">${parcel.price || "0.00"}</span>
-                </div>
-              </div>
-              
-              <div className="info-tile">
-                <FiPackage className="tile-icon" />
-                <div className="tile-content">
-                  <span className="tile-label">Weight</span>
-                  <span className="tile-value">{parcel.weight || "0"} kg</span>
-                </div>
-              </div>
-              
-              <div className="info-tile">
-                <FiTruck className="tile-icon" />
-                <div className="tile-content">
-                  <span className="tile-label">Delivery Type</span>
-                  <span className="tile-value">{parcel.deliveryType || "Standard"}</span>
-                </div>
-              </div>
-              
-              <div className="info-tile">
-                <FiCalendar className="tile-icon" />
-                <div className="tile-content">
-                  <span className="tile-label">Estimated Delivery</span>
-                  <span className="tile-value">
-                    {parcel.estimatedDelivery ? new Date(parcel.estimatedDelivery).toLocaleDateString() : "N/A"}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="parcel-card">
-            <h2 className="card-title"><FiTruck /> Tracking</h2>
-            <div className="tracking-timeline">
-              <div className={`timeline-step ${parcel.status === 'pending' || parcel.status === 'shipping' || parcel.status === 'delivered' ? 'completed' : ''}`}>
-                <div className="step-marker"></div>
-                <div className="step-content">
-                  <h3>Order Placed</h3>
-                  <p>{new Date(parcel.createdAt).toLocaleString()}</p>
-                </div>
-              </div>
-              
-              <div className={`timeline-step ${parcel.status === 'shipping' || parcel.status === 'delivered' ? 'completed' : ''}`}>
-                <div className="step-marker"></div>
-                <div className="step-content">
-                  <h3>In Transit</h3>
-                  <p>{parcel.shippingDate ? new Date(parcel.shippingDate).toLocaleString() : 'Pending'}</p>
-                </div>
-              </div>
-              
-              <div className={`timeline-step ${parcel.status === 'delivered' ? 'completed' : ''}`}>
-                <div className="step-marker"></div>
-                <div className="step-content">
-                  <h3>Delivered</h3>
-                  <p>{parcel.deliveryDate ? new Date(parcel.deliveryDate).toLocaleString() : 'Pending'}</p>
-                </div>
-              </div>
+            <div>
+              <h4 className="font-medium text-green-800 mb-1">Customer Feedback</h4>
+              <p className="text-green-700">
+                {parcel.status === 2 
+                  ? "Goods received in good condition. Thank you for the excellent service!"
+                  : "Awaiting delivery confirmation from recipient."
+                }
+              </p>
+              <p className="text-sm text-green-600 mt-2">
+                Status: {parcel.status === 1 ? "Pending Delivery" : "Delivered Successfully"}
+              </p>
             </div>
           </div>
         </div>
-      )}
-      
-      <ToastContainer position="bottom-right" />
+      </div>
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </div>
   );
 };

@@ -1,261 +1,319 @@
 import { useEffect, useState } from "react";
-import { FaArrowLeft, FaBox, FaMapMarkerAlt, FaTruckLoading, FaCheckCircle, FaWeightHanging, FaCalendarAlt, FaUser, FaPhone } from "react-icons/fa";
-import { Link, useLocation } from "react-router-dom";
+import { FaArrowLeft, FaMapMarkerAlt, FaWeight, FaCalendarAlt, FaUserTie, FaDollarSign, FaUser, FaIdCard, FaStickyNote, FaEnvelope } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { publicRequest } from "../requestMethods";
+import { toast } from "react-toastify";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import "./Parcel.css";
 
 const Parcel = () => {
   const location = useLocation();
   const parcelId = location.pathname.split("/")[2];
   const [parcel, setParcel] = useState({});
   const [loading, setLoading] = useState(true);
+  const [feedback, setFeedback] = useState("");
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
 
   useEffect(() => {
     const getParcel = async () => {
       try {
         setLoading(true);
-        // Replace with your actual API call
-        // const res = await publicRequest.get(`/parcels/${parcelId}`);
-        // setParcel(res.data);
-        
-        // Mock data for demonstration
-        setTimeout(() => {
-          setParcel({
-            id: parcelId,
-            trackingNumber: "FMS8372651",
-            status: "In Transit",
-            origin: "New York City, NY",
-            destination: "Los Angeles, CA",
-            weight: "5.2 kg",
-            dimensions: "30cm × 20cm × 15cm",
-            estimatedDelivery: "2023-07-25",
-            createdAt: "2023-07-15",
-            sender: {
-              name: "John Smith",
-              phone: "(212) 555-1234",
-              email: "john.smith@example.com"
-            },
-            receiver: {
-              name: "Jane Doe",
-              phone: "(310) 555-5678",
-              email: "jane.doe@example.com"
-            },
-            trackingHistory: [
-              {
-                id: 1,
-                status: "Order Placed",
-                location: "New York City, NY",
-                timestamp: "2023-07-15 09:23:15",
-                description: "Package has been registered in our system."
-              },
-              {
-                id: 2,
-                status: "Package Received",
-                location: "New York City Warehouse, NY",
-                timestamp: "2023-07-16 14:05:32",
-                description: "Package has been received at our facility."
-              },
-              {
-                id: 3,
-                status: "In Transit",
-                location: "Chicago Sorting Center, IL",
-                timestamp: "2023-07-18 07:45:21",
-                description: "Package is in transit to the destination."
-              }
-            ]
-          });
-          setLoading(false);
-        }, 1000);
-      } catch (err) {
-        console.log(err);
+        const res = await publicRequest.get("/parcels/find/" + parcelId);
+        setParcel(res.data);
+      } catch (error) {
+        console.log(error);
+        toast.error("Failed to load shipment details");
+      } finally {
         setLoading(false);
       }
     };
     getParcel();
   }, [parcelId]);
 
-  // Helper function to determine the step status
-  const getStepStatus = (stepNumber, currentStatus) => {
-    const statusMap = {
-      "Order Placed": 1,
-      "Package Received": 2,
-      "In Transit": 3,
-      "Out for Delivery": 4,
-      "Delivered": 5
-    };
-    
-    const currentStep = statusMap[currentStatus] || 3;
-    
-    if (stepNumber < currentStep) return "completed";
-    if (stepNumber === currentStep) return "active";
-    return "pending";
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 1:
+        return "status-pending";
+      case 2:
+        return "status-in-transit";
+      case 3:
+        return "status-delivered";
+      default:
+        return "status-pending";
+    }
   };
 
+  const getStatusText = (status) => {
+    switch (status) {
+      case 1:
+        return "Pending";
+      case 2:
+        return "In Transit";
+      case 3:
+        return "Delivered";
+      default:
+        return "Unknown";
+    }
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const handleFeedbackSubmit = async () => {
+    if (!feedback.trim()) {
+      toast.error("Please enter your feedback");
+      return;
+    }
+
+    try {
+      setSubmittingFeedback(true);
+      // API call would go here
+      toast.success("Feedback submitted successfully!");
+      setFeedback("");
+    } catch (error) {
+      toast.error("Failed to submit feedback");
+    } finally {
+      setSubmittingFeedback(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="fms-card text-center p-8">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <span className="text-white font-bold text-xl">F</span>
+            </div>
+            <h3 className="text-xl font-semibold fms-gradient-text mb-2">Loading shipment details...</h3>
+            <p className="text-gray-600">Please wait while we fetch the information</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
-    <div className="parcel-page">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <Navbar />
       
-      <div className="parcel-container">
-        <Link to="/myparcels" className="back-button">
-          <FaArrowLeft /> Back to My Parcels
-        </Link>
-
-        {loading ? (
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p>Loading parcel details...</p>
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="flex items-center space-x-4 mb-8">
+          <Link 
+            to="/myparcels"
+            className="flex items-center justify-center w-12 h-12 bg-white/80 backdrop-blur-md hover:bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-gray-200"
+          >
+            <FaArrowLeft className="text-gray-600" />
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Shipment Details</h1>
+            <p className="text-gray-600">Tracking ID: #{parcel._id?.slice(-8).toUpperCase()}</p>
           </div>
-        ) : (
-          <div className="parcel-content">
-            <div className="parcel-header">
-              <div className="header-left">
-                <h1>Parcel Details</h1>
-                <div className="tracking-info">
-                  <span className="tracking-label">Tracking Number:</span>
-                  <span className="tracking-number">{parcel.trackingNumber}</span>
-                </div>
-              </div>
-              <div className="header-right">
-                <span className={`status-badge ${parcel.status?.toLowerCase().replace(" ", "-")}`}>
-                  {parcel.status}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Details */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Status Card */}
+            <div className="fms-card">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Shipment Status</h2>
+                <span className={`fms-badge ${getStatusColor(parcel.status)}`}>
+                  {getStatusText(parcel.status)}
                 </span>
               </div>
-            </div>
-            
-            <div className="tracking-timeline">
-              <div className="timeline-title">Shipping Progress</div>
-              <div className="timeline-steps">
-                <div className={`timeline-step ${getStepStatus(1, parcel.status)}`}>
-                  <div className="step-icon">
-                    <FaBox />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                      <FaMapMarkerAlt className="text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Origin</p>
+                      <p className="font-semibold text-gray-900">{parcel.from}</p>
+                    </div>
                   </div>
-                  <div className="step-label">Order Placed</div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                      <FaMapMarkerAlt className="text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Destination</p>
+                      <p className="font-semibold text-gray-900">{parcel.to}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="step-connector"></div>
-                <div className={`timeline-step ${getStepStatus(2, parcel.status)}`}>
-                  <div className="step-icon">
-                    <FaTruckLoading />
+                
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                      <FaWeight className="text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Weight</p>
+                      <p className="font-semibold text-gray-900">{parcel.weight} kg</p>
+                    </div>
                   </div>
-                  <div className="step-label">Package Received</div>
-                </div>
-                <div className="step-connector"></div>
-                <div className={`timeline-step ${getStepStatus(3, parcel.status)}`}>
-                  <div className="step-icon">
-                    <FaMapMarkerAlt />
+                  
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+                      <FaCalendarAlt className="text-orange-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Ship Date</p>
+                      <p className="font-semibold text-gray-900">{formatDate(parcel.date)}</p>
+                    </div>
                   </div>
-                  <div className="step-label">In Transit</div>
-                </div>
-                <div className="step-connector"></div>
-                <div className={`timeline-step ${getStepStatus(4, parcel.status)}`}>
-                  <div className="step-icon">
-                    <FaTruckLoading />
-                  </div>
-                  <div className="step-label">Out for Delivery</div>
-                </div>
-                <div className="step-connector"></div>
-                <div className={`timeline-step ${getStepStatus(5, parcel.status)}`}>
-                  <div className="step-icon">
-                    <FaCheckCircle />
-                  </div>
-                  <div className="step-label">Delivered</div>
                 </div>
               </div>
             </div>
-            
-            <div className="parcel-details-grid">
-              <div className="details-card shipment-details">
-                <h2><FaBox /> Shipment Details</h2>
-                <div className="detail-rows">
-                  <div className="detail-row">
-                    <span className="detail-label">Origin:</span>
-                    <span className="detail-value">{parcel.origin}</span>
+
+            {/* Sender & Recipient Details */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Sender Info */}
+              <div className="fms-card">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <FaUserTie className="text-blue-600 mr-2" />
+                  Sender Information
+                </h3>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-500">Name</p>
+                    <p className="font-medium text-gray-900">{parcel.sendername}</p>
                   </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Destination:</span>
-                    <span className="detail-value">{parcel.destination}</span>
+                  <div>
+                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="font-medium text-gray-900">{parcel.senderemail}</p>
                   </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Weight:</span>
-                    <span className="detail-value"><FaWeightHanging /> {parcel.weight}</span>
+                </div>
+              </div>
+
+              {/* Recipient Info */}
+              <div className="fms-card">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <FaUser className="text-green-600 mr-2" />
+                  Recipient Information
+                </h3>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-500">Name</p>
+                    <p className="font-medium text-gray-900">{parcel.recipientname}</p>
                   </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Dimensions:</span>
-                    <span className="detail-value">{parcel.dimensions}</span>
+                  <div>
+                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="font-medium text-gray-900">{parcel.recipientemail}</p>
                   </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Est. Delivery:</span>
-                    <span className="detail-value"><FaCalendarAlt /> {parcel.estimatedDelivery}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Details */}
+            <div className="fms-card">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                      <FaDollarSign className="text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Shipping Cost</p>
+                      <p className="font-semibold text-gray-900">${parcel.cost}</p>
+                    </div>
                   </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Order Date:</span>
-                    <span className="detail-value">{parcel.createdAt}</span>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                      <FaIdCard className="text-indigo-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Tracking ID</p>
+                      <p className="font-semibold text-gray-900 text-sm">{parcel._id}</p>
+                    </div>
                   </div>
                 </div>
               </div>
               
-              <div className="details-card contact-details">
-                <h2><FaUser /> Contact Information</h2>
-                <div className="contact-section">
-                  <h3>Sender</h3>
-                  <div className="detail-rows">
-                    <div className="detail-row">
-                      <span className="detail-label">Name:</span>
-                      <span className="detail-value">{parcel.sender?.name}</span>
+              {parcel.note && (
+                <div className="mt-6">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center mt-1">
+                      <FaStickyNote className="text-yellow-600" />
                     </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Phone:</span>
-                      <span className="detail-value"><FaPhone /> {parcel.sender?.phone}</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Email:</span>
-                      <span className="detail-value">{parcel.sender?.email}</span>
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-500 mb-1">Special Notes</p>
+                      <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{parcel.note}</p>
                     </div>
                   </div>
                 </div>
-                <div className="contact-section">
-                  <h3>Receiver</h3>
-                  <div className="detail-rows">
-                    <div className="detail-row">
-                      <span className="detail-label">Name:</span>
-                      <span className="detail-value">{parcel.receiver?.name}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Feedback Section */}
+          <div className="space-y-6">
+            <div className="fms-card">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <FaEnvelope className="text-purple-600 mr-2" />
+                Leave Feedback
+              </h3>
+              <div className="space-y-4">
+                <textarea
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  rows={6}
+                  placeholder="Share your experience with this shipment..."
+                  className="fms-input resize-none"
+                />
+                <button
+                  onClick={handleFeedbackSubmit}
+                  disabled={submittingFeedback}
+                  className="fms-button-primary w-full"
+                >
+                  {submittingFeedback ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Submitting...</span>
                     </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Phone:</span>
-                      <span className="detail-value"><FaPhone /> {parcel.receiver?.phone}</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Email:</span>
-                      <span className="detail-value">{parcel.receiver?.email}</span>
-                    </div>
-                  </div>
-                </div>
+                  ) : (
+                    "Submit Feedback"
+                  )}
+                </button>
               </div>
             </div>
-            
-            <div className="tracking-history">
-              <h2>Tracking History</h2>
-              <div className="history-timeline">
-                {parcel.trackingHistory?.map((event) => (
-                  <div className="history-event" key={event.id}>
-                    <div className="event-dot"></div>
-                    <div className="event-content">
-                      <div className="event-header">
-                        <span className="event-status">{event.status}</span>
-                        <span className="event-timestamp">{event.timestamp}</span>
-                      </div>
-                      <div className="event-location">{event.location}</div>
-                      <div className="event-description">{event.description}</div>
-                    </div>
-                  </div>
-                ))}
+
+            {/* Quick Actions */}
+            <div className="fms-card">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+              <div className="space-y-3">
+                <button className="fms-button-secondary w-full">
+                  📧 Contact Support
+                </button>
+                <button className="fms-button-secondary w-full">
+                  📄 Download Receipt
+                </button>
+                <button className="fms-button-secondary w-full">
+                  📋 Track History
+                </button>
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
-      
+
       <Footer />
     </div>
   );
