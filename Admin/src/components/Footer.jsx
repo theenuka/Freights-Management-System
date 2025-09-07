@@ -1,7 +1,7 @@
 const Footer = () => {
   return (
     <div className="relative px-6 py-6 mt-auto text-white bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700">
-      <div className="flex items-center justify-between mx-auto max-w-7xl">
+      <div className="flex items-center justify-between mx-auto max-w-7xl"> 
         {/* FMS Branding */}
         <div className="flex items-center space-x-3">
           <div className="flex flex-col">
@@ -14,7 +14,7 @@ const Footer = () => {
 
         {/* Simple Copyright */}
         <div className="flex items-center space-x-2 text-blue-200">
-          <span className="text-sm">&copy; 2024 FMS. All rights reserved.</span>
+          <span className="text-sm">&copy; 2025 FMS. All rights reserved.</span>
         </div>
       </div>
 
