@@ -30,31 +30,31 @@ const Home = () => {
       color: "from-orange-500 to-orange-600",
       bgColor: "from-orange-50 to-orange-100"
     }
-  ];
+  ]; //stats data
 
   const recentUsers = [
-    { id: 1, name: "John Smith", email: "john@company.com", status: "Active" },
-    { id: 2, name: "Sarah Johnson", email: "sarah@logistics.com", status: "Active" },
-    { id: 3, name: "Mike Wilson", email: "mike@freight.com", status: "Pending" },
-    { id: 4, name: "Lisa Brown", email: "lisa@transport.com", status: "Active" }
+    { id: 1, name: "Theenuka Bandara", email: "theenuka@company.com", status: "Active" },
+    { id: 2, name: "Tharindu Perera", email: "tharindu@logistics.com", status: "Active" },
+    { id: 3, name: "Sithum Aluvihare", email: "sithum@freight.com", status: "Pending" },
+    { id: 4, name: "Theekshana Perera", email: "theekshana@transport.com", status: "Active" }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+    <div className="min-h-screen p-6 bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+        <h1 className="mb-2 text-4xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
           FMS Dashboard
         </h1>
         <p className="text-gray-600">Welcome to Freights Management System Admin Panel</p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat, index) => {
           const IconComponent = stat.icon;
           return (
-            <div key={index} className="fms-card p-6 hover:scale-105 transition-all duration-300">
+            <div key={index} className="p-6 transition-all duration-300 fms-card hover:scale-105">
               <div className="flex items-center justify-between mb-4">
                 <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.bgColor}`}>
                   <IconComponent className={`w-6 h-6 bg-gradient-to-r ${stat.color} text-transparent bg-clip-text`} style={{color: stat.color.includes('blue') ? '#3b82f6' : stat.color.includes('green') ? '#10b981' : '#f59e0b'}} />
@@ -68,7 +68,7 @@ const Home = () => {
                   {stat.change}
                 </div>
               </div>
-              <h3 className="text-gray-600 text-sm font-medium mb-1">{stat.title}</h3>
+              <h3 className="mb-1 text-sm font-medium text-gray-600">{stat.title}</h3>
               <p className="text-3xl font-bold text-gray-800">{stat.value}</p>
             </div>
           );
@@ -76,10 +76,10 @@ const Home = () => {
       </div>
 
       {/* Charts and Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Pie Chart */}
-        <div className="lg:col-span-2 fms-card p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Freight Distribution</h2>
+        <div className="p-6 lg:col-span-2 fms-card">
+          <h2 className="mb-4 text-xl font-bold text-gray-800">Freight Distribution</h2>
           <div className="flex items-center justify-center">
             <PieChart
               series={[
@@ -103,32 +103,32 @@ const Home = () => {
               height={300}
             />
           </div>
-          <div className="flex justify-center space-x-6 mt-4">
+          <div className="flex justify-center mt-4 space-x-6">
             <div className="flex items-center">
-              <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+              <div className="w-3 h-3 mr-2 bg-green-500 rounded-full"></div>
               <span className="text-sm text-gray-600">Delivered (93%)</span>
             </div>
             <div className="flex items-center">
-              <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+              <div className="w-3 h-3 mr-2 bg-yellow-500 rounded-full"></div>
               <span className="text-sm text-gray-600">Pending (5%)</span>
             </div>
             <div className="flex items-center">
-              <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+              <div className="w-3 h-3 mr-2 bg-red-500 rounded-full"></div>
               <span className="text-sm text-gray-600">Rejected (2%)</span>
             </div>
           </div>
         </div>
 
         {/* Recent Users */}
-        <div className="fms-card p-6">
+        <div className="p-6 fms-card">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-gray-800">Recent Users</h2>
-            <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">View All</button>
+            <button className="text-sm font-medium text-blue-600 hover:text-blue-800">View All</button>
           </div>
           <div className="space-y-4">
             {recentUsers.map((user) => (
-              <div key={user.id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+              <div key={user.id} className="flex items-center p-3 space-x-3 transition-colors duration-200 rounded-lg hover:bg-gray-50">
+                <div className="flex items-center justify-center w-10 h-10 text-sm font-semibold text-white rounded-full bg-gradient-to-r from-blue-500 to-purple-600">
                   {user.name.split(' ').map(n => n[0]).join('')}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -149,19 +149,19 @@ const Home = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="mt-8 fms-card p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button className="fms-button-primary text-center">
+      <div className="p-6 mt-8 fms-card">
+        <h2 className="mb-4 text-xl font-bold text-gray-800">Quick Actions</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <button className="text-center fms-button-primary">
             Add New Freight
           </button>
-          <button className="fms-button-secondary text-center">
+          <button className="text-center fms-button-secondary">
             Manage Users
           </button>
-          <button className="fms-button-secondary text-center">
+          <button className="text-center fms-button-secondary">
             View Reports
           </button>
-          <button className="fms-button-secondary text-center">
+          <button className="text-center fms-button-secondary">
             System Settings
           </button>
         </div>
