@@ -23,7 +23,7 @@ const sendParcelEmail = async (parcel, recipientEmail) => {
         return;
       }
 
-      const messageOption = {
+      const messageOption = { //If rendering succeeds
         from: process.env.EMAIL,
         to: recipientEmail,
         subject: "Your parcel has been delivered",
@@ -38,6 +38,8 @@ const sendParcelEmail = async (parcel, recipientEmail) => {
     }
   );
 };
+
+//Main Function: SendParcelPendingEmail
 
 const SendParcelDeliveredEmail = async () => {
   const parcels = await Parcel.find({ status: 2 });
