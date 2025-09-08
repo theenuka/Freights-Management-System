@@ -4,6 +4,8 @@ const User = require("../models/User");
 const dotenv = require("dotenv");
 dotenv.config();
 
+//register controller
+
 const registerUser = async (req, res) => {
   const newUser = User({
     fullname: req.body.fullname,
@@ -24,6 +26,8 @@ const registerUser = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+//login controller
 
 const loginUser = async (req, res) => {
   try {

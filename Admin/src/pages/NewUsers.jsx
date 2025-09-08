@@ -96,7 +96,7 @@ const NewUsers = () => {
     {
       title: "Personal Information",
       fields: [
-        { name: "fullname", label: "Full Name", type: "text", placeholder: "e.g., John Smith", required: true },
+        { name: "fullname", label: "Full Name", type: "text", placeholder: "e.g., Theenuka Bandara", required: true },
         { name: "email", label: "Email Address", type: "email", placeholder: "user@company.com", required: true },
         { name: "age", label: "Age", type: "number", placeholder: "e.g., 28", required: true, min: 18, max: 100 },
       ]
@@ -104,7 +104,7 @@ const NewUsers = () => {
     {
       title: "Location Details",
       fields: [
-        { name: "country", label: "Country", type: "text", placeholder: "e.g., United States", required: true },
+        { name: "country", label: "Country", type: "text", placeholder: "e.g., Srilanka", required: true },
         { name: "address", label: "Full Address", type: "textarea", placeholder: "Complete address including street, city, state/province, postal code", required: true },
       ]
     }

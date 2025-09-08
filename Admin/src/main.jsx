@@ -16,7 +16,7 @@ class FMSErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('FMS Admin Error:', error, errorInfo);
-  }
+  } //lifecycle method logs error details to console
 
   render() {
     if (this.state.hasError) {
@@ -53,3 +53,4 @@ root.render(
     </FMSErrorBoundary>
   </React.StrictMode>
 );
+//wraps everything
