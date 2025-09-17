@@ -1,0 +1,270 @@
+﻿<Window x:Class="FreightsManagementWPF.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:views="clr-namespace:FreightsManagementWPF.Views"
+        Title="Freights Management System" 
+        Height="800" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource MaterialDesignPaper}">
+    
+    <Window.Resources>
+        <!-- Navigation Button Style -->
+        <Style x:Key="NavigationButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        
+        <!-- Card Style -->
+        <Style x:Key="DashboardCard" TargetType="materialDesign:Card">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Background" Value="{DynamicResource MaterialDesignCardBackground}"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Navigation Panel -->
+        <materialDesign:Card Grid.Column="0" Margin="0" CornerRadius="0,8,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Grid Grid.Row="0" Background="{DynamicResource PrimaryHueMidBrush}" Margin="-16,-16,-16,0">
+                    <StackPanel Margin="20" VerticalAlignment="Center">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <materialDesign:PackIcon Grid.Column="0" Kind="TruckDelivery" 
+                                                   Width="40" Height="40" 
+                                                   Foreground="White" 
+                                                   VerticalAlignment="Center"/>
+                            
+                            <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                                <TextBlock Text="Freights System" 
+                                         FontSize="18" FontWeight="Bold" 
+                                         Foreground="White"/>
+                                <TextBlock Text="{Binding CurrentUser.FullName}" 
+                                         FontSize="12" 
+                                         Foreground="White" Opacity="0.8"/>
+                                <TextBlock Text="{Binding CurrentUser.Role}" 
+                                         FontSize="10" 
+                                         Foreground="White" Opacity="0.6"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Navigation Menu -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="8,20,8,8">
+                    <StackPanel>
+                        
+                        <!-- Dashboard -->
+                        <Button Style="{StaticResource NavigationButton}"
+                              Command="{Binding NavigateCommand}"
+                              CommandParameter="Dashboard">
+                            <Button.Background>
+                                <SolidColorBrush Color="{DynamicResource Primary300}" 
+                                               Opacity="{Binding IsDashboardSelected, Converter={StaticResource BooleanToDoubleConverter}}"/>
+                            </Button.Background>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="ViewDashboard" Width="20" Height="20" Margin="0,0,12,0"/>
+                                <TextBlock Text="Dashboard" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Users Management (Admin only) -->
+                        <Button Style="{StaticResource NavigationButton}"
+                              Command="{Binding NavigateCommand}"
+                              CommandParameter="Users"
+                              Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Button.Background>
+                                <SolidColorBrush Color="{DynamicResource Primary300}" 
+                                               Opacity="{Binding IsUsersSelected, Converter={StaticResource BooleanToDoubleConverter}}"/>
+                            </Button.Background>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="AccountGroup" Width="20" Height="20" Margin="0,0,12,0"/>
+                                <TextBlock Text="Users Management" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Parcels Management -->
+                        <Button Style="{StaticResource NavigationButton}"
+                              Command="{Binding NavigateCommand}"
+                              CommandParameter="Parcels">
+                            <Button.Background>
+                                <SolidColorBrush Color="{DynamicResource Primary300}" 
+                                               Opacity="{Binding IsParcelsSelected, Converter={StaticResource BooleanToDoubleConverter}}"/>
+                            </Button.Background>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Package" Width="20" Height="20" Margin="0,0,12,0"/>
+                                <TextBlock Text="Parcels Management" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Separator Margin="8,20" Background="{DynamicResource MaterialDesignDivider}"/>
+
+                        <!-- Refresh -->
+                        <Button Style="{StaticResource NavigationButton}"
+                              Command="{Binding RefreshCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Refresh" Width="20" Height="20" Margin="0,0,12,0"/>
+                                <TextBlock Text="Refresh Data" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Logout -->
+                <Button Grid.Row="2" Style="{StaticResource MaterialDesignFlatButton}"
+                      Command="{Binding LogoutCommand}"
+                      Height="48" Margin="8">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Logout" Width="20" Height="20" Margin="0,0,12,0"/>
+                        <TextBlock Text="Logout" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+            </Grid>
+        </materialDesign:Card>
+
+        <!-- Main Content Area -->
+        <Grid Grid.Column="1" Margin="16">
+            
+            <!-- Dashboard View -->
+            <ScrollViewer Visibility="{Binding IsDashboardSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="Dashboard" FontSize="32" FontWeight="Bold" Margin="0,0,0,20"/>
+                    
+                    <!-- Statistics Cards -->
+                    <UniformGrid Columns="4" Margin="0,0,0,20">
+                        
+                        <!-- Total Parcels -->
+                        <materialDesign:Card Style="{StaticResource DashboardCard}" Background="{DynamicResource PrimaryHueLightBrush}">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Total Parcels" FontSize="14" Opacity="0.8"/>
+                                        <TextBlock Text="{Binding TotalParcels}" FontSize="28" FontWeight="Bold"/>
+                                    </StackPanel>
+                                    <materialDesign:PackIcon Grid.Column="1" Kind="Package" Width="40" Height="40" Opacity="0.6"/>
+                                </Grid>
+                            </StackPanel>
+                        </materialDesign:Card>
+
+                        <!-- Pending Parcels -->
+                        <materialDesign:Card Style="{StaticResource DashboardCard}" Background="{DynamicResource SecondaryHueLightBrush}">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Pending" FontSize="14" Opacity="0.8"/>
+                                        <TextBlock Text="{Binding PendingParcels}" FontSize="28" FontWeight="Bold"/>
+                                    </StackPanel>
+                                    <materialDesign:PackIcon Grid.Column="1" Kind="ClockOutline" Width="40" Height="40" Opacity="0.6"/>
+                                </Grid>
+                            </StackPanel>
+                        </materialDesign:Card>
+
+                        <!-- In Transit Parcels -->
+                        <materialDesign:Card Style="{StaticResource DashboardCard}" Background="#FFBBDEFB">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="In Transit" FontSize="14" Opacity="0.8"/>
+                                        <TextBlock Text="{Binding InTransitParcels}" FontSize="28" FontWeight="Bold"/>
+                                    </StackPanel>
+                                    <materialDesign:PackIcon Grid.Column="1" Kind="TruckDelivery" Width="40" Height="40" Opacity="0.6"/>
+                                </Grid>
+                            </StackPanel>
+                        </materialDesign:Card>
+
+                        <!-- Delivered Parcels -->
+                        <materialDesign:Card Style="{StaticResource DashboardCard}" Background="#FFC8E6C9">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Delivered" FontSize="14" Opacity="0.8"/>
+                                        <TextBlock Text="{Binding DeliveredParcels}" FontSize="28" FontWeight="Bold"/>
+                                    </StackPanel>
+                                    <materialDesign:PackIcon Grid.Column="1" Kind="CheckCircle" Width="40" Height="40" Opacity="0.6"/>
+                                </Grid>
+                            </StackPanel>
+                        </materialDesign:Card>
+
+                    </UniformGrid>
+
+                    <!-- Quick Actions -->
+                    <materialDesign:Card Style="{StaticResource DashboardCard}">
+                        <StackPanel>
+                            <TextBlock Text="Quick Actions" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
+                            
+                            <UniformGrid Columns="3">
+                                <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                      Content="Add New Parcel"
+                                      Margin="4"
+                                      Command="{Binding NavigateCommand}"
+                                      CommandParameter="Parcels"/>
+                                
+                                <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                      Content="View All Parcels"
+                                      Margin="4"
+                                      Command="{Binding NavigateCommand}"
+                                      CommandParameter="Parcels"/>
+                                
+                                <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                      Content="Manage Users"
+                                      Margin="4"
+                                      Command="{Binding NavigateCommand}"
+                                      CommandParameter="Users"
+                                      Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </materialDesign:Card>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Users View -->
+            <views:UsersView DataContext="{Binding UsersViewModel}"
+                           Visibility="{Binding IsUsersSelected, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+            <!-- Parcels View -->
+            <views:ParcelsView DataContext="{Binding ParcelsViewModel}"
+                             Visibility="{Binding IsParcelsSelected, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+        </Grid>
+    </Grid>
+</Window>

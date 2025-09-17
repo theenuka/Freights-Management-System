@@ -1,0 +1,140 @@
+﻿<Window x:Class="FreightsManagementWPF.Views.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Freights Management System - Login" 
+        Height="500" Width="400"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="{DynamicResource MaterialDesignPaper}">
+    
+    <Window.Resources>
+        <Style x:Key="LoginTextBox" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+            <Setter Property="Margin" Value="0,8"/>
+            <Setter Property="Height" Value="56"/>
+        </Style>
+        
+        <Style x:Key="LoginPasswordBox" TargetType="PasswordBox" BasedOn="{StaticResource MaterialDesignOutlinedPasswordBox}">
+            <Setter Property="Margin" Value="0,8"/>
+            <Setter Property="Height" Value="56"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <materialDesign:Card Grid.Row="0" Margin="0,0,0,20" Background="{DynamicResource PrimaryHueMidBrush}">
+            <Grid Margin="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <materialDesign:PackIcon Grid.Column="0" Kind="TruckDelivery" 
+                                       Width="48" Height="48" 
+                                       Foreground="White" 
+                                       VerticalAlignment="Center"/>
+                
+                <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="Freights Management" 
+                             FontSize="24" FontWeight="Bold" 
+                             Foreground="White"/>
+                    <TextBlock Text="Secure Login Portal" 
+                             FontSize="14" 
+                             Foreground="White" Opacity="0.8"/>
+                </StackPanel>
+            </Grid>
+        </materialDesign:Card>
+
+        <!-- Login Form -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="40,20" MaxWidth="300">
+                
+                <!-- Welcome Message -->
+                <TextBlock Text="Welcome Back!" 
+                         FontSize="28" FontWeight="Bold" 
+                         HorizontalAlignment="Center" 
+                         Margin="0,0,0,30"
+                         Foreground="{DynamicResource MaterialDesignBody}"/>
+
+                <!-- Username -->
+                <TextBox Style="{StaticResource LoginTextBox}"
+                       materialDesign:HintAssist.Hint="Username"
+                       materialDesign:HintAssist.IsFloating="True"
+                       Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <!-- Password -->
+                <PasswordBox Style="{StaticResource LoginPasswordBox}"
+                           materialDesign:HintAssist.Hint="Password"
+                           materialDesign:HintAssist.IsFloating="True"
+                           x:Name="PasswordBox"/>
+
+                <!-- Error Message -->
+                <TextBlock Text="{Binding ErrorMessage}" 
+                         Foreground="Red" 
+                         TextWrapping="Wrap"
+                         Margin="0,8"
+                         Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"/>
+
+                <!-- Login Button -->
+                <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                      Content="LOGIN"
+                      Background="{DynamicResource PrimaryHueMidBrush}"
+                      Foreground="White"
+                      Height="48"
+                      Margin="0,20,0,10"
+                      Command="{Binding LoginCommand}"
+                      IsEnabled="{Binding CanLogin}">
+                    
+                    <Button.Content>
+                        <Grid>
+                            <TextBlock Text="LOGIN" 
+                                     Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverted}"/>
+                            <StackPanel Orientation="Horizontal" 
+                                      Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                                           Width="20" Height="20"
+                                           IsIndeterminate="True"
+                                           Foreground="White"/>
+                                <TextBlock Text="LOGGING IN..." Margin="10,0,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Button.Content>
+                </Button>
+
+                <!-- Register Link -->
+                <Button Style="{StaticResource MaterialDesignFlatButton}"
+                      Content="Don't have an account? Register here"
+                      HorizontalAlignment="Center"
+                      Margin="0,10"
+                      Command="{Binding RegisterCommand}"/>
+
+                <!-- Demo Credentials -->
+                <Border Background="{DynamicResource MaterialDesignDivider}" 
+                      Padding="15" Margin="0,20,0,0"
+                      CornerRadius="4">
+                    <StackPanel>
+                        <TextBlock Text="Demo Credentials:" FontWeight="Bold" FontSize="12"/>
+                        <TextBlock Text="Username: admin" FontSize="11"/>
+                        <TextBlock Text="Password: admin123" FontSize="11"/>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="{DynamicResource MaterialDesignDivider}" Height="1"/>
+        <TextBlock Grid.Row="2" 
+                 Text="© 2024 Freights Management System" 
+                 FontSize="11" 
+                 HorizontalAlignment="Center" 
+                 Margin="0,8"
+                 Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+    </Grid>
+</Window>
