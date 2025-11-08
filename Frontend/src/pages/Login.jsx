@@ -28,9 +28,17 @@ const Login = () => {
 
     try {
       setLoading(true);
-      await login(dispatch, { email, password });
-      toast.success("Welcome to FMS!");
+      const result = await login(dispatch, { email, password });
       setLoading(false);
+      if (result.ok) {
+        toast.success("Welcome to FMS!");
+      } else if (result.status === 401) {
+        toast.error("Incorrect email or password.");
+      } else if (result.status === 404) {
+        toast.error("User not found. Please contact Admin.");
+      } else {
+        toast.error(result.message || "Login failed. Please try again.");
+      }
     } catch (error) {
       setLoading(false);
       toast.error("Login failed. Please check your credentials.");
@@ -94,7 +102,7 @@ const Login = () => {
                       className="w-full px-4 py-3 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent placeholder:text-gray-400"
                       placeholder="Enter your email address"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value.replace(/\s/g, ''))}
+                      onChange={(e) => setEmail(e.target.value.trim())}
                     />
                   </div>
 
@@ -107,7 +115,7 @@ const Login = () => {
                         className="w-full px-4 py-3 pr-12 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent placeholder:text-gray-400"
                         placeholder="Enter your password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value.replace(/\s/g, ''))}
+                        onChange={(e) => setPassword(e.target.value)}
                       />
                       <button
                         type="button"
