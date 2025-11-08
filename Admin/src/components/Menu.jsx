@@ -12,6 +12,7 @@ import {
   FaCalendarAlt,
 } from "react-icons/fa";
 import { Link } from "react-router-dom"; 
+import PropTypes from "prop-types";
 
 
 //menuItem Component
@@ -25,6 +26,12 @@ const MenuItem = ({ icon: Icon, label, path }) => (
     </li>
   </Link>
 );
+
+MenuItem.propTypes = {
+  icon: PropTypes.elementType.isRequired,
+  label: PropTypes.string.isRequired,
+  path: PropTypes.string.isRequired,
+};
 
 //menu items array
 const Menu = () => {

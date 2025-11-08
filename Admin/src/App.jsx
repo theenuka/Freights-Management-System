@@ -76,7 +76,7 @@ function App() {
     {
       path: "/login",
       element: (
-        <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
+        <div className="min-h-screen bg-white">
           <Login />
         </div>
       ),

@@ -186,7 +186,7 @@ const MyParcels = () => {
                 <FaBox className="text-white text-3xl" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No Shipments Found</h3>
-              <p className="text-gray-600 mb-6">You don't have any freight shipments yet.</p>
+              <p className="text-gray-600 mb-6">You don&apos;t have any freight shipments yet.</p>
               <Link 
                 to="/"
                 className="fms-button-primary inline-flex items-center"
