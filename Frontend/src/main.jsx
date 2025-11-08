@@ -1,5 +1,6 @@
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
@@ -16,7 +17,7 @@ class ErrorBoundary extends React.Component {
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     return { hasError: true };
   }
 
@@ -33,7 +34,7 @@ class ErrorBoundary extends React.Component {
               <span className="text-white text-2xl">⚠️</span>
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Something went wrong</h2>
-            <p className="text-gray-600 mb-6">We're sorry, but something unexpected happened. Please refresh the page to try again.</p>
+            <p className="text-gray-600 mb-6">We&apos;re sorry, but something unexpected happened. Please refresh the page to try again.</p>
             <button 
               onClick={() => window.location.reload()}
               className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
@@ -49,8 +50,12 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+ErrorBoundary.propTypes = {
+  children: PropTypes.node
+};
+
 // Loading Component
-const LoadingSpinner = () => (
+export const LoadingSpinner = () => (
   <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
     <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-8 text-center">
       <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">

@@ -42,82 +42,69 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-white">
       <Navbar />
-      
-      <div className="min-h-screen flex items-center justify-center py-20 px-4">
-        <div className="max-w-6xl w-full mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            
-            {/* Left Side - Hero Image */}
-            <div className="hidden lg:block relative">
-              <div className="relative z-10">
-                <img 
-                  src="/hero.png" 
-                  alt="FMS Login" 
-                  className="w-full h-auto rounded-2xl shadow-2xl"
-                />
+
+      <div className="flex items-center justify-center px-4 py-16">
+        <div className="w-full max-w-6xl">
+          <div className="grid items-center grid-cols-1 gap-12 lg:grid-cols-2">
+            {/* Left: Hero card with badges */}
+            <div className="relative hidden lg:block">
+              <div className="p-4 bg-white border border-gray-200 shadow-sm rounded-2xl">
+                <img src="/hero.png" alt="FMS Login" className="w-full h-auto rounded-xl" />
               </div>
-              
-              {/* Floating Elements */}
-              <div className="absolute -top-6 -left-6 bg-white/90 backdrop-blur-md rounded-xl p-4 shadow-lg border border-white/20">
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium text-gray-700">Secure Access</span>
+              <div className="absolute -top-5 -left-5">
+                <div className="flex items-center px-4 py-2 text-sm bg-white border border-gray-200 rounded-xl shadow-sm">
+                  <span className="mr-2 inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span className="font-medium text-gray-700">Secure Access</span>
                 </div>
               </div>
-              
-              <div className="absolute -bottom-6 -right-6 bg-white/90 backdrop-blur-md rounded-xl p-4 shadow-lg border border-white/20">
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium text-gray-700">24/7 Available</span>
+              <div className="absolute -bottom-5 -right-5">
+                <div className="flex items-center px-3 py-2 text-xs bg-white border border-gray-200 rounded-xl shadow-sm text-gray-600">
+                  <span className="mr-2 inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+                  24/7 Available
                 </div>
               </div>
             </div>
 
-            {/* Right Side - Login Form */}
+            {/* Right: Login card */}
             <div className="w-full max-w-md mx-auto lg:mx-0">
-              <div className="fms-card-glass p-8 lg:p-10">
-                {/* Header */}
-                <div className="text-center mb-8">
-                  <div className="flex items-center justify-center space-x-3 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                      <span className="text-white font-bold text-xl">F</span>
+              <div className="p-8 bg-white border border-gray-200 shadow-sm rounded-2xl">
+                <div className="mb-8 text-center">
+                  <div className="flex items-center justify-center mb-4 space-x-3">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 shadow-sm">
+                      <span className="text-xl font-bold text-white">F</span>
                     </div>
-                    <div>
-                      <h1 className="text-2xl font-bold fms-gradient-text">FMS</h1>
-                      <p className="text-blue-200 text-xs">Freights Management</p>
+                    <div className="text-left">
+                      <h1 className="text-2xl font-bold text-gray-900">FMS</h1>
+                      <p className="text-xs font-medium text-blue-600">Freights Management</p>
                     </div>
                   </div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
-                  <p className="text-blue-200">Sign in to access your freight dashboard</p>
+                  <h2 className="mb-1 text-2xl font-semibold text-gray-900">Welcome Back</h2>
+                  <p className="text-sm text-gray-600">Sign in to access your freight dashboard</p>
                 </div>
 
                 {/* Form */}
                 <div className="space-y-6">
-                  {/* Email Input */}
+                  {/* Email */}
                   <div>
-                    <label className="block text-sm font-semibold text-blue-200 mb-2">
-                      Email Address
-                    </label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Email Address</label>
                     <input
                       type="email"
-                      className="fms-input-glass"
+                      className="w-full px-4 py-3 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent placeholder:text-gray-400"
                       placeholder="Enter your email address"
                       value={email}
                       onChange={(e) => setEmail(e.target.value.replace(/\s/g, ''))}
                     />
                   </div>
 
-                  {/* Password Input */}
+                  {/* Password */}
                   <div>
-                    <label className="block text-sm font-semibold text-blue-200 mb-2">
-                      Password
-                    </label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Password</label>
                     <div className="relative">
                       <input
-                        type={showPassword ? "text" : "password"}
-                        className="fms-input-glass pr-12"
+                        type={showPassword ? 'text' : 'password'}
+                        className="w-full px-4 py-3 pr-12 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent placeholder:text-gray-400"
                         placeholder="Enter your password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value.replace(/\s/g, ''))}
@@ -125,28 +112,25 @@ const Login = () => {
                       <button
                         type="button"
                         onClick={handleTogglePassword}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300 hover:text-white transition-colors duration-300"
+                        className="absolute inset-y-0 right-0 flex items-center px-3 text-sm font-medium text-gray-500 hover:text-gray-700"
                       >
-                        {showPassword ? "🙈" : "👁️"}
+                        {showPassword ? 'Hide' : 'Show'}
                       </button>
                     </div>
                   </div>
 
-                  {/* Error Message */}
+                  {/* Error */}
                   {error && (
-                    <div className="bg-red-500/20 backdrop-blur-md border border-red-400/30 rounded-xl p-4">
-                      <p className="text-red-200 text-sm">
-                        Please ensure that your credentials are entered correctly before attempting to log in. 
-                        Double-check your email and password and try again.
-                      </p>
+                    <div className="p-4 border border-red-200 rounded-xl bg-red-50">
+                      <p className="text-sm text-red-700">Please ensure your credentials are correct and try again.</p>
                     </div>
                   )}
 
-                  {/* Login Button */}
+                  {/* Sign in */}
                   <button
                     onClick={handleLogin}
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:scale-100 disabled:cursor-not-allowed"
+                    className="w-full py-3 font-semibold text-white transition-colors rounded-lg shadow-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-60"
                   >
                     {loading ? (
                       <div className="flex items-center justify-center space-x-2">
@@ -161,21 +145,14 @@ const Login = () => {
                     )}
                   </button>
 
-                  {/* Additional Links */}
+                  {/* Links */}
                   <div className="space-y-4 text-center">
-                    <Link 
-                      to="/forgot-password" 
-                      className="text-blue-300 hover:text-white transition-colors duration-300 text-sm"
-                    >
+                    <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700">
                       Forgot your password?
                     </Link>
-                    
                     <div className="flex items-center justify-center space-x-2 text-sm">
-                      <span className="text-blue-200">Don't have an account?</span>
-                      <Link 
-                        to="/register" 
-                        className="text-blue-300 hover:text-white font-semibold transition-colors duration-300"
-                      >
+                      <span className="text-gray-600">Don&apos;t have an account?</span>
+                      <Link to="/register" className="font-semibold text-blue-600 hover:text-blue-700">
                         Contact Admin
                       </Link>
                     </div>
@@ -183,11 +160,11 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* Security Badge */}
+              {/* Security badge */}
               <div className="mt-6 text-center">
-                <div className="inline-flex items-center space-x-2 bg-green-100/80 backdrop-blur-md text-green-700 px-4 py-2 rounded-full text-sm">
-                  <span>🔒</span>
-                  <span>Secured with 256-bit SSL encryption</span>
+                <div className="inline-flex items-center px-4 py-2 text-sm text-green-700 bg-green-100 border border-green-200 rounded-full">
+                  <span className="mr-2">🔒</span>
+                  Secured with 256-bit SSL encryption
                 </div>
               </div>
             </div>

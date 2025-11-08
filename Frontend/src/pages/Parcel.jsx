@@ -85,15 +85,15 @@ const Parcel = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="min-h-screen bg-white">
         <Navbar />
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="fms-card text-center p-8">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8 text-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse shadow">
               <span className="text-white font-bold text-xl">F</span>
             </div>
-            <h3 className="text-xl font-semibold fms-gradient-text mb-2">Loading shipment details...</h3>
-            <p className="text-gray-600">Please wait while we fetch the information</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Loading shipment details...</h3>
+            <p className="text-gray-600">Please wait while we fetch the information.</p>
           </div>
         </div>
         <Footer />
@@ -102,7 +102,7 @@ const Parcel = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-white">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
@@ -110,7 +110,7 @@ const Parcel = () => {
         <div className="flex items-center space-x-4 mb-8">
           <Link 
             to="/myparcels"
-            className="flex items-center justify-center w-12 h-12 bg-white/80 backdrop-blur-md hover:bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-gray-200"
+            className="flex items-center justify-center w-12 h-12 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow transition-all duration-200"
           >
             <FaArrowLeft className="text-gray-600" />
           </Link>
@@ -124,12 +124,27 @@ const Parcel = () => {
           {/* Main Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Status Card */}
-            <div className="fms-card">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">Shipment Status</h2>
                 <span className={`fms-badge ${getStatusColor(parcel.status)}`}>
                   {getStatusText(parcel.status)}
                 </span>
+              </div>
+              {/* Progress */}
+              <div className="mt-2 mb-6">
+                <div className="flex items-center">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold ${parcel.status >= 1 ? 'bg-blue-600' : 'bg-gray-300'}`}>1</div>
+                  <div className={`flex-1 h-1 mx-2 ${parcel.status >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold ${parcel.status >= 2 ? 'bg-blue-600' : 'bg-gray-300'}`}>2</div>
+                  <div className={`flex-1 h-1 mx-2 ${parcel.status >= 3 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold ${parcel.status >= 3 ? 'bg-blue-600' : 'bg-gray-300'}`}>3</div>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-2">
+                  <span>Pending</span>
+                  <span>In transit</span>
+                  <span>Delivered</span>
+                </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -182,7 +197,7 @@ const Parcel = () => {
             {/* Sender & Recipient Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Sender Info */}
-              <div className="fms-card">
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                   <FaUserTie className="text-blue-600 mr-2" />
                   Sender Information
@@ -200,7 +215,7 @@ const Parcel = () => {
               </div>
 
               {/* Recipient Info */}
-              <div className="fms-card">
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                   <FaUser className="text-green-600 mr-2" />
                   Recipient Information
@@ -219,7 +234,7 @@ const Parcel = () => {
             </div>
 
             {/* Additional Details */}
-            <div className="fms-card">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
@@ -265,7 +280,7 @@ const Parcel = () => {
 
           {/* Feedback Section */}
           <div className="space-y-6">
-            <div className="fms-card">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <FaEnvelope className="text-purple-600 mr-2" />
                 Leave Feedback
@@ -276,12 +291,12 @@ const Parcel = () => {
                   onChange={(e) => setFeedback(e.target.value)}
                   rows={6}
                   placeholder="Share your experience with this shipment..."
-                  className="fms-input resize-none"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none"
                 />
                 <button
                   onClick={handleFeedbackSubmit}
                   disabled={submittingFeedback}
-                  className="fms-button-primary w-full"
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl shadow-sm hover:shadow transition-all duration-200"
                 >
                   {submittingFeedback ? (
                     <div className="flex items-center justify-center space-x-2">
@@ -296,16 +311,16 @@ const Parcel = () => {
             </div>
 
             {/* Quick Actions */}
-            <div className="fms-card">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <button className="fms-button-secondary w-full">
+                <button className="w-full bg-white text-gray-700 font-semibold py-3 px-6 rounded-xl border border-gray-300 hover:bg-gray-50 transition">
                   📧 Contact Support
                 </button>
-                <button className="fms-button-secondary w-full">
+                <button className="w-full bg-white text-gray-700 font-semibold py-3 px-6 rounded-xl border border-gray-300 hover:bg-gray-50 transition">
                   📄 Download Receipt
                 </button>
-                <button className="fms-button-secondary w-full">
+                <button className="w-full bg-white text-gray-700 font-semibold py-3 px-6 rounded-xl border border-gray-300 hover:bg-gray-50 transition">
                   📋 Track History
                 </button>
               </div>

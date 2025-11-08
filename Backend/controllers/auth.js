@@ -34,7 +34,7 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
-      return res.status(401).json("You have not registered");
+      return res.status(404).json({ message: "User not found. Please register first." });
     }
     const hashedPassword = CryptoJs.AES.decrypt(
       user.password,
@@ -43,7 +43,7 @@ const loginUser = async (req, res) => {
 
     const originalPassword = hashedPassword.toString(CryptoJs.enc.Utf8);
     if (originalPassword !== req.body.password) {
-      return res.status(500).json("wrong credentials");
+      return res.status(401).json({ message: "Incorrect email or password." });
     }
     const { password, ...info } = user._doc;
 
@@ -55,7 +55,8 @@ const loginUser = async (req, res) => {
 
     res.status(200).json({ ...info, accessToken });
   } catch (error) {
-    res.status(500).json(error);
+    console.error("Login error", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 module.exports = { registerUser, loginUser };

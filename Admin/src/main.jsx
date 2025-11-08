@@ -10,7 +10,7 @@ class FMSErrorBoundary extends React.Component {
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     return { hasError: true };
   }
 
@@ -42,6 +42,13 @@ class FMSErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
+FMSErrorBoundary.propTypes = {
+  children: (props, propName) => {
+    if (!props[propName]) return null;
+    return undefined;
+  },
+};
 
 // Initialize FMS Admin Application
 const root = ReactDOM.createRoot(document.getElementById('root'));
