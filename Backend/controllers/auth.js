@@ -29,9 +29,14 @@ const registerUser = async (req, res) => {
 
 //login controller
 
+const escapeRegex = (str = "") => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const loginUser = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
+    const email = (req.body.email || "").trim();
+    const passwordInput = req.body.password ?? "";
+    // case-insensitive exact match on email to avoid casing pitfalls
+    const user = await User.findOne({ email: { $regex: `^${escapeRegex(email)}$`, $options: 'i' } });
 
     if (!user) {
       return res.status(404).json({ message: "User not found. Please register first." });
@@ -42,7 +47,7 @@ const loginUser = async (req, res) => {
     );
 
     const originalPassword = hashedPassword.toString(CryptoJs.enc.Utf8);
-    if (originalPassword !== req.body.password) {
+    if (originalPassword !== passwordInput) {
       return res.status(401).json({ message: "Incorrect email or password." });
     }
     const { password, ...info } = user._doc;
