@@ -122,7 +122,42 @@ npm run start
 4. JWT attached on future protected requests
 
 ---
-## 🔌 API Summary
+## � Run with Docker
+
+### Prerequisites
+- Docker Desktop or Docker Engine + Compose v2
+
+### 1) Copy env file
+```bash
+cp .env.example .env
+# then edit .env to set PASS / JWT_SEC (and EMAIL_USER/PASS if using emails)
+```
+
+### 2) Build and start all services
+```bash
+docker compose up --build
+```
+
+### 3) Access
+- Frontend: http://localhost:5173
+- Admin: http://localhost:5174
+- API: http://localhost:8000/api/v1
+- MongoDB: mongodb://localhost:27017 (DB name: fms)
+
+Containers include health checks for Mongo and Backend.
+
+To stop:
+```bash
+docker compose down
+```
+
+To start detached:
+```bash
+docker compose up -d
+```
+
+---
+## �🔌 API Summary
 
 Base URL: `http://localhost:<PORT>/api/v1`
 

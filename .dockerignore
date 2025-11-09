@@ -1,0 +1,13 @@
+# Global ignore
+.git
+node_modules
+**/node_modules
+npm-debug.log
+Dockerfile*
+.gitignore
+.env
+.env.local
+.dist
+**/dist
+.idea
+.vscode
