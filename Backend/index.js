@@ -17,6 +17,11 @@ app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/parcels", parcelRoute);
 
+// Simple health endpoint for container checks
+app.get("/api/v1/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 // Prefer env PORT, fallback to 8000 for local dev
 // Use env PORT or auto-fallback to first free port from 8000 upward
 let basePort = parseInt(process.env.PORT, 10) || 8000;
