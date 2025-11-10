@@ -28,7 +28,7 @@ resource "aws_security_group" "app_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Production එකේදී මෙය ඔයාගේ IP එකට පමණක් සීමා කරන්න
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -44,14 +44,14 @@ resource "aws_security_group" "app_sg" {
 }
 
 resource "aws_instance" "app_server" {
-  ami                    = data.aws_ami.ubuntu.id # data.tf එකෙන් එන අලුත්ම ID එක
+  ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.app_sg.id]
 
   root_block_device {
-    volume_size = 15 # Free tier එකේ 30GB වෙනකන් පුළුවන්, අපි 15GB ගමු
-    volume_type = "gp3"
+    volume_size = 15
+    volume_type = "gp2"
   }
 
   user_data = <<-EOF
