@@ -65,8 +65,7 @@ pipeline {
                 script {
                     dir('terraform') {
                         sh 'terraform init'
-                        sh 'terraform plan -out=tfplan'
-                        sh 'terraform apply -auto-approve tfplan'
+                        sh 'terraform apply -auto-approve'
                         sh 'terraform output -raw server_public_ip > ../server_ip.txt'
                     }
                 }
@@ -76,9 +75,13 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 script {
-                    def SERVER_IP = sh(script: 'cat server_ip.txt', returnStdout: true).trim()
+                    sh 'ls -la' 
+                    
+                    def SERVER_IP = sh(script: "cat ${env.WORKSPACE}/server_ip.txt", returnStdout: true).trim()
+                    echo "Deploying to Server IP: ${SERVER_IP}"
+
                     sshagent(['freights-app-ssh-key']) {
-                        sh "ssh -o StrictHostKeyChecking=no ubuntu@${SERVER_IP} 'bash -s' < ./deploy.sh"
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@${SERVER_IP} 'bash -s' < ${env.WORKSPACE}/deploy.sh"
                     }
                 }
             }
