@@ -60,7 +60,6 @@ pipeline {
             }
         }
 
-        // --- MISSING STAGES ---
         stage('Deploy Infrastructure') {
             steps {
                 script {
@@ -84,7 +83,6 @@ pipeline {
                 }
             }
         }
-        // ----------------------
     }
     post {
         always {
