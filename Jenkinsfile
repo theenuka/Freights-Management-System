@@ -59,6 +59,32 @@ pipeline {
                 }
             }
         }
+
+        // --- MISSING STAGES ---
+        stage('Deploy Infrastructure') {
+            steps {
+                script {
+                    dir('terraform') {
+                        sh 'terraform init'
+                        sh 'terraform plan -out=tfplan'
+                        sh 'terraform apply -auto-approve tfplan'
+                        sh 'terraform output -raw server_public_ip > ../server_ip.txt'
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Application') {
+            steps {
+                script {
+                    def SERVER_IP = sh(script: 'cat server_ip.txt', returnStdout: true).trim()
+                    sshagent(['freights-app-ssh-key']) {
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@${SERVER_IP} 'bash -s' < ./deploy.sh"
+                    }
+                }
+            }
+        }
+        // ----------------------
     }
     post {
         always {
