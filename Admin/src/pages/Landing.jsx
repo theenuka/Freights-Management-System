@@ -26,13 +26,14 @@ FeatureCard.propTypes = {
 };
 
 const Landing = () => {
+  // Animated counters
   const [counters, setCounters] = useState(countersConfig.map(() => 0));
   useEffect(() => {
     const duration = 1400;
     const start = performance.now();
     const tick = (now) => {
       const progress = Math.min((now - start) / duration, 1);
-      setCounters(countersConfig.map(cfg => Math.round(cfg.end * progress)));
+      setCounters(countersConfig.map((cfg) => Math.round(cfg.end * progress)));
       if (progress < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -40,12 +41,12 @@ const Landing = () => {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center px-6 py-16">
-      {/* Animated gradient backdrop */}
-      <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.15),transparent_60%),radial-gradient(circle_at_80%_30%,rgba(99,102,241,0.18),transparent_55%),linear-gradient(to_bottom_right,#f8fafc,#eef2ff)]" />
+      {/* Softer, lighter gradient backdrop */}
+      <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_15%_20%,rgba(59,130,246,0.10),transparent_55%),radial-gradient(circle_at_85%_25%,rgba(99,102,241,0.08),transparent_50%),linear-gradient(to_bottom_right,#ffffff,#f6f9ff)]" />
       {/* Floating orbs */}
       <div className="absolute -z-10 inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/3 left-10 w-40 h-40 bg-blue-300/30 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-10 right-14 w-52 h-52 bg-purple-300/30 rounded-full blur-3xl animate-pulse [animation-delay:400ms]" />
+        <div className="absolute top-1/3 left-10 w-40 h-40 bg-blue-200/20 rounded-full blur-2xl animate-pulse" />
+        <div className="absolute bottom-10 right-14 w-52 h-52 bg-indigo-200/20 rounded-full blur-2xl animate-pulse [animation-delay:400ms]" />
       </div>
 
       <div className="w-full max-w-7xl grid lg:grid-cols-12 gap-12 items-center">
@@ -76,11 +77,11 @@ const Landing = () => {
           </div>
 
           <div className="flex flex-wrap gap-4 pt-2">
-            <Link to="/login" className="group relative inline-flex items-center px-7 py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all">
+            <Link to="/login" className="group relative inline-flex items-center px-7 py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
               <span className="relative z-10">Sign In</span>
               <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-20 bg-white transition-opacity" />
             </Link>
-            <Link to="/signup" className="inline-flex items-center px-7 py-3 rounded-xl font-semibold bg-white text-blue-700 border border-blue-200 hover:border-blue-300 hover:shadow-md transition-all">
+            <Link to="/signup" className="inline-flex items-center px-7 py-3 rounded-xl font-semibold bg-white text-blue-700 border border-blue-200 hover:border-blue-300 hover:shadow-md transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
               Create Admin Account
             </Link>
           </div>
