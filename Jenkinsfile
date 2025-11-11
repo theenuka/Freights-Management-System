@@ -75,9 +75,24 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 script {
-                    def SERVER_IP = sh(script: "cat ${env.WORKSPACE}/server_ip.txt", returnStdout: true).trim()
+                    def SERVER_IP = sh(script: 'cat server_ip.txt', returnStdout: true).trim()
+                    echo "--------------------------------------------------"
+                    echo "DEPLOYING TO SERVER: ${SERVER_IP}"
+                    echo "--------------------------------------------------"
+
+                    echo "Checking workspace files..."
+                    sh 'ls -la'
+
+                    if (fileExists('deploy.sh')) {
+                        sh 'chmod +x deploy.sh'
+                        echo "deploy.sh found and made executable."
+                    } else {
+                        error "deploy.sh NOT FOUND in workspace!"
+                    }
+
                     sshagent(['freights-app-ssh-key']) {
-                        sh "ssh -o StrictHostKeyChecking=no ubuntu@${SERVER_IP} 'bash -s' < ${env.WORKSPACE}/deploy.sh"
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@${SERVER_IP} 'echo SSH Connection Success!'"
+                        sh "ssh -v -o StrictHostKeyChecking=no ubuntu@${SERVER_IP} 'bash -s' < deploy.sh"
                     }
                 }
             }
