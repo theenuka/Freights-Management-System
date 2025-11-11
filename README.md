@@ -4,7 +4,7 @@
 	<p>End‑to‑end freight & parcel tracking platform – Admin control, Customer visibility, Background automation.</p>
 	<p>
 		<a href="#getting-started"><strong>Getting Started »</strong></a> ·
-		<a href="#live-demo">Demo</a> ·
+		<a href="#deployment">Deployment</a> ·
 		<a href="#roadmap">Roadmap</a> ·
 		<a href="#contributing">Contribute</a>
 	</p>
@@ -56,13 +56,15 @@ Express API (Auth, Parcels, Users) ----> MongoDB
 - **Frontend / Admin:** React + Vite, React Router, Redux Toolkit, Tailwind CSS, React Icons, Toast notifications
 - **Backend:** Node.js, Express, Mongoose (MongoDB), JWT, CryptoJS AES
 - **Background Services:** Node + nodemailer (via helper), EJS templates
-- **Tooling:** Nodemon, kill-port (dev convenience), PostCSS, dotenv
+- **Dev Tooling:** Nodemon, kill-port (dev convenience), PostCSS, dotenv
+- **Infra / CI:** Docker, AWS ECR, Terraform (VPC + EC2), Ansible (roles), Jenkins Pipeline
 
 ### Security
 - Passwords AES encrypted at rest using `PASS` secret.
 - JWT access tokens signed with `JWT_SEC`, 10 day validity.
 - CORS enabled for frontend origins.
 - Error responses normalized (401, 404, 500) for consistent client handling.
+ - Ansible installs `python3-docker` (not pip) to avoid PEP 668 issues on Ubuntu.
 
 ---
 ## 🚀 Getting Started
@@ -122,7 +124,7 @@ npm run start
 4. JWT attached on future protected requests
 
 ---
-## � Run with Docker
+## 🐳 Run with Docker
 
 ### Prerequisites
 - Docker Desktop or Docker Engine + Compose v2
@@ -138,7 +140,7 @@ cp .env.example .env
 docker compose up --build
 ```
 
-### 3) Access
+### 3) Access (local compose)
 - Frontend: http://localhost:5173
 - Admin: http://localhost:5174
 - API: http://localhost:8000/api/v1
@@ -157,7 +159,7 @@ docker compose up -d
 ```
 
 ---
-## �🔌 API Summary
+## 🔌 API Summary
 
 Base URL: `http://localhost:<PORT>/api/v1`
 
@@ -183,7 +185,41 @@ Base URL: `http://localhost:<PORT>/api/v1`
 - Auto port fallback prevents local clash loops (no more manual kill). 
 
 ---
-## 📂 Folder Structure (Root excerpt)
+## � Deployment
+
+This repo ships with an opinionated CI/CD pipeline targeting AWS EC2:
+
+1) Jenkins Pipeline (`Jenkinsfile`)
+- Stages: Checkout → Login to ECR → Build & Push 4 images (Backend, Frontend, Admin, Background) → Terraform Apply → Ansible Deploy.
+- Credentials expected in Jenkins:
+	- `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (string credentials)
+	- `freights-app-ssh-key` (SSH private key for ubuntu@EC2)
+- ECR repositories: defined via env `ECR_*_URI` in Jenkinsfile.
+
+2) Terraform (`terraform/`)
+- Provisions VPC, public subnet, IGW, route table, security group (22, 80, 3000, 8000), and an Ubuntu EC2 instance.
+- Outputs `server_public_ip` consumed by Jenkins to build the Ansible inventory.
+
+3) Ansible (`ansible/`)
+- Roles: `common` (base pkgs + venv), `docker` (Docker engine + python3-docker), `aws_cli` (installs AWS CLI v2), `app_deploy`.
+- Deploys 4 containers on a user-defined docker network:
+	- backend → publishes 8000:8000
+	- frontend → publishes 80:80
+	- admin → publishes 3000:80
+	- background → internal only
+- ECR auth passed from Jenkins as `ecr_password` variable.
+
+4) Production Access
+- Frontend (user portal): http://<ec2-public-ip>/
+- Admin: http://<ec2-public-ip>:3000/
+- Backend API: http://<ec2-public-ip>:8000/api/v1
+
+Notes
+- We fixed Ubuntu 24.04 PEP 668 issues by installing `python3-docker` via apt (no system pip writes).
+- For security, move DB/JWT secrets from `ansible/site.yml` to Jenkins credentials or Ansible Vault before real deployments.
+
+---
+## �📂 Folder Structure (Root excerpt)
 ```
 Backend/
 	controllers/   # auth, parcel, user logic
@@ -206,7 +242,7 @@ BackgroundServices/
 - [ ] Role-based granular permissions (super-admin, dispatcher)
 - [ ] Refresh token flow & token revocation list
 - [ ] Metrics dashboard (daily parcels, delivery SLA)
-- [ ] Dockerization & CI pipeline
+- [x] Dockerization & CI pipeline (ECR + Terraform + Ansible + Jenkins)
 - [ ] Internationalization (i18n)
 
 ---
@@ -227,6 +263,8 @@ Please keep changes scoped and include screenshots for UI updates.
 | Port already in use | Ghost process on 8000 | Dynamic port fallback or manually kill with `lsof -ti:8000 | xargs kill` |
 | Red toast but success earlier | Old frontend code always toasted success | Pull latest, ensure structured login result used |
 | Emails not sending | Missing SMTP vars | Set EMAIL_USER / EMAIL_PASS in .env |
+| Ansible pip error (PEP 668) | System Python is externally managed | We install `python3-docker` from apt instead |
+| npm ci EUSAGE in Docker | package-lock out of sync | Commit updated lockfiles before running the pipeline |
 
 ---
 ## 📄 License
