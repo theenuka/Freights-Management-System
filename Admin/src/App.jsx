@@ -10,6 +10,7 @@ import NewUsers from "./pages/NewUsers";
 import Parcel from "./pages/Parcel";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Landing from "./pages/Landing";
 
 function App() {
   const isAuthed = () => {
@@ -59,32 +60,38 @@ function App() {
   };
 
   const router = createBrowserRouter([
+    // Public landing page
     {
       path: "/",
+      element: <Landing />,
+    },
+    // Protected app section
+    {
+      path: "/app",
       element: <ProtectedLayout />,
       children: [
         {
-          path: "/",
+          path: "/app",
           element: <Home />,
         },
         {
-          path: "/parcels",
+          path: "/app/parcels",
           element: <Parcels />,
         },
         {
-          path: "/users",
+          path: "/app/users",
           element: <Users />,
         },
         {
-          path: "/newparcel",
+          path: "/app/newparcel",
           element: <NewParcel />,
         },
         {
-          path: "/newuser",
+          path: "/app/newuser",
           element: <NewUsers />,
         },
         {
-          path: "/parcel/:id",
+          path: "/app/parcel/:id",
           element: <Parcel />,
         },
       ],
