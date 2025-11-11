@@ -1,7 +1,7 @@
 ---
 - name: Setup and Deploy Freights App Server
   hosts: all
-  become: yes
+  become: true
   vars:
     ecr_uri: "487409145731.dkr.ecr.us-east-1.amazonaws.com"
     db_string: "mongodb+srv://theenkabandara:test1234@cluster0.rdjc9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
