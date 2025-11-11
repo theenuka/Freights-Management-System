@@ -1,35 +1,46 @@
 #!/bin/bash
 set -e
 REGION="us-east-1"
-# ඔයාගේ ECR මූලික URI එක
 ECR_BASE_URI="487409145731.dkr.ecr.us-east-1.amazonaws.com"
 
-echo "Logging into ECR..."
-aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ECR_BASE_URI
+if ! command -v docker &> /dev/null
+then
+    sudo apt-get update
+    sudo apt-get install -y docker.io
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    sudo usermod -aG docker ubuntu
+fi
 
-echo "Creating Docker network..."
-docker network create freights-net || true
+if ! command -v aws &> /dev/null
+then
+    sudo apt-get install -y awscli
+fi
 
-echo "Stopping old containers..."
-docker rm -f backend frontend admin background || true
+aws ecr get-login-password --region $REGION | sudo docker login --username AWS --password-stdin $ECR_BASE_URI
 
-echo "Pulling latest images..."
-docker pull $ECR_BASE_URI/freights-management-app:latest
-docker pull $ECR_BASE_URI/freights-management-frontend:latest
-docker pull $ECR_BASE_URI/freights-management-admin:latest
-docker pull $ECR_BASE_URI/freights-management-background:latest
+sudo docker network create freights-net || true
 
-echo "Starting new containers..."
-# 1. Backend
-docker run -d --name backend --net freights-net --restart unless-stopped -p 8000:8000   -e MONGO_URL="mongodb://mongo:27017/freights"   $ECR_BASE_URI/freights-management-app:latest
+sudo docker rm -f backend frontend admin background || true
 
-# 2. Frontend (Runs on port 80)
-docker run -d --name frontend --net freights-net --restart unless-stopped -p 80:80   $ECR_BASE_URI/freights-management-frontend:latest
+sudo docker pull $ECR_BASE_URI/freights-management-app:latest
+sudo docker pull $ECR_BASE_URI/freights-management-frontend:latest
+sudo docker pull $ECR_BASE_URI/freights-management-admin:latest
+sudo docker pull $ECR_BASE_URI/freights-management-background:latest
 
-# 3. Admin (Runs on port 3000)
-docker run -d --name admin --net freights-net --restart unless-stopped -p 3000:80   $ECR_BASE_URI/freights-management-admin:latest
+sudo docker run -d --name backend --net freights-net --restart unless-stopped -p 8000:8000 \
+  -e DB="mongodb+srv://theenkabandara:test1234@cluster0.rdjc9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" \
+  -e PORT=8000 \
+  -e PASS="parcel@2025" \
+  -e JWT_SEC="parcel12345" \
+  $ECR_BASE_URI/freights-management-app:latest
 
-# 4. Background Service
-docker run -d --name background --net freights-net --restart unless-stopped   -e MONGO_URL="mongodb://mongo:27017/freights"   $ECR_BASE_URI/freights-management-background:latest
+sudo docker run -d --name frontend --net freights-net --restart unless-stopped -p 80:80 \
+  $ECR_BASE_URI/freights-management-frontend:latest
 
-echo "Deployment handled successfully!"
+sudo docker run -d --name admin --net freights-net --restart unless-stopped -p 3000:80 \
+  $ECR_BASE_URI/freights-management-admin:latest
+
+sudo docker run -d --name background --net freights-net --restart unless-stopped \
+  -e DB="mongodb+srv://theenkabandara:test1234@cluster0.rdjc9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" \
+  $ECR_BASE_URI/freights-management-background:latest
