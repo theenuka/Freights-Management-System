@@ -75,11 +75,7 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 script {
-                    sh 'ls -la' 
-                    
                     def SERVER_IP = sh(script: "cat ${env.WORKSPACE}/server_ip.txt", returnStdout: true).trim()
-                    echo "Deploying to Server IP: ${SERVER_IP}"
-
                     sshagent(['freights-app-ssh-key']) {
                         sh "ssh -o StrictHostKeyChecking=no ubuntu@${SERVER_IP} 'bash -s' < ${env.WORKSPACE}/deploy.sh"
                     }
