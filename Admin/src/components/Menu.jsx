@@ -36,10 +36,10 @@ MenuItem.propTypes = {
 //menu items array
 const Menu = () => {
   const menuItems = [
-    { icon: FaHome, label: "Dashboard", path: "/", group: "main" },
+    { icon: FaHome, label: "Dashboard", path: "/app", group: "main" },
     { icon: FaUser, label: "Profile", path: "#", group: "main" },
-    { icon: FaBox, label: "Freight Management", path: "/parcels", group: "freight" },
-    { icon: FaUsers, label: "Users", path: "/users", group: "freight" },
+    { icon: FaBox, label: "Freight Management", path: "/app/parcels", group: "freight" },
+    { icon: FaUsers, label: "Users", path: "/app/users", group: "freight" },
     { icon: FaClipboardList, label: "Orders", path: "#", group: "freight" },
     { icon: FaElementor, label: "Elements", path: "#", group: "tools" },
     { icon: FaCog, label: "Settings", path: "#", group: "tools" },

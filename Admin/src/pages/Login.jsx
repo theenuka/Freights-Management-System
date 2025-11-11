@@ -18,7 +18,7 @@ const Login = () => {
       // store token and user for route protection
       localStorage.setItem("fms_admin", JSON.stringify(res.data));
       toast.success("Welcome back");
-      navigate("/");
+  navigate("/app");
     } catch (err) {
       const msg = err?.response?.data?.message || "Login failed";
       toast.error(msg);
