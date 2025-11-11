@@ -72,7 +72,7 @@ pipeline {
             }
         }
 
-        stage('Deploy Application (with Ansible)') {
+        stage('Deploy Application (with Ansible Roles)') {
             steps {
                 script {
                     def SERVER_IP = sh(script: "cat ${env.WORKSPACE}/server_ip.txt", returnStdout: true).trim()
@@ -85,7 +85,7 @@ pipeline {
 
                         sshagent(['freights-app-ssh-key']) {
                             sh """
-                                ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory deploy-playbook.yml \
+                                ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory site.yml \
                                     --user ubuntu \
                                     -e "ecr_password=${ECR_PASSWORD}"
                             """
