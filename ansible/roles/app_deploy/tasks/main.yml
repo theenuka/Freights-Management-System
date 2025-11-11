@@ -36,8 +36,10 @@
     image: "{{ ecr_uri }}/freights-management-app:latest"
     state: started
     restart_policy: unless-stopped
-    network_mode: freights-net
-    ports: "8000:8000"
+    networks:
+      - name: freights-net
+    published_ports:
+      - "8000:8000"
     env:
       DB: "{{ db_string }}"
       PORT: "8000"
@@ -50,8 +52,10 @@
     image: "{{ ecr_uri }}/freights-management-frontend:latest"
     state: started
     restart_policy: unless-stopped
-    network_mode: freights-net
-    ports: "80:80"
+    networks:
+      - name: freights-net
+    published_ports:
+      - "80:80"
 
 - name: Start Admin Container
   community.docker.docker_container:
@@ -59,8 +63,10 @@
     image: "{{ ecr_uri }}/freights-management-admin:latest"
     state: started
     restart_policy: unless-stopped
-    network_mode: freights-net
-    ports: "3000:80"
+    networks:
+      - name: freights-net
+    published_ports:
+      - "3000:80"
 
 - name: Start Background Container
   community.docker.docker_container:
@@ -68,6 +74,7 @@
     image: "{{ ecr_uri }}/freights-management-background:latest"
     state: started
     restart_policy: unless-stopped
-    network_mode: freights-net
+    networks:
+      - name: freights-net
     env:
       DB: "{{ db_string }}"

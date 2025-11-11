@@ -1,8 +1,22 @@
 ---
 - name: Install common dependencies
   apt:
-    name: 
+    name:
       - python3-pip
       - unzip
+      - python3-venv
     state: present
     update_cache: yes
+
+# Ensure pip is usable in a virtual environment (avoid system package restriction)
+- name: Create tools virtualenv
+  command: python3 -m venv /opt/ansible-venv
+  args:
+    creates: /opt/ansible-venv/bin/activate
+
+- name: Upgrade pip inside virtualenv
+  command: /opt/ansible-venv/bin/pip install --upgrade pip
+
+- name: Set fact for venv Python
+  set_fact:
+    venv_python: /opt/ansible-venv/bin/python

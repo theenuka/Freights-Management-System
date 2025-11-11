@@ -1,15 +1,15 @@
 ---
-- name: Setup and Deploy Freights App Server
-  hosts: all
-  become: true
-  vars:
-    ecr_uri: "487409145731.dkr.ecr.us-east-1.amazonaws.com"
-    db_string: "mongodb+srv://theenkabandara:test1234@cluster0.rdjc9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-    backend_pass: "parcel@2025"
-    backend_jwt: "parcel12345"
-  
-  roles:
-    - common
-    - docker
-    - aws_cli
-    - app_deploy
+ - name: Setup and Deploy Freights App Server
+   hosts: all
+   become: true
+   vars:
+     ecr_uri: "487409145731.dkr.ecr.us-east-1.amazonaws.com"
+     # Inject from Jenkins or Ansible Vault in production; placeholder here
+     db_string: "mongodb+srv://theenkabandara:test1234@cluster0.rdjc9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+     backend_pass: "parcel@2025"
+     backend_jwt: "parcel12345"
+   roles:
+     - common
+     - docker
+     - aws_cli
+     - app_deploy
