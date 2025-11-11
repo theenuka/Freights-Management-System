@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Menu from "./components/Menu";
@@ -9,8 +9,24 @@ import NewParcel from "./pages/NewParcel";
 import NewUsers from "./pages/NewUsers";
 import Parcel from "./pages/Parcel";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 function App() {
+  const isAuthed = () => {
+    try {
+      const raw = localStorage.getItem('fms_admin');
+      if (!raw) return false;
+      const obj = JSON.parse(raw);
+      return !!obj?.accessToken && (obj?.role === 'admin' || obj?.role === 'superadmin');
+    } catch { return false; }
+  };
+
+  const ProtectedLayout = () => {
+    if (!isAuthed()) {
+      return <Navigate to="/login" replace />;
+    }
+    return <Layout />;
+  };
   const Layout = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex flex-col">
@@ -45,7 +61,7 @@ function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Layout />,
+      element: <ProtectedLayout />,
       children: [
         {
           path: "/",
@@ -78,6 +94,14 @@ function App() {
       element: (
         <div className="min-h-screen bg-white">
           <Login />
+        </div>
+      ),
+    },
+    {
+      path: "/signup",
+      element: (
+        <div className="min-h-screen bg-white">
+          <Signup />
         </div>
       ),
     },

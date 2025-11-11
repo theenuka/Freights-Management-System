@@ -1,10 +1,31 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { publicRequest } from "../requestMethods";
+import { toast } from "react-toastify";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await publicRequest.post("/auth/login", { email: email.trim(), password });
+      // store token and user for route protection
+      localStorage.setItem("fms_admin", JSON.stringify(res.data));
+      toast.success("Welcome back");
+      navigate("/");
+    } catch (err) {
+      const msg = err?.response?.data?.message || "Login failed";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen px-6 py-12 bg-white">
@@ -36,7 +57,7 @@ const Login = () => {
           <div className="p-8 bg-white border border-gray-200 shadow-sm rounded-2xl">
             <h2 className="mb-2 text-2xl font-semibold text-gray-900">Welcome Back</h2>
             <p className="mb-8 text-sm text-gray-600">Sign in to your administrator account.</p>
-            <form className="space-y-6" onSubmit={(e)=>e.preventDefault()}>
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-700">Email Address</label>
                 <input
@@ -73,14 +94,18 @@ const Login = () => {
                 </label>
                 <button type="button" className="text-sm font-medium text-blue-600 hover:text-blue-700">Forgot password?</button>
               </div>
-              <Link to="/">
+              <div className="space-y-3">
                 <button
-                  type="button"
-                  className="w-full py-3 text-sm font-semibold text-white transition-colors rounded-lg shadow-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 text-sm font-semibold text-white transition-colors rounded-lg shadow-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-70"
                 >
-                  Sign In to FMS Admin
+                  {loading ? 'Signing in...' : 'Sign In to FMS Admin'}
                 </button>
-              </Link>
+                <p className="text-xs text-center text-gray-500">
+                  No account? <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-700">Create one</Link>
+                </p>
+              </div>
             </form>
             <div className="pt-6 mt-6 text-xs border-t border-gray-100 text-gray-500">
               🔒 Secured with enterprise-grade encryption

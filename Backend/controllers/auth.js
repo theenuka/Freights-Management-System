@@ -7,23 +7,37 @@ dotenv.config();
 //register controller
 
 const registerUser = async (req, res) => {
-  const newUser = User({
-    fullname: req.body.fullname,
-    email: req.body.email,
-    age: req.body.age,
-    country: req.body.country,
-    address: req.body.address,
-    password: CryptoJs.AES.encrypt(
-      req.body.password,
-      process.env.PASS
-    ).toString(),
-  });
-
   try {
+    const email = (req.body.email || "").trim();
+    if (!email || !req.body.password || !req.body.fullname) {
+      return res.status(400).json({ message: "Full name, email and password are required" });
+    }
+
+    // prevent duplicate registrations (case-insensitive)
+    const existing = await User.findOne({ email: { $regex: `^${escapeRegex(email)}$`, $options: 'i' } });
+    if (existing) {
+      return res.status(409).json({ message: "Email already registered" });
+    }
+
+    const newUser = new User({
+      fullname: req.body.fullname,
+      email: email,
+      age: req.body.age,
+      country: req.body.country,
+      address: req.body.address,
+      role: req.body.role || 'user',
+      password: CryptoJs.AES.encrypt(
+        req.body.password,
+        process.env.PASS
+      ).toString(),
+    });
+
     const user = await newUser.save();
-    res.status(201).json(user);
+    const { password, ...info } = user._doc;
+    res.status(201).json(info);
   } catch (error) {
-    res.status(500).json(error);
+    console.error("Register error", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
