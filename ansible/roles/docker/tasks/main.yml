@@ -1,0 +1,16 @@
+---
+- name: Install Docker
+  apt:
+    name: docker.io
+    state: present
+
+- name: Start Docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Install Docker Python library
+  pip:
+    name: docker
+    state: present

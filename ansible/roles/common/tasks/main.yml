@@ -1,0 +1,8 @@
+---
+- name: Install common dependencies
+  apt:
+    name: 
+      - python3-pip
+      - unzip
+    state: present
+    update_cache: yes

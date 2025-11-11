@@ -1,0 +1,73 @@
+---
+- name: Login to AWS ECR
+  community.docker.docker_login:
+    registry_url: "{{ ecr_uri }}"
+    username: AWS
+    password: "{{ ecr_password }}"
+
+- name: Create Docker Network
+  community.docker.docker_network:
+    name: freights-net
+    state: present
+
+- name: Pull images
+  community.docker.docker_image:
+    name: "{{ item }}"
+    source: pull
+  loop:
+    - "{{ ecr_uri }}/freights-management-app:latest"
+    - "{{ ecr_uri }}/freights-management-frontend:latest"
+    - "{{ ecr_uri }}/freights-management-admin:latest"
+    - "{{ ecr_uri }}/freights-management-background:latest"
+
+- name: Stop and remove old containers
+  community.docker.docker_container:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - backend
+    - frontend
+    - admin
+    - background
+
+- name: Start Backend Container
+  community.docker.docker_container:
+    name: backend
+    image: "{{ ecr_uri }}/freights-management-app:latest"
+    state: started
+    restart_policy: unless-stopped
+    network_mode: freights-net
+    ports: "8000:8000"
+    env:
+      DB: "{{ db_string }}"
+      PORT: "8000"
+      PASS: "{{ backend_pass }}"
+      JWT_SEC: "{{ backend_jwt }}"
+
+- name: Start Frontend Container
+  community.docker.docker_container:
+    name: frontend
+    image: "{{ ecr_uri }}/freights-management-frontend:latest"
+    state: started
+    restart_policy: unless-stopped
+    network_mode: freights-net
+    ports: "80:80"
+
+- name: Start Admin Container
+  community.docker.docker_container:
+    name: admin
+    image: "{{ ecr_uri }}/freights-management-admin:latest"
+    state: started
+    restart_policy: unless-stopped
+    network_mode: freights-net
+    ports: "3000:80"
+
+- name: Start Background Container
+  community.docker.docker_container:
+    name: background
+    image: "{{ ecr_uri }}/freights-management-background:latest"
+    state: started
+    restart_policy: unless-stopped
+    network_mode: freights-net
+    env:
+      DB: "{{ db_string }}"
