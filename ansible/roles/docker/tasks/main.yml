@@ -3,6 +3,7 @@
   apt:
     name: docker.io
     state: present
+    update_cache: yes
 
 - name: Start Docker service
   service:
@@ -10,7 +11,8 @@
     state: started
     enabled: yes
 
-- name: Install Docker Python library
-  pip:
-    name: docker
+# Install the Docker SDK for Python via apt to avoid PEP 668 "externally-managed-environment" errors
+- name: Install python3-docker (Docker SDK for Python)
+  apt:
+    name: python3-docker
     state: present
