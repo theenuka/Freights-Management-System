@@ -31,7 +31,7 @@ function App() {
   };
   const Layout = () => {
     return (
-      <div className="min-h-screen bg-slate-100 flex flex-col">
+      <div className="flex flex-col min-h-screen bg-slate-100">
         {/* Header */}
         <Navbar />
 
@@ -46,8 +46,8 @@ function App() {
           <div className="flex-1 overflow-hidden">
             {/* Removed translucent + blur to avoid visual banding over gradient seams */}
             <div className="h-full bg-white border-l border-slate-200/50">
-              <div className="p-6 h-full overflow-y-auto">
-                <div className="max-w-7xl mx-auto">
+              <div className="h-full p-6 overflow-y-auto">
+                <div className="mx-auto max-w-7xl">
                   <Outlet />
                 </div>
               </div>
@@ -132,7 +132,7 @@ function App() {
   ]);
 
   return (
-    <div className="font-inter antialiased">
+    <div className="antialiased font-inter">
       <RouterProvider router={router} />
     </div>
   );
