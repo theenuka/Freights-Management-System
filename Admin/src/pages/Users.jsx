@@ -218,7 +218,7 @@ const Users = () => {
             </div>
           </div>
           
-          <Link to="/newuser">
+          <Link to="/app/newuser">
             <button className="fms-button-primary">
               + Create New User
             </button>
@@ -324,7 +324,7 @@ const Users = () => {
       <div className="mt-8 fms-card p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Link to="/newuser">
+          <Link to="/app/newuser">
             <button className="w-full fms-button-secondary">
               Create User
             </button>
