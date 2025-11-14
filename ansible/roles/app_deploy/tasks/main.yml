@@ -96,12 +96,14 @@
     port: 3000
     timeout: 60
 
-- name: Probe Backend health endpoint
+- name: Probe Backend health endpoint (retry until healthy)
   uri:
     url: http://127.0.0.1:8000/api/v1/health
     status_code: 200
   register: backend_health
-  failed_when: backend_health.status is not defined or backend_health.status != 200
+  retries: 5
+  delay: 5
+  until: backend_health.status == 200
 
 - name: Probe Admin root
   uri:
