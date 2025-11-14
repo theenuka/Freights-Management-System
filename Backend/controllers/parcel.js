@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Parcel = require("../models/Parcel"); // Import the Parcel model (adjust path as necessary)
+const Parcel = require("../models/parcel"); // Import the Parcel model (Linux is case-sensitive)
 
 // CREATE A PARCEL
 const createParcel = async (req, res) => {
