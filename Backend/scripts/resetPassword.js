@@ -8,7 +8,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const mongoose = require('mongoose');
 const CryptoJs = require('crypto-js');
-const User = require('../models/User');
+const User = require('../models/user');
 
 async function run() {
   const [,, email, newPassword] = process.argv;
