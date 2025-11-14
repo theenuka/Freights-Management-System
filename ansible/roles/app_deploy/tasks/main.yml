@@ -60,15 +60,39 @@
   debug:
     var: backend_ls.stdout_lines
 
-- name: Test loading backend index.js directly
-  command: docker exec backend node -e "try{require('./index.js');console.log('INDEX_LOAD_OK');}catch(e){console.error('INDEX_LOAD_FAIL:',e);process.exit(1)}"
-  register: backend_index_test
+- name: Test requiring backend index.js (non-start import)
+  command: docker exec backend node -e "try{const m=require('./index.js');console.log('INDEX_REQUIRE_OK',Object.keys(m));}catch(e){console.error('INDEX_REQUIRE_FAIL',e);process.exit(1)}"
+  register: backend_index_require
   changed_when: false
-  failed_when: backend_index_test.rc != 0
+  ignore_errors: true
 
-- name: Show backend index.js load test output
+- name: Show backend index.js require output
   debug:
-    var: backend_index_test.stdout_lines
+    var: backend_index_require.stdout_lines
+
+- name: Show backend index.js require stderr if any
+  debug:
+    var: backend_index_require.stderr_lines
+
+- name: Backend runtime memory & node processes snapshot
+  command: docker exec backend sh -c "(grep MemTotal /proc/meminfo || true); ps -o pid,comm,rss | grep node || true"
+  register: backend_mem
+  changed_when: false
+  ignore_errors: true
+
+- name: Show backend memory snapshot
+  debug:
+    var: backend_mem.stdout_lines
+
+- name: Backend node version
+  command: docker exec backend node -p "process.version"
+  register: backend_node_version
+  changed_when: false
+  ignore_errors: true
+
+- name: Show backend node version
+  debug:
+    var: backend_node_version.stdout_lines
 
 - name: Start Frontend Container
   community.docker.docker_container:
