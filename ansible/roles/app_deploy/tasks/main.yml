@@ -96,14 +96,44 @@
     port: 3000
     timeout: 60
 
-- name: Probe Backend health endpoint (retry until healthy)
-  uri:
-    url: http://127.0.0.1:8000/api/v1/health
-    status_code: 200
-  register: backend_health
-  retries: 5
-  delay: 5
-  until: backend_health.status == 200
+- name: Pause briefly before backend health probe
+  pause:
+    seconds: 5
+
+- block:
+    - name: Probe Backend health endpoint (retry until healthy)
+      uri:
+        url: http://127.0.0.1:8000/api/v1/health
+        status_code: 200
+      register: backend_health
+      retries: 6
+      delay: 5
+      until: backend_health.status == 200
+  rescue:
+    - name: Backend health probe failed - gather docker ps
+      command: docker ps -a
+      register: docker_ps
+      changed_when: false
+    - name: Show docker ps output
+      debug:
+        var: docker_ps.stdout_lines
+    - name: Gather backend container inspect
+      command: docker inspect backend
+      register: backend_inspect
+      changed_when: false
+    - name: Show backend inspect
+      debug:
+        var: backend_inspect.stdout_lines
+    - name: Fetch backend container logs
+      command: docker logs --tail=200 backend
+      register: backend_logs
+      changed_when: false
+    - name: Show backend logs
+      debug:
+        var: backend_logs.stdout_lines
+    - name: Fail play explicitly after diagnostics
+      fail:
+        msg: "Backend health endpoint unreachable after retries. Diagnostics collected."
 
 - name: Probe Admin root
   uri:
