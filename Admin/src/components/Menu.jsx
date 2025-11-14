@@ -62,7 +62,7 @@ const Menu = () => {
   );
 
   return (
-    <div className="h-full border-r shadow-2xl bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700">
+    <div className="relative h-full border-r shadow-2xl bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-slate-700">
       {/* FMS Header */}
       <div className="p-6 border-b border-slate-700">
         <div className="text-center">
@@ -83,8 +83,7 @@ const Menu = () => {
         </ul>
       </div>
 
-      {/* Bottom Decoration */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
+  {/* Removed bottom decoration bar to eliminate stray horizontal line across layout */}
     </div>
   );
 };
