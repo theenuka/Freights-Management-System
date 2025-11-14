@@ -50,6 +50,26 @@
       PASS: "{{ backend_pass }}"
       JWT_SEC: "{{ backend_jwt }}"
 
+# Early diagnostics: ensure code is present and index.js loads before port wait
+- name: Verify backend /app directory contents
+  command: docker exec backend ls -1 /app
+  register: backend_ls
+  changed_when: false
+
+- name: Show backend /app directory listing
+  debug:
+    var: backend_ls.stdout_lines
+
+- name: Test loading backend index.js directly
+  command: docker exec backend node -e "try{require('./index.js');console.log('INDEX_LOAD_OK');}catch(e){console.error('INDEX_LOAD_FAIL:',e);process.exit(1)}"
+  register: backend_index_test
+  changed_when: false
+  failed_when: backend_index_test.rc != 0
+
+- name: Show backend index.js load test output
+  debug:
+    var: backend_index_test.stdout_lines
+
 - name: Start Frontend Container
   community.docker.docker_container:
     name: frontend
