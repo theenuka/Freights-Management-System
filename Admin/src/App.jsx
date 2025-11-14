@@ -11,6 +11,7 @@ import Parcel from "./pages/Parcel";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Landing from "./pages/Landing";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const isAuthed = () => {
@@ -65,6 +66,15 @@ function App() {
       path: "/",
       element: <Landing />,
     },
+    // Direct alias redirects (handle people typing /newuser or /newparcel directly)
+    {
+      path: "/newuser",
+      element: <Navigate to="/app/newuser" replace />,
+    },
+    {
+      path: "/newparcel",
+      element: <Navigate to="/app/newparcel" replace />,
+    },
     // Protected app section
     {
       path: "/app",
@@ -96,6 +106,7 @@ function App() {
         },
       ],
     },
+    // Auth pages
     {
       path: "/login",
       element: (
@@ -111,6 +122,11 @@ function App() {
           <Signup />
         </div>
       ),
+    },
+    // Catch-all 404
+    {
+      path: "*",
+      element: <NotFound />,
     },
   ]);
 
