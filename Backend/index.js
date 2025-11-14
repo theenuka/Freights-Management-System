@@ -40,14 +40,18 @@ function connectDatabase() {
     return;
   }
   console.log("[BOOT] Connecting to MongoDB...");
-  mongoose
-    .connect(process.env.DB)
-    .then(() => {
-      console.log("DB connection is successful");
-    })
-    .catch((e) => {
-      console.error("DB connection error", e);
-    });
+  try {
+    mongoose
+      .connect(process.env.DB)
+      .then(() => {
+        console.log("DB connection is successful");
+      })
+      .catch((e) => {
+        console.error("DB connection error", e);
+      });
+  } catch (e) {
+    console.error("DB connect threw synchronously", e);
+  }
 }
 
 function start() {
