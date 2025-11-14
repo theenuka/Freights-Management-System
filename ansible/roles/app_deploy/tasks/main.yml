@@ -82,3 +82,29 @@
       - name: freights-net
     env:
       DB: "{{ db_string }}"
+
+# Sanity checks: ensure services are up
+- name: Wait for Backend API to listen
+  wait_for:
+    host: 127.0.0.1
+    port: 8000
+    timeout: 60
+
+- name: Wait for Admin to listen
+  wait_for:
+    host: 127.0.0.1
+    port: 3000
+    timeout: 60
+
+- name: Probe Backend health endpoint
+  uri:
+    url: http://127.0.0.1:8000/api/v1/health
+    status_code: 200
+  register: backend_health
+  failed_when: backend_health.status is not defined or backend_health.status != 200
+
+- name: Probe Admin root
+  uri:
+    url: http://127.0.0.1:3000
+    return_content: no
+    status_code: 200
