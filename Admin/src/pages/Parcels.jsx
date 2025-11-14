@@ -203,7 +203,7 @@ const Parcels = () => {
             </div>
           </div>
           
-          <Link to="/newparcel">
+          <Link to="/app/newparcel">
             <button className="fms-button-primary">
               + Create New Freight
             </button>
@@ -298,7 +298,7 @@ const Parcels = () => {
       <div className="p-6 mt-8 fms-card">
         <h3 className="mb-4 text-lg font-semibold text-gray-800">Quick Actions</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Link to="/newparcel">
+          <Link to="/app/newparcel">
             <button className="w-full fms-button-secondary">
               Create Freight
             </button>
