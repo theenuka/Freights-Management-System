@@ -10,6 +10,10 @@
     name: freights-net
     state: present
 
+- name: Determine admin image tag
+  set_fact:
+    admin_image_tag: "{{ commit_sha | default('latest') }}"
+
 - name: Pull images
   community.docker.docker_image:
     name: "{{ item }}"
@@ -17,7 +21,7 @@
   loop:
     - "{{ ecr_uri }}/freights-management-app:latest"
     - "{{ ecr_uri }}/freights-management-frontend:latest"
-    - "{{ ecr_uri }}/freights-management-admin:latest"
+    - "{{ ecr_uri }}/freights-management-admin:{{ admin_image_tag }}"
     - "{{ ecr_uri }}/freights-management-background:latest"
 
 - name: Stop and remove old containers
@@ -60,7 +64,7 @@
 - name: Start Admin Container
   community.docker.docker_container:
     name: admin
-    image: "{{ ecr_uri }}/freights-management-admin:latest"
+    image: "{{ ecr_uri }}/freights-management-admin:{{ admin_image_tag }}"
     state: started
     restart_policy: unless-stopped
     networks:

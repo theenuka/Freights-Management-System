@@ -12,7 +12,11 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                script {
+                    checkout scm
+                    env.COMMIT_SHA = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    echo "Resolved commit SHA: ${env.COMMIT_SHA}"
+                }
             }
         }
         
@@ -45,8 +49,10 @@ pipeline {
         stage('Build & Push Admin') {
             steps {
                 script {
-                    sh 'docker build -t $ECR_ADMIN_URI:latest ./Admin'
+                    echo "Building Admin image with commit tag ${env.COMMIT_SHA}"
+                    sh 'docker build --no-cache -t $ECR_ADMIN_URI:latest -t $ECR_ADMIN_URI:' + env.COMMIT_SHA + ' ./Admin'
                     sh 'docker push $ECR_ADMIN_URI:latest'
+                    sh 'docker push $ECR_ADMIN_URI:' + env.COMMIT_SHA
                 }
             }
         }
@@ -87,7 +93,7 @@ pipeline {
                             sh """
                                 ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory site.yml \
                                     --user ubuntu \
-                                    -e "ecr_password=${ECR_PASSWORD}"
+                                    -e "ecr_password=${ECR_PASSWORD} commit_sha=${COMMIT_SHA}"
                             """
                         }
                     }
