@@ -31,7 +31,7 @@ function App() {
   };
   const Layout = () => {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex flex-col">
+      <div className="min-h-screen bg-slate-100 flex flex-col">
         {/* Header */}
         <Navbar />
 
@@ -44,7 +44,8 @@ function App() {
 
           {/* Content Area */}
           <div className="flex-1 overflow-hidden">
-            <div className="h-full bg-white/50 backdrop-blur-sm border-l border-slate-200/50">
+            {/* Removed translucent + blur to avoid visual banding over gradient seams */}
+            <div className="h-full bg-white border-l border-slate-200/50">
               <div className="p-6 h-full overflow-y-auto">
                 <div className="max-w-7xl mx-auto">
                   <Outlet />
