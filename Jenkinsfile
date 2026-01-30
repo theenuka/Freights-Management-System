@@ -110,16 +110,12 @@ pipeline {
             steps {
                 withCredentials([
                     sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY'),
-                    string(credentialsId: 'ansible-vault-password', variable: 'VAULT_PASS')
+                    usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')
                 ]) {
                     sh '''
                         echo "==================================="
                         echo "Starting Deployment with Ansible"
                         echo "==================================="
-
-                        # Create vault password file
-                        echo "${VAULT_PASS}" > /tmp/vault_pass.txt
-                        chmod 600 /tmp/vault_pass.txt
 
                         # Setup SSH key
                         mkdir -p ~/.ssh
@@ -129,16 +125,19 @@ pipeline {
                         # Disable host key checking for automation
                         export ANSIBLE_HOST_KEY_CHECKING=False
 
-                        # Run Ansible playbook
+                        # Run Ansible playbook with variables passed directly
                         cd ansible
                         ansible-playbook -i inventories/dev/hosts.yml site.yml \
-                            --vault-password-file /tmp/vault_pass.txt \
                             -e "server_ip=34.228.166.118" \
                             -e "ssh_key_path=~/.ssh/deploy_key.pem" \
-                            -e "image_tag=${IMAGE_TAG}"
+                            -e "image_tag=${IMAGE_TAG}" \
+                            -e "vault_dockerhub_password=${DH_PASS}" \
+                            -e "vault_db_string=mongodb://mongo:27017/fms" \
+                            -e "vault_backend_pass=devpass123" \
+                            -e "vault_backend_jwt=devjwtsecret456"
 
                         # Cleanup sensitive files
-                        rm -f /tmp/vault_pass.txt ~/.ssh/deploy_key.pem
+                        rm -f ~/.ssh/deploy_key.pem
                     '''
                 }
             }
