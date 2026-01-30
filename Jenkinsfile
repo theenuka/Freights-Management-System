@@ -48,82 +48,45 @@ pipeline {
             }
         }
 
-        stage('Build Docker Images') {
+        stage('Build & Push Docker Images') {
             parallel {
-                stage('Build Backend') {
+                stage('Backend') {
                     steps {
                         sh """
-                            docker build --platform linux/amd64 \
+                            docker buildx build --platform linux/amd64 \
                                 -t ${IMAGE_BACKEND}:${IMAGE_TAG} \
                                 -t ${IMAGE_BACKEND}:latest \
-                                ./Backend
+                                --push ./Backend
                         """
                     }
                 }
-                stage('Build Frontend') {
+                stage('Frontend') {
                     steps {
                         sh """
-                            docker build --platform linux/amd64 \
+                            docker buildx build --platform linux/amd64 \
                                 -t ${IMAGE_FRONTEND}:${IMAGE_TAG} \
                                 -t ${IMAGE_FRONTEND}:latest \
-                                ./Frontend
+                                --push ./Frontend
                         """
                     }
                 }
-                stage('Build Admin') {
+                stage('Admin') {
                     steps {
                         sh """
-                            docker build --platform linux/amd64 \
+                            docker buildx build --platform linux/amd64 \
                                 -t ${IMAGE_ADMIN}:${IMAGE_TAG} \
                                 -t ${IMAGE_ADMIN}:latest \
-                                ./Admin
+                                --push ./Admin
                         """
                     }
                 }
-                stage('Build Background') {
+                stage('Background') {
                     steps {
                         sh """
-                            docker build --platform linux/amd64 \
+                            docker buildx build --platform linux/amd64 \
                                 -t ${IMAGE_BACKGROUND}:${IMAGE_TAG} \
                                 -t ${IMAGE_BACKGROUND}:latest \
-                                ./BackgroundServices
-                        """
-                    }
-                }
-            }
-        }
-
-        stage('Push Docker Images') {
-            parallel {
-                stage('Push Backend') {
-                    steps {
-                        sh """
-                            docker push ${IMAGE_BACKEND}:${IMAGE_TAG}
-                            docker push ${IMAGE_BACKEND}:latest
-                        """
-                    }
-                }
-                stage('Push Frontend') {
-                    steps {
-                        sh """
-                            docker push ${IMAGE_FRONTEND}:${IMAGE_TAG}
-                            docker push ${IMAGE_FRONTEND}:latest
-                        """
-                    }
-                }
-                stage('Push Admin') {
-                    steps {
-                        sh """
-                            docker push ${IMAGE_ADMIN}:${IMAGE_TAG}
-                            docker push ${IMAGE_ADMIN}:latest
-                        """
-                    }
-                }
-                stage('Push Background') {
-                    steps {
-                        sh """
-                            docker push ${IMAGE_BACKGROUND}:${IMAGE_TAG}
-                            docker push ${IMAGE_BACKGROUND}:latest
+                                --push ./BackgroundServices
                         """
                     }
                 }
