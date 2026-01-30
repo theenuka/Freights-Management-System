@@ -1,22 +1,37 @@
 ---
+# roles/common/tasks/main.yml
+# Common system setup tasks
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  tags: [packages]
+
 - name: Install common dependencies
   apt:
     name:
       - python3-pip
-      - unzip
       - python3-venv
+      - curl
+      - wget
+      - unzip
+      - htop
+      - jq
+      - git
     state: present
-    update_cache: yes
+  tags: [packages]
 
-# Ensure pip is usable in a virtual environment (avoid system package restriction)
-- name: Create tools virtualenv
-  command: python3 -m venv /opt/ansible-venv
-  args:
-    creates: /opt/ansible-venv/bin/activate
+- name: Create application directory
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+  tags: [setup]
 
-- name: Upgrade pip inside virtualenv
-  command: /opt/ansible-venv/bin/pip install --upgrade pip
-
-- name: Set fact for venv Python
-  set_fact:
-    venv_python: /opt/ansible-venv/bin/python
+- name: Set timezone
+  timezone:
+    name: UTC
+  tags: [setup]

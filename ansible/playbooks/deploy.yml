@@ -1,0 +1,53 @@
+---
+# ansible/playbooks/deploy.yml
+# Main deployment playbook for Freights Management System
+
+- name: Deploy Freights Management Application
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars_files:
+    - ../group_vars/all.yml
+    - ../group_vars/vault.yml
+
+  pre_tasks:
+    - name: Validate required variables
+      assert:
+        that:
+          - vault_dockerhub_password is defined
+          - vault_db_string is defined
+          - vault_backend_pass is defined
+          - vault_backend_jwt is defined
+        fail_msg: "Required vault variables are not defined. Please configure vault.yml"
+        success_msg: "All required variables are present"
+      tags: [always]
+
+    - name: Display deployment info
+      debug:
+        msg: |
+          Deploying to: {{ inventory_hostname }}
+          Environment: {{ env | default('dev') }}
+          Image tag: {{ image_tag | default('latest') }}
+      tags: [always]
+
+  roles:
+    - role: common
+      tags: [common, setup]
+    - role: docker
+      tags: [docker, setup]
+    - role: app_deploy
+      tags: [deploy, app]
+
+  post_tasks:
+    - name: Display application URLs
+      debug:
+        msg: |
+          Deployment completed successfully!
+
+          Application URLs:
+          - Frontend: http://{{ ansible_host }}
+          - Admin:    http://{{ ansible_host }}:{{ ports.admin }}
+          - API:      http://{{ ansible_host }}:{{ ports.backend }}
+          - Health:   http://{{ ansible_host }}:{{ ports.backend }}/api/v1/health
+      tags: [always]

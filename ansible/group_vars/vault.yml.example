@@ -1,0 +1,18 @@
+# ansible/group_vars/vault.yml.example
+# Copy this file to vault.yml and encrypt with: ansible-vault encrypt vault.yml
+#
+# IMPORTANT: Never commit the actual vault.yml file!
+
+# DockerHub credentials
+vault_dockerhub_password: "your_dockerhub_access_token"
+
+# MongoDB connection string
+vault_db_string: "mongodb+srv://username:password@cluster.mongodb.net/dbname?retryWrites=true&w=majority"
+
+# Backend secrets
+vault_backend_pass: "your_aes_encryption_key"
+vault_backend_jwt: "your_jwt_secret_key"
+
+# Email service credentials (for background service)
+vault_email_user: "your_email@gmail.com"
+vault_email_pass: "your_email_app_password"

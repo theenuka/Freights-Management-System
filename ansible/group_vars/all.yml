@@ -1,0 +1,42 @@
+# ansible/group_vars/all.yml
+# Common variables for all environments
+
+# Project settings
+project_name: freights-management
+app_user: ubuntu
+app_group: ubuntu
+app_dir: /opt/freights-management
+
+# Docker settings
+docker_network: freights-net
+dockerhub_username: theenukabandara
+
+# Container image names (DockerHub)
+images:
+  backend: "{{ dockerhub_username }}/freights-backend"
+  frontend: "{{ dockerhub_username }}/freights-frontend"
+  admin: "{{ dockerhub_username }}/freights-admin"
+  background: "{{ dockerhub_username }}/freights-background"
+
+# Container names
+containers:
+  backend: backend
+  frontend: frontend
+  admin: admin
+  background: background
+
+# Port mappings
+ports:
+  frontend: 80
+  admin: 3000
+  backend: 8000
+
+# Health check settings
+health_check:
+  backend_endpoint: "http://127.0.0.1:8000/api/v1/health"
+  retries: 10
+  delay: 5
+  timeout: 60
+
+# Application settings (non-sensitive)
+backend_port: "8000"
