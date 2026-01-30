@@ -8,8 +8,8 @@
   gather_facts: true
 
   vars_files:
-    - ../group_vars/all.yml
-    - ../group_vars/vault.yml
+    - "{{ playbook_dir }}/../group_vars/all.yml"
+    - "{{ playbook_dir }}/../group_vars/vault.yml"
 
   pre_tasks:
     - name: Validate required variables
