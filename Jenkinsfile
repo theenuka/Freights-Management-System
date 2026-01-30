@@ -12,11 +12,7 @@ pipeline {
     }
 
     environment {
-        // DockerHub Configuration
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
         DOCKERHUB_USERNAME = 'theenukabandara'
-
-        // Image names
         IMAGE_BACKEND = "${DOCKERHUB_USERNAME}/freights-backend"
         IMAGE_FRONTEND = "${DOCKERHUB_USERNAME}/freights-frontend"
         IMAGE_ADMIN = "${DOCKERHUB_USERNAME}/freights-admin"
@@ -44,9 +40,11 @@ pipeline {
 
         stage('Login to DockerHub') {
             steps {
-                sh '''
-                    echo "${DOCKERHUB_CREDENTIALS_PSW}" | docker login -u "${DOCKERHUB_CREDENTIALS_USR}" --password-stdin
-                '''
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+                    '''
+                }
             }
         }
 
