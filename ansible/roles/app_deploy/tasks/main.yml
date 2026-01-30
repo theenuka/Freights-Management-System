@@ -1,6 +1,6 @@
 ---
 # roles/app_deploy/tasks/main.yml
-# Application deployment tasks using DockerHub
+# Application deployment using Docker Compose
 
 - name: Set image tag
   set_fact:
@@ -8,7 +8,31 @@
   tags: [deploy]
 
 #------------------------------------------------------------------------------
-# DockerHub Authentication
+# Ensure app directory exists
+#------------------------------------------------------------------------------
+- name: Create application directory
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+  tags: [deploy, setup]
+
+#------------------------------------------------------------------------------
+# Deploy docker-compose file
+#------------------------------------------------------------------------------
+- name: Deploy docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ app_dir }}/docker-compose.yml"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0644'
+  tags: [deploy]
+
+#------------------------------------------------------------------------------
+# DockerHub Authentication (for private repos)
 #------------------------------------------------------------------------------
 - name: Login to DockerHub
   community.docker.docker_login:
@@ -18,108 +42,19 @@
   tags: [deploy, login]
 
 #------------------------------------------------------------------------------
-# Docker Network Setup
+# Pull and Deploy
 #------------------------------------------------------------------------------
-- name: Create Docker network
-  community.docker.docker_network:
-    name: "{{ docker_network }}"
-    state: present
-  tags: [deploy, network]
-
-#------------------------------------------------------------------------------
-# Pull Images
-#------------------------------------------------------------------------------
-- name: Pull Docker images
-  community.docker.docker_image:
-    name: "{{ item.name }}:{{ item.tag }}"
-    source: pull
-    force_source: yes
-  loop:
-    - { name: "{{ images.backend }}", tag: "{{ deploy_tag }}" }
-    - { name: "{{ images.frontend }}", tag: "{{ deploy_tag }}" }
-    - { name: "{{ images.admin }}", tag: "{{ deploy_tag }}" }
-    - { name: "{{ images.background }}", tag: "{{ deploy_tag }}" }
-  loop_control:
-    label: "{{ item.name }}:{{ item.tag }}"
+- name: Pull latest images
+  command: docker compose pull
+  args:
+    chdir: "{{ app_dir }}"
   tags: [deploy, pull]
 
-#------------------------------------------------------------------------------
-# Stop Old Containers
-#------------------------------------------------------------------------------
-- name: Stop and remove old containers
-  community.docker.docker_container:
-    name: "{{ item }}"
-    state: absent
-  loop:
-    - "{{ containers.backend }}"
-    - "{{ containers.frontend }}"
-    - "{{ containers.admin }}"
-    - "{{ containers.background }}"
-  tags: [deploy, cleanup]
-
-#------------------------------------------------------------------------------
-# Start Application Containers
-#------------------------------------------------------------------------------
-- name: Start Backend container
-  community.docker.docker_container:
-    name: "{{ containers.backend }}"
-    image: "{{ images.backend }}:{{ deploy_tag }}"
-    state: started
-    restart_policy: unless-stopped
-    networks:
-      - name: "{{ docker_network }}"
-    published_ports:
-      - "{{ ports.backend }}:8000"
-    env:
-      DB: "{{ vault_db_string }}"
-      PORT: "{{ backend_port }}"
-      PASS: "{{ vault_backend_pass }}"
-      JWT_SEC: "{{ vault_backend_jwt }}"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-  tags: [deploy, backend]
-
-- name: Start Frontend container
-  community.docker.docker_container:
-    name: "{{ containers.frontend }}"
-    image: "{{ images.frontend }}:{{ deploy_tag }}"
-    state: started
-    restart_policy: unless-stopped
-    networks:
-      - name: "{{ docker_network }}"
-    published_ports:
-      - "{{ ports.frontend }}:80"
-  tags: [deploy, frontend]
-
-- name: Start Admin container
-  community.docker.docker_container:
-    name: "{{ containers.admin }}"
-    image: "{{ images.admin }}:{{ deploy_tag }}"
-    state: started
-    restart_policy: unless-stopped
-    networks:
-      - name: "{{ docker_network }}"
-    published_ports:
-      - "{{ ports.admin }}:80"
-  tags: [deploy, admin]
-
-- name: Start Background service container
-  community.docker.docker_container:
-    name: "{{ containers.background }}"
-    image: "{{ images.background }}:{{ deploy_tag }}"
-    state: started
-    restart_policy: unless-stopped
-    networks:
-      - name: "{{ docker_network }}"
-    env:
-      DB: "{{ vault_db_string }}"
-      EMAIL_USER: "{{ vault_email_user | default('') }}"
-      EMAIL_PASS: "{{ vault_email_pass | default('') }}"
-  tags: [deploy, background]
+- name: Start application with docker compose
+  command: docker compose up -d
+  args:
+    chdir: "{{ app_dir }}"
+  tags: [deploy, start]
 
 #------------------------------------------------------------------------------
 # Health Checks
@@ -156,7 +91,7 @@
   tags: [deploy, health]
 
 - name: Show running containers
-  command: docker ps --format "table {{ '{{' }}.Names{{ '}}' }}\t{{ '{{' }}.Status{{ '}}' }}\t{{ '{{' }}.Ports{{ '}}' }}"
+  command: docker ps --format "table {{'{{'}}.Names{{'}}'}}\t{{'{{'}}.Status{{'}}'}}\t{{'{{'}}.Ports{{'}}'}}"
   register: docker_ps
   changed_when: false
   tags: [deploy, verify]
@@ -175,8 +110,6 @@
   tags: [deploy, cleanup]
 
 - name: Prune unused Docker images
-  community.docker.docker_prune:
-    images: yes
-    images_filters:
-      dangling: true
+  command: docker image prune -f
+  changed_when: false
   tags: [deploy, cleanup]

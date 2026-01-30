@@ -5,7 +5,7 @@
 project_name: freights-management
 app_user: ubuntu
 app_group: ubuntu
-app_dir: /opt/freights-management
+app_dir: /opt/freights
 
 # Docker settings
 docker_network: freights-net

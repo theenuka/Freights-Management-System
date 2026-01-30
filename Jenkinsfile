@@ -93,7 +93,7 @@ pipeline {
             }
         }
 
-        stage('Cleanup') {
+        stage('Cleanup Build') {
             steps {
                 sh '''
                     docker logout || true
@@ -105,14 +105,60 @@ pipeline {
                 echo "==================================="
             }
         }
+
+        stage('Deploy with Ansible') {
+            steps {
+                withCredentials([
+                    sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY'),
+                    string(credentialsId: 'ansible-vault-password', variable: 'VAULT_PASS')
+                ]) {
+                    sh '''
+                        echo "==================================="
+                        echo "Starting Deployment with Ansible"
+                        echo "==================================="
+
+                        # Create vault password file
+                        echo "${VAULT_PASS}" > /tmp/vault_pass.txt
+                        chmod 600 /tmp/vault_pass.txt
+
+                        # Setup SSH key
+                        mkdir -p ~/.ssh
+                        cp "${SSH_KEY}" ~/.ssh/deploy_key.pem
+                        chmod 600 ~/.ssh/deploy_key.pem
+
+                        # Disable host key checking for automation
+                        export ANSIBLE_HOST_KEY_CHECKING=False
+
+                        # Run Ansible playbook
+                        cd ansible
+                        ansible-playbook -i inventories/dev/hosts.yml site.yml \
+                            --vault-password-file /tmp/vault_pass.txt \
+                            -e "server_ip=34.228.166.118" \
+                            -e "ssh_key_path=~/.ssh/deploy_key.pem" \
+                            -e "image_tag=${IMAGE_TAG}"
+
+                        # Cleanup sensitive files
+                        rm -f /tmp/vault_pass.txt ~/.ssh/deploy_key.pem
+                    '''
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully!'
+            echo "==================================="
+            echo "CI/CD Pipeline Completed Successfully!"
+            echo "Application deployed to: http://34.228.166.118"
+            echo "Admin: http://34.228.166.118:3000"
+            echo "API: http://34.228.166.118:8000"
+            echo "==================================="
         }
         failure {
             echo 'Pipeline failed. Check the logs for details.'
+        }
+        always {
+            sh 'rm -f /tmp/vault_pass.txt ~/.ssh/deploy_key.pem 2>/dev/null || true'
         }
     }
 }

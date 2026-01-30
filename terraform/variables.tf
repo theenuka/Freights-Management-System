@@ -71,5 +71,5 @@ variable "enable_monitoring" {
 variable "jenkins_instance_type" {
   description = "EC2 instance type for Jenkins server"
   type        = string
-  default     = "t3.micro"
+  default     = "m7i-flex.large"  # Free tier eligible with 8GB RAM
 }
