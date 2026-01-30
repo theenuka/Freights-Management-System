@@ -53,7 +53,8 @@ pipeline {
                 stage('Build Backend') {
                     steps {
                         sh """
-                            docker build -t ${IMAGE_BACKEND}:${IMAGE_TAG} \
+                            docker build --platform linux/amd64 \
+                                -t ${IMAGE_BACKEND}:${IMAGE_TAG} \
                                 -t ${IMAGE_BACKEND}:latest \
                                 ./Backend
                         """
@@ -62,7 +63,8 @@ pipeline {
                 stage('Build Frontend') {
                     steps {
                         sh """
-                            docker build -t ${IMAGE_FRONTEND}:${IMAGE_TAG} \
+                            docker build --platform linux/amd64 \
+                                -t ${IMAGE_FRONTEND}:${IMAGE_TAG} \
                                 -t ${IMAGE_FRONTEND}:latest \
                                 ./Frontend
                         """
@@ -71,7 +73,8 @@ pipeline {
                 stage('Build Admin') {
                     steps {
                         sh """
-                            docker build -t ${IMAGE_ADMIN}:${IMAGE_TAG} \
+                            docker build --platform linux/amd64 \
+                                -t ${IMAGE_ADMIN}:${IMAGE_TAG} \
                                 -t ${IMAGE_ADMIN}:latest \
                                 ./Admin
                         """
@@ -80,7 +83,8 @@ pipeline {
                 stage('Build Background') {
                     steps {
                         sh """
-                            docker build -t ${IMAGE_BACKGROUND}:${IMAGE_TAG} \
+                            docker build --platform linux/amd64 \
+                                -t ${IMAGE_BACKGROUND}:${IMAGE_TAG} \
                                 -t ${IMAGE_BACKGROUND}:latest \
                                 ./BackgroundServices
                         """
