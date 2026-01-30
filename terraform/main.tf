@@ -1,37 +1,26 @@
-resource "aws_security_group" "app_sg" {
-  name        = "${var.project_name}-sg"
-  description = "Security group for ${var.project_name}"
+# terraform/main.tf
+# Main infrastructure resources
 
-  ingress {
-    description = "HTTP Frontend"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    description = "Admin Frontend"
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    description = "Backend API"
-    from_port   = 8000
-    to_port     = 8000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    description = "SSH Access"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+#------------------------------------------------------------------------------
+# Security Group
+#------------------------------------------------------------------------------
+resource "aws_security_group" "app_sg" {
+  name        = "${local.name_prefix}-sg"
+  description = "Security group for ${var.project_name} application"
+
+  dynamic "ingress" {
+    for_each = local.ingress_rules
+    content {
+      description = ingress.value.description
+      from_port   = ingress.value.port
+      to_port     = ingress.value.port
+      protocol    = "tcp"
+      cidr_blocks = ingress.value.cidr_blocks
+    }
   }
 
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -39,32 +28,44 @@ resource "aws_security_group" "app_sg" {
   }
 
   tags = {
-    Name = "${var.project_name}-sg"
+    Name = "${local.name_prefix}-sg"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
+#------------------------------------------------------------------------------
+# EC2 Instance
+#------------------------------------------------------------------------------
 resource "aws_instance" "app_server" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.app_sg.id]
+  monitoring             = var.enable_monitoring
 
   root_block_device {
-    volume_size = 15
-    volume_type = "gp2"
+    volume_size           = var.root_volume_size
+    volume_type           = "gp3"
+    encrypted             = true
+    delete_on_termination = true
+
+    tags = {
+      Name = "${local.name_prefix}-root-volume"
+    }
   }
 
-  user_data = <<-EOF
-              #!/bin/bash
-              sudo apt-get update -y
-              sudo apt-get install -y docker.io awscli
-              sudo systemctl start docker
-              sudo systemctl enable docker
-              sudo usermod -aG docker ubuntu
-              EOF
+  user_data = base64encode(templatefile("${path.module}/scripts/user_data.sh", {
+    project_name = var.project_name
+  }))
 
   tags = {
-    Name        = "${var.project_name}-server"
-    Environment = var.environment
+    Name = "${local.name_prefix}-server"
+  }
+
+  lifecycle {
+    ignore_changes = [ami]  # Don't recreate on AMI updates
   }
 }

@@ -1,2 +1,61 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment files
 .env
-node_modules
+.env.local
+.env.*.local
+*.env
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/*.tfplan
+terraform/tfplan
+terraform/.terraform.lock.hcl
+terraform/crash.log
+terraform/override.tf
+terraform/override.tf.json
+terraform/*_override.tf
+terraform/*_override.tf.json
+
+# Ansible
+ansible/group_vars/vault.yml
+ansible/*.retry
+ansible/.vault_pass
+.vault_pass
+
+# Jenkins
+server_ip.txt
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+*.log
+
+# Docker
+docker-compose.override.yml
+
+# SSH Keys
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+
+# Credentials
+credentials.json
+secrets.yml
+secrets.yaml

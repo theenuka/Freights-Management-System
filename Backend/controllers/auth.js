@@ -8,8 +8,18 @@ dotenv.config();
 
 const registerUser = async (req, res) => {
   try {
+    console.log("[REGISTER] Received registration request:", { 
+      fullname: req.body.fullname, 
+      email: req.body.email,
+      hasPassword: !!req.body.password,
+      age: req.body.age,
+      country: req.body.country,
+      hasAddress: !!req.body.address
+    });
+    
     const email = (req.body.email || "").trim();
     if (!email || !req.body.password || !req.body.fullname) {
+      console.log("[REGISTER] Missing required fields");
       return res.status(400).json({ message: "Full name, email and password are required" });
     }
 

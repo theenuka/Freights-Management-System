@@ -1,5 +1,0 @@
-aws_region    = "us-east-1"
-project_name  = "freights-management"
-environment   = "production"
-instance_type = "t3.micro"
-key_name      = "freights-app-key" 

@@ -1,109 +1,256 @@
+// Jenkinsfile - CI/CD Pipeline for Freights Management System
+// Uses DockerHub for container registry
+
 pipeline {
     agent any
-    environment {
-        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-        AWS_DEFAULT_REGION    = 'us-east-1'
-        ECR_BACKEND_URI       = '487409145731.dkr.ecr.us-east-1.amazonaws.com/freights-management-app'
-        ECR_FRONTEND_URI      = '487409145731.dkr.ecr.us-east-1.amazonaws.com/freights-management-frontend'
-        ECR_ADMIN_URI         = '487409145731.dkr.ecr.us-east-1.amazonaws.com/freights-management-admin'
-        ECR_BG_SERVICE_URI    = '487409145731.dkr.ecr.us-east-1.amazonaws.com/freights-management-background'
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timestamps()
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
     }
+
+    environment {
+        // DockerHub Configuration
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+        DOCKERHUB_USERNAME = 'theenukabandara'
+
+        // Image names
+        IMAGE_BACKEND = "${DOCKERHUB_USERNAME}/freights-backend"
+        IMAGE_FRONTEND = "${DOCKERHUB_USERNAME}/freights-frontend"
+        IMAGE_ADMIN = "${DOCKERHUB_USERNAME}/freights-admin"
+        IMAGE_BACKGROUND = "${DOCKERHUB_USERNAME}/freights-background"
+
+        // AWS Configuration
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+        AWS_DEFAULT_REGION = 'us-east-1'
+
+        // Ansible Configuration
+        ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+        ANSIBLE_HOST_KEY_CHECKING = 'False'
+    }
+
     stages {
         stage('Checkout') {
             steps {
+                checkout scm
                 script {
-                    checkout scm
-                    env.COMMIT_SHA = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-                    echo "Resolved commit SHA: ${env.COMMIT_SHA}"
-                }
-            }
-        }
-        
-        stage('Login to ECR') {
-            steps {
-                script {
-                    sh 'aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_BACKEND_URI'
+                    // Get commit info for tagging
+                    env.GIT_COMMIT_SHORT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    env.GIT_BRANCH_NAME = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+                    env.IMAGE_TAG = "${env.GIT_COMMIT_SHORT}"
+
+                    echo "==================================="
+                    echo "Build Information:"
+                    echo "Branch: ${env.GIT_BRANCH_NAME}"
+                    echo "Commit: ${env.GIT_COMMIT_SHORT}"
+                    echo "Image Tag: ${env.IMAGE_TAG}"
+                    echo "==================================="
                 }
             }
         }
 
-        stage('Build & Push Backend') {
+        stage('Login to DockerHub') {
             steps {
                 script {
-                    sh 'docker build -t $ECR_BACKEND_URI:latest ./Backend'
-                    sh 'docker push $ECR_BACKEND_URI:latest'
+                    sh '''
+                        echo "${DOCKERHUB_CREDENTIALS_PSW}" | docker login -u "${DOCKERHUB_CREDENTIALS_USR}" --password-stdin
+                    '''
                 }
             }
         }
 
-        stage('Build & Push Frontend') {
-            steps {
-                script {
-                    sh 'docker build -t $ECR_FRONTEND_URI:latest ./Frontend'
-                    sh 'docker push $ECR_FRONTEND_URI:latest'
-                }
-            }
-        }
-
-        stage('Build & Push Admin') {
-            steps {
-                script {
-                    echo "Building Admin image with commit tag ${env.COMMIT_SHA}"
-                    sh 'docker build --no-cache -t $ECR_ADMIN_URI:latest -t $ECR_ADMIN_URI:' + env.COMMIT_SHA + ' ./Admin'
-                    sh 'docker push $ECR_ADMIN_URI:latest'
-                    sh 'docker push $ECR_ADMIN_URI:' + env.COMMIT_SHA
-                }
-            }
-        }
-
-        stage('Build & Push Background') {
-            steps {
-                script {
-                    sh 'docker build -t $ECR_BG_SERVICE_URI:latest ./BackgroundServices'
-                    sh 'docker push $ECR_BG_SERVICE_URI:latest'
-                }
-            }
-        }
-
-        stage('Deploy Infrastructure') {
-            steps {
-                script {
-                    dir('terraform') {
-                        sh 'terraform init'
-                        sh 'terraform apply -auto-approve'
-                        sh 'terraform output -raw server_public_ip > ../server_ip.txt'
+        stage('Build Docker Images') {
+            parallel {
+                stage('Build Backend') {
+                    steps {
+                        script {
+                            sh """
+                                docker build -t ${IMAGE_BACKEND}:${IMAGE_TAG} \
+                                    -t ${IMAGE_BACKEND}:latest \
+                                    --label "git.commit=${GIT_COMMIT_SHORT}" \
+                                    --label "git.branch=${GIT_BRANCH_NAME}" \
+                                    --label "build.number=${BUILD_NUMBER}" \
+                                    ./Backend
+                            """
+                        }
                     }
                 }
-            }
-        }
-
-        stage('Deploy Application (with Ansible Roles)') {
-            steps {
-                script {
-                    def SERVER_IP = sh(script: "cat ${env.WORKSPACE}/server_ip.txt", returnStdout: true).trim()
-                    def ECR_PASSWORD = sh(script: "aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION}", returnStdout: true).trim()
-
-                    dir('ansible') {
-                        
-                        sh "echo '[all]' > inventory"
-                        sh "echo '${SERVER_IP}' >> inventory"
-
-                        sshagent(['freights-app-ssh-key']) {
+                stage('Build Frontend') {
+                    steps {
+                        script {
                             sh """
-                                ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory site.yml \
-                                    --user ubuntu \
-                                    -e "ecr_password=${ECR_PASSWORD} commit_sha=${COMMIT_SHA}"
+                                docker build -t ${IMAGE_FRONTEND}:${IMAGE_TAG} \
+                                    -t ${IMAGE_FRONTEND}:latest \
+                                    --label "git.commit=${GIT_COMMIT_SHORT}" \
+                                    --label "git.branch=${GIT_BRANCH_NAME}" \
+                                    --label "build.number=${BUILD_NUMBER}" \
+                                    ./Frontend
+                            """
+                        }
+                    }
+                }
+                stage('Build Admin') {
+                    steps {
+                        script {
+                            sh """
+                                docker build -t ${IMAGE_ADMIN}:${IMAGE_TAG} \
+                                    -t ${IMAGE_ADMIN}:latest \
+                                    --label "git.commit=${GIT_COMMIT_SHORT}" \
+                                    --label "git.branch=${GIT_BRANCH_NAME}" \
+                                    --label "build.number=${BUILD_NUMBER}" \
+                                    ./Admin
+                            """
+                        }
+                    }
+                }
+                stage('Build Background') {
+                    steps {
+                        script {
+                            sh """
+                                docker build -t ${IMAGE_BACKGROUND}:${IMAGE_TAG} \
+                                    -t ${IMAGE_BACKGROUND}:latest \
+                                    --label "git.commit=${GIT_COMMIT_SHORT}" \
+                                    --label "git.branch=${GIT_BRANCH_NAME}" \
+                                    --label "build.number=${BUILD_NUMBER}" \
+                                    ./BackgroundServices
                             """
                         }
                     }
                 }
             }
         }
+
+        stage('Push Docker Images') {
+            parallel {
+                stage('Push Backend') {
+                    steps {
+                        sh """
+                            docker push ${IMAGE_BACKEND}:${IMAGE_TAG}
+                            docker push ${IMAGE_BACKEND}:latest
+                        """
+                    }
+                }
+                stage('Push Frontend') {
+                    steps {
+                        sh """
+                            docker push ${IMAGE_FRONTEND}:${IMAGE_TAG}
+                            docker push ${IMAGE_FRONTEND}:latest
+                        """
+                    }
+                }
+                stage('Push Admin') {
+                    steps {
+                        sh """
+                            docker push ${IMAGE_ADMIN}:${IMAGE_TAG}
+                            docker push ${IMAGE_ADMIN}:latest
+                        """
+                    }
+                }
+                stage('Push Background') {
+                    steps {
+                        sh """
+                            docker push ${IMAGE_BACKGROUND}:${IMAGE_TAG}
+                            docker push ${IMAGE_BACKGROUND}:latest
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Init & Plan') {
+            steps {
+                dir('terraform') {
+                    script {
+                        sh '''
+                            terraform init -input=false
+                            terraform plan -var-file=environments/dev/terraform.tfvars -out=tfplan
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                dir('terraform') {
+                    script {
+                        sh '''
+                            terraform apply -auto-approve tfplan
+                            terraform output -raw server_public_ip > ../server_ip.txt
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Deploy with Ansible') {
+            steps {
+                script {
+                    def serverIP = readFile('server_ip.txt').trim()
+
+                    echo "==================================="
+                    echo "Deployment Target: ${serverIP}"
+                    echo "==================================="
+
+                    // Create vault password file
+                    writeFile file: '.vault_pass', text: env.ANSIBLE_VAULT_PASSWORD
+
+                    dir('ansible') {
+                        sshagent(['ec2-ssh-key']) {
+                            sh """
+                                # Install Ansible collections
+                                ansible-galaxy collection install -r requirements.yml --force
+
+                                # Run deployment
+                                ansible-playbook site.yml \
+                                    -i inventories/dev/hosts.yml \
+                                    -e "server_ip=${serverIP}" \
+                                    -e "image_tag=${IMAGE_TAG}" \
+                                    --vault-password-file ../.vault_pass
+                            """
+                        }
+                    }
+
+                    // Clean up vault password file
+                    sh 'rm -f .vault_pass'
+
+                    echo "==================================="
+                    echo "Deployment Successful!"
+                    echo ""
+                    echo "Application URLs:"
+                    echo "Frontend: http://${serverIP}"
+                    echo "Admin:    http://${serverIP}:3000"
+                    echo "API:      http://${serverIP}:8000"
+                    echo "Health:   http://${serverIP}:8000/api/v1/health"
+                    echo "==================================="
+                }
+            }
+        }
     }
+
     post {
         always {
-            sh 'docker rmi $(docker images -q) || true'
+            script {
+                // Logout from DockerHub
+                sh 'docker logout || true'
+
+                // Clean up Docker images to save space
+                sh '''
+                    docker image prune -f || true
+                '''
+
+                // Clean up workspace files
+                sh 'rm -f .vault_pass server_ip.txt || true'
+            }
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the logs for details.'
         }
     }
 }

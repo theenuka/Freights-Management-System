@@ -1,11 +1,18 @@
+# docker-compose.yml
+# Local development environment for Freights Management System
+
 services:
+  # MongoDB Database
   mongo:
     image: mongo:6
+    container_name: fms-mongo
     restart: unless-stopped
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    networks:
+      - fms-network
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })"]
       interval: 30s
@@ -13,19 +20,25 @@ services:
       retries: 5
       start_period: 20s
 
+  # Backend API
   backend:
     build:
       context: ./Backend
       dockerfile: Dockerfile
+    container_name: fms-backend
+    restart: unless-stopped
     environment:
       - PORT=8000
       - DB=mongodb://mongo:27017/fms
       - PASS=${PASS:-changeme_pass}
       - JWT_SEC=${JWT_SEC:-changeme_jwt}
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     ports:
       - "8000:8000"
+    networks:
+      - fms-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
       interval: 30s
@@ -33,16 +46,20 @@ services:
       retries: 5
       start_period: 15s
 
+  # Frontend (Customer Portal)
   frontend:
     build:
       context: ./Frontend
       dockerfile: Dockerfile
-      args:
-        - VITE_API_URL=http://backend:8000/api/v1/
+    container_name: fms-frontend
+    restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     ports:
-      - "5173:80"
+      - "80:80"
+    networks:
+      - fms-network
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost"]
       interval: 30s
@@ -50,16 +67,20 @@ services:
       retries: 5
       start_period: 20s
 
+  # Admin Dashboard
   admin:
     build:
       context: ./Admin
       dockerfile: Dockerfile
-      args:
-        - VITE_API_URL=http://backend:8000/api/v1/
+    container_name: fms-admin
+    restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     ports:
-      - "5174:80"
+      - "3000:80"
+    networks:
+      - fms-network
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost"]
       interval: 30s
@@ -67,16 +88,28 @@ services:
       retries: 5
       start_period: 20s
 
+  # Background Email Service
   background:
     build:
       context: ./BackgroundServices
       dockerfile: Dockerfile
+    container_name: fms-background
+    restart: unless-stopped
     environment:
       - DB=mongodb://mongo:27017/fms
       - EMAIL_USER=${EMAIL_USER:-}
       - EMAIL_PASS=${EMAIL_PASS:-}
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+    networks:
+      - fms-network
+
+networks:
+  fms-network:
+    driver: bridge
+    name: freights-net
 
 volumes:
   mongo_data:
+    name: fms-mongo-data

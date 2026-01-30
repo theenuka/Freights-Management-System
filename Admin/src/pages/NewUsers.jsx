@@ -78,8 +78,20 @@ const NewUsers = () => {
       );
 
     } catch (error) {
-      console.log(error);
-      toast.error("Failed to register the user. Please try again.", {
+      console.error("Registration error:", error);
+      
+      // Show specific error message from backend
+      let errorMessage = "Failed to register the user. Please try again.";
+      
+      if (error?.response?.status === 409) {
+        errorMessage = "This email is already registered. Please use a different email.";
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage, {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
