@@ -1,5 +1,6 @@
 // Jenkinsfile - CI/CD Pipeline for Freights Management System
 // Uses DockerHub for container registry
+// Webhook trigger enabled
 
 pipeline {
     agent any
