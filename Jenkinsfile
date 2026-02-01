@@ -4,6 +4,11 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush()                    // Trigger on GitHub webhook
+        pollSCM('H/5 * * * *')          // Backup: poll every 5 minutes
+    }
+
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         timestamps()
