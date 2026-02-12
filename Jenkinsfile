@@ -134,7 +134,7 @@ pipeline {
                         # Run Ansible playbook with variables passed directly
                         cd ansible
                         ansible-playbook -i inventories/dev/hosts.yml site.yml \
-                            -e "server_ip=34.228.166.118" \
+                            -e "server_ip=54.83.112.87" \
                             -e "ssh_key_path=~/.ssh/deploy_key.pem" \
                             -e "image_tag=${IMAGE_TAG}" \
                             -e "vault_dockerhub_password=${DH_PASS}" \
@@ -154,9 +154,9 @@ pipeline {
         success {
             echo "==================================="
             echo "CI/CD Pipeline Completed Successfully!"
-            echo "Application deployed to: http://34.228.166.118"
-            echo "Admin: http://34.228.166.118:3000"
-            echo "API: http://34.228.166.118:8000"
+            echo "Application deployed to: http://54.83.112.87"
+            echo "Admin: http://54.83.112.87:3000"
+            echo "API: http://54.83.112.87:8000"
             echo "==================================="
         }
         failure {
