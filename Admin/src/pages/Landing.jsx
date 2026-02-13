@@ -110,7 +110,7 @@ const Landing = () => {
 						</div>
 						<div>
 							<h1 className="text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
-								Run globalss logistics with clarity and calm
+								Run global logistics with clarity and calm
 							</h1>
 							<p className="mt-4 text-lg leading-relaxed text-slate-600">
 								From parcel assignments to compliance reporting, the FMS admin console keeps every operator in sync. Dispatch faster, mitigate escalations, and deliver with confidence.
