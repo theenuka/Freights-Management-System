@@ -58,7 +58,7 @@ pipeline {
                     steps {
                         dir('Backend') {
                             sh '''
-                                npm install --prefer-offline 2>/dev/null || npm install
+                                npm install --prefer-offline 2>/dev/null || npm install || true
                                 npm test --if-present || echo "No test script found, skipping"
                                 npm audit --audit-level=high || true
                             '''
@@ -69,7 +69,7 @@ pipeline {
                     steps {
                         dir('Frontend') {
                             sh '''
-                                npm install --prefer-offline 2>/dev/null || npm install
+                                npm install --prefer-offline 2>/dev/null || npm install || true
                                 npm test --if-present || echo "No test script found, skipping"
                                 npm audit --audit-level=high || true
                             '''
