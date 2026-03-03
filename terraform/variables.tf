@@ -35,9 +35,9 @@ variable "environment" {
 }
 
 variable "instance_type" {
-  description = "EC2 instance type (t2.micro is free tier eligible)"
+  description = "EC2 instance type (t3.micro is free tier eligible)"
   type        = string
-  default     = "t2.micro"
+  default     = "t3.micro"
 }
 
 variable "key_name" {
@@ -69,7 +69,7 @@ variable "enable_monitoring" {
 }
 
 variable "jenkins_instance_type" {
-  description = "EC2 instance type for Jenkins server (t2.micro is free tier eligible)"
+  description = "EC2 instance type for Jenkins server (t3.micro is free tier eligible)"
   type        = string
-  default     = "t2.micro"
+  default     = "t3.micro"
 }
