@@ -1,0 +1,11 @@
+# ansible/inventories/jenkins/group_vars/all.yml
+# Variables for Jenkins server provisioning
+
+# Swap
+jenkins_swap_size: 2G
+
+# Jenkins GPG key fingerprint (rotated Dec 2025)
+jenkins_gpg_key_id: "7198F4B714ABFC68"
+
+# JVM heap — 1 GB for Jenkins, leaves ~1 GB for OS + Docker on t3.small
+jenkins_java_opts: "-Xms256m -Xmx1g -XX:+UseG1GC -Djava.awt.headless=true"

@@ -1,0 +1,59 @@
+---
+# ansible/site-jenkins.yml
+# Playbook to provision the Jenkins CI/CD server
+#
+# Usage (run from ansible/ directory):
+#   ansible-playbook -i inventories/jenkins/hosts.yml site-jenkins.yml \
+#     -e "server_ip=<JENKINS_IP>" \
+#     -e "ssh_key_path=~/.ssh/freights-dev-key.pem"
+
+- name: Provision Jenkins CI/CD Server
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Display provisioning info
+      debug:
+        msg: |
+          Provisioning Jenkins server
+          Host:        {{ inventory_hostname }} ({{ ansible_host }})
+          OS:          {{ ansible_distribution }} {{ ansible_distribution_version }}
+          RAM:         {{ ansible_memtotal_mb }} MB
+          Environment: {{ env | default('dev') }}
+      tags: [always]
+
+  roles:
+    - role: jenkins
+      tags: [jenkins]
+
+  post_tasks:
+    - name: Verify all tools are installed
+      command: "{{ item }}"
+      loop:
+        - java -version
+        - jenkins --version
+        - docker --version
+        - terraform version
+        - ansible --version
+        - aws --version
+      register: tool_versions
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Show installed tool versions
+      debug:
+        msg: "{{ item.stdout | default(item.stderr) }}"
+      loop: "{{ tool_versions.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+
+    - name: Show Jenkins access info
+      debug:
+        msg: |
+          ============================================================
+          Jenkins is ready!
+          URL:  http://{{ ansible_host }}:8080
+          SSH:  ssh -i {{ ssh_key_path | default('~/.ssh/freights-dev-key.pem') }} ubuntu@{{ ansible_host }}
+          ============================================================
+      tags: [always]

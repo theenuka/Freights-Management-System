@@ -1,0 +1,23 @@
+---
+# ansible/roles/jenkins/tasks/main.yml
+# Provision Jenkins CI/CD server with all required tools
+
+- name: Configure swap space
+  import_tasks: swap.yml
+  tags: [swap]
+
+- name: Install system packages
+  import_tasks: packages.yml
+  tags: [packages]
+
+- name: Install Jenkins
+  import_tasks: jenkins.yml
+  tags: [jenkins]
+
+- name: Install Docker
+  import_tasks: docker.yml
+  tags: [docker]
+
+- name: Install DevOps tools (Terraform, Ansible, AWS CLI)
+  import_tasks: devops_tools.yml
+  tags: [devops_tools]
