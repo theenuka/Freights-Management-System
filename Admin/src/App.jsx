@@ -129,7 +129,7 @@ function App() {
       path: "*",
       element: <NotFound />,
     },
-  ]);
+  ], { basename: '/admin' });
 
   return (
     <div className="antialiased font-inter">
