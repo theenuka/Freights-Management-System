@@ -7,6 +7,16 @@
 resource "aws_security_group" "app_sg" {
   name        = "${local.name_prefix}-sg"
   description = "Security group for ${var.project_name} application"
+  vpc_id      = aws_vpc.main.id
+
+  # Port 80 restricted to ALB only (DevSecOps: no direct internet access to app)
+  ingress {
+    description     = "HTTP from ALB only"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
+  }
 
   dynamic "ingress" {
     for_each = local.ingress_rules
@@ -43,6 +53,7 @@ resource "aws_instance" "app_server" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
   key_name               = var.key_name
+  subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.app_sg.id]
   monitoring             = var.enable_monitoring
 

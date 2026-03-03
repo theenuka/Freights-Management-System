@@ -13,13 +13,9 @@ locals {
   # Resource naming convention
   name_prefix = "${var.project_name}-${var.environment}"
 
-  # Security group rules - easily maintainable
+  # Security group rules for app server
+  # Port 80 is handled separately in main.tf (restricted to ALB SG only)
   ingress_rules = [
-    {
-      description = "HTTP - Frontend"
-      port        = 80
-      cidr_blocks = ["0.0.0.0/0"]
-    },
     {
       description = "Admin Dashboard"
       port        = 3000

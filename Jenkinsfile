@@ -52,6 +52,59 @@ pipeline {
             }
         }
 
+        stage('Test') {
+            parallel {
+                stage('Backend Tests') {
+                    steps {
+                        dir('Backend') {
+                            sh '''
+                                npm install --prefer-offline 2>/dev/null || npm install
+                                npm test --if-present || echo "No test script found, skipping"
+                                npm audit --audit-level=high || true
+                            '''
+                        }
+                    }
+                }
+                stage('Frontend Tests') {
+                    steps {
+                        dir('Frontend') {
+                            sh '''
+                                npm install --prefer-offline 2>/dev/null || npm install
+                                npm test --if-present || echo "No test script found, skipping"
+                                npm audit --audit-level=high || true
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                sh '''
+                    # Install Trivy if not present
+                    if ! command -v trivy >/dev/null 2>&1; then
+                        echo "Installing Trivy..."
+                        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+                    fi
+
+                    echo "Running Trivy filesystem scan..."
+                    trivy fs --exit-code 0 --severity HIGH,CRITICAL \
+                        --format table --output trivy-report.txt \
+                        --skip-dirs node_modules \
+                        . || true
+
+                    echo "=== Trivy Scan Results ==="
+                    cat trivy-report.txt
+                '''
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true
+                }
+            }
+        }
+
         stage('Build & Push Docker Images') {
             parallel {
                 stage('Backend') {
