@@ -1,0 +1,32 @@
+---
+# ansible/roles/jenkins/tasks/packages.yml
+# Base system packages
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Upgrade all packages
+  apt:
+    upgrade: dist
+    autoremove: yes
+
+- name: Install base packages
+  apt:
+    name:
+      - fontconfig
+      - openjdk-17-jre
+      - curl
+      - wget
+      - unzip
+      - git
+      - jq
+      - htop
+      - gnupg
+      - lsb-release
+      - ca-certificates
+      - apt-transport-https
+      - software-properties-common
+      - python3-pip
+    state: present

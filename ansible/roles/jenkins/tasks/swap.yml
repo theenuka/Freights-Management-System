@@ -1,0 +1,41 @@
+---
+# ansible/roles/jenkins/tasks/swap.yml
+# Add swap space — extra buffer for t3.small (2 GB RAM)
+
+- name: Check if swap file exists
+  stat:
+    path: /swapfile
+  register: swapfile_stat
+
+- name: Create swap file
+  command: fallocate -l {{ jenkins_swap_size }} /swapfile
+  when: not swapfile_stat.stat.exists
+
+- name: Set swap file permissions
+  file:
+    path: /swapfile
+    mode: '0600'
+  when: not swapfile_stat.stat.exists
+
+- name: Format swap file
+  command: mkswap /swapfile
+  when: not swapfile_stat.stat.exists
+
+- name: Enable swap
+  command: swapon /swapfile
+  when: not swapfile_stat.stat.exists
+
+- name: Persist swap in fstab
+  mount:
+    path: none
+    src: /swapfile
+    fstype: swap
+    opts: sw
+    state: present
+
+- name: Set swappiness to 10
+  sysctl:
+    name: vm.swappiness
+    value: '10'
+    state: present
+    reload: yes

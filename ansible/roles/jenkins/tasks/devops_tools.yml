@@ -1,0 +1,86 @@
+---
+# ansible/roles/jenkins/tasks/devops_tools.yml
+# Install Terraform, Ansible, and AWS CLI v2
+
+# ── Terraform ────────────────────────────────────────────────────────────────
+- name: Check if Terraform is installed
+  command: terraform version
+  register: terraform_check
+  ignore_errors: yes
+  changed_when: false
+
+- name: Add HashiCorp GPG key
+  shell: >
+    wget -qO- https://apt.releases.hashicorp.com/gpg |
+    gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  when: terraform_check.rc != 0
+
+- name: Add HashiCorp apt repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+    state: present
+    filename: hashicorp
+  when: terraform_check.rc != 0
+
+- name: Install Terraform
+  apt:
+    name: terraform
+    state: present
+    update_cache: yes
+  when: terraform_check.rc != 0
+
+# ── Ansible ──────────────────────────────────────────────────────────────────
+- name: Check if Ansible is installed
+  command: ansible --version
+  register: ansible_check
+  ignore_errors: yes
+  changed_when: false
+
+- name: Add Ansible PPA
+  apt_repository:
+    repo: ppa:ansible/ansible
+    state: present
+    update_cache: yes
+  when: ansible_check.rc != 0
+
+- name: Install Ansible
+  apt:
+    name: ansible
+    state: present
+  when: ansible_check.rc != 0
+
+# ── AWS CLI v2 ────────────────────────────────────────────────────────────────
+- name: Check if AWS CLI is installed
+  command: aws --version
+  register: awscli_check
+  ignore_errors: yes
+  changed_when: false
+
+- name: Download AWS CLI v2 installer
+  get_url:
+    url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    dest: /tmp/awscliv2.zip
+    mode: '0644'
+  when: awscli_check.rc != 0
+
+- name: Unzip AWS CLI installer
+  unarchive:
+    src: /tmp/awscliv2.zip
+    dest: /tmp
+    remote_src: yes
+  when: awscli_check.rc != 0
+
+- name: Install AWS CLI v2
+  command: /tmp/aws/install
+  when: awscli_check.rc != 0
+
+- name: Cleanup AWS CLI installer
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/awscliv2.zip
+    - /tmp/aws
+  when: awscli_check.rc != 0

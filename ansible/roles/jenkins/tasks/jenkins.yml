@@ -1,0 +1,83 @@
+---
+# ansible/roles/jenkins/tasks/jenkins.yml
+# Install and configure Jenkins
+#
+# NOTE: Jenkins rotated their signing key in Dec 2025.
+# We fetch the key by fingerprint from keyserver to avoid stale URL issues.
+
+- name: Fetch Jenkins GPG key from keyserver
+  command: >
+    gpg --batch --no-default-keyring
+    --keyring /tmp/temp-jenkins.gpg
+    --keyserver hkp://keyserver.ubuntu.com:80
+    --recv-keys {{ jenkins_gpg_key_id }}
+  args:
+    creates: /usr/share/keyrings/jenkins-keyring.gpg
+  register: gpg_recv
+
+- name: Export Jenkins key to keyring file
+  shell: >
+    gpg --batch --no-default-keyring
+    --keyring /tmp/temp-jenkins.gpg
+    --export {{ jenkins_gpg_key_id }} |
+    gpg --dearmor > /usr/share/keyrings/jenkins-keyring.gpg
+  when: gpg_recv.changed
+
+- name: Set keyring permissions
+  file:
+    path: /usr/share/keyrings/jenkins-keyring.gpg
+    mode: '0644'
+
+- name: Cleanup temp keyring files
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/temp-jenkins.gpg
+    - /tmp/temp-jenkins.gpg~
+
+- name: Add Jenkins apt repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/"
+    state: present
+    filename: jenkins
+
+- name: Install Jenkins
+  apt:
+    name: jenkins
+    state: present
+    update_cache: yes
+  notify: restart jenkins
+
+- name: Configure Jenkins JVM heap
+  template:
+    src: jenkins-jvm.conf.j2
+    dest: /etc/systemd/system/jenkins.service.d/override.conf
+    mode: '0644'
+  notify:
+    - reload systemd
+    - restart jenkins
+
+- name: Enable and start Jenkins
+  service:
+    name: jenkins
+    state: started
+    enabled: yes
+
+- name: Wait for Jenkins to be ready
+  uri:
+    url: "http://localhost:8080/login"
+    status_code: 200
+  register: jenkins_ready
+  retries: 20
+  delay: 15
+  until: jenkins_ready.status == 200
+
+- name: Print Jenkins initial admin password
+  command: cat /var/lib/jenkins/secrets/initialAdminPassword
+  register: jenkins_password
+  changed_when: false
+
+- name: Show Jenkins initial admin password
+  debug:
+    msg: "Jenkins Initial Admin Password: {{ jenkins_password.stdout }}"

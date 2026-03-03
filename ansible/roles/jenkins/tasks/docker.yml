@@ -1,0 +1,48 @@
+---
+# ansible/roles/jenkins/tasks/docker.yml
+# Install Docker and add jenkins user to docker group
+
+- name: Check if Docker is already installed
+  command: docker --version
+  register: docker_check
+  ignore_errors: yes
+  changed_when: false
+
+- name: Add Docker GPG key
+  shell: >
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
+    gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/docker-archive-keyring.gpg
+  when: docker_check.rc != 0
+
+- name: Add Docker apt repository
+  apt_repository:
+    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+    filename: docker
+  when: docker_check.rc != 0
+
+- name: Install Docker packages
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    state: present
+    update_cache: yes
+  when: docker_check.rc != 0
+
+- name: Enable and start Docker
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add jenkins user to docker group
+  user:
+    name: jenkins
+    groups: docker
+    append: yes
+  notify: restart jenkins

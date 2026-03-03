@@ -1,0 +1,11 @@
+---
+# ansible/roles/jenkins/handlers/main.yml
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: restart jenkins
+  service:
+    name: jenkins
+    state: restarted
