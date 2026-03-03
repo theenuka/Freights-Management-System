@@ -5,36 +5,17 @@
 # NOTE: Jenkins rotated their signing key in Dec 2025.
 # We fetch the key by fingerprint from keyserver to avoid stale URL issues.
 
-- name: Fetch Jenkins GPG key from keyserver
-  command: >
-    gpg --batch --no-default-keyring
-    --keyring /tmp/temp-jenkins.gpg
-    --keyserver hkp://keyserver.ubuntu.com:80
-    --recv-keys {{ jenkins_gpg_key_id }}
+- name: Fetch and install Jenkins GPG key via curl
+  shell: |
+    curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x{{ jenkins_gpg_key_id }}" \
+      | gpg --dearmor -o /usr/share/keyrings/jenkins-keyring.gpg
   args:
     creates: /usr/share/keyrings/jenkins-keyring.gpg
-  register: gpg_recv
-
-- name: Export Jenkins key to keyring file
-  shell: >
-    gpg --batch --no-default-keyring
-    --keyring /tmp/temp-jenkins.gpg
-    --export {{ jenkins_gpg_key_id }} |
-    gpg --dearmor > /usr/share/keyrings/jenkins-keyring.gpg
-  when: gpg_recv.changed
 
 - name: Set keyring permissions
   file:
     path: /usr/share/keyrings/jenkins-keyring.gpg
     mode: '0644'
-
-- name: Cleanup temp keyring files
-  file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-    - /tmp/temp-jenkins.gpg
-    - /tmp/temp-jenkins.gpg~
 
 - name: Add Jenkins apt repository
   apt_repository:
@@ -48,6 +29,12 @@
     state: present
     update_cache: yes
   notify: restart jenkins
+
+- name: Create Jenkins systemd override directory
+  file:
+    path: /etc/systemd/system/jenkins.service.d
+    state: directory
+    mode: '0755'
 
 - name: Configure Jenkins JVM heap
   template:
