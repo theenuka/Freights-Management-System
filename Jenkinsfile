@@ -159,12 +159,14 @@ pipeline {
     post {
         success {
             withCredentials([string(credentialsId: 'app-server-ip', variable: 'SERVER_IP')]) {
-                echo "==================================="
-                echo "CI/CD Pipeline Completed Successfully!"
-                echo "Application deployed to: http://${SERVER_IP}"
-                echo "Admin:                   http://${SERVER_IP}:3000"
-                echo "API:                     http://${SERVER_IP}:8000"
-                echo "==================================="
+                sh '''
+                    echo "==================================="
+                    echo "CI/CD Pipeline Completed Successfully!"
+                    echo "Application deployed to: http://${SERVER_IP}"
+                    echo "Admin:                   http://${SERVER_IP}:3000"
+                    echo "API:                     http://${SERVER_IP}:8000"
+                    echo "==================================="
+                '''
             }
         }
         failure {
