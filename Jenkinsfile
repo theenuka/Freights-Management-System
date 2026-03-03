@@ -82,20 +82,21 @@ pipeline {
         stage('Security Scan') {
             steps {
                 sh '''
-                    # Install Trivy if not present
-                    if ! command -v trivy >/dev/null 2>&1; then
+                    # Install Trivy to home dir (jenkins user has no sudo)
+                    if ! command -v ~/bin/trivy >/dev/null 2>&1; then
                         echo "Installing Trivy..."
-                        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+                        mkdir -p ~/bin
+                        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b ~/bin
                     fi
 
                     echo "Running Trivy filesystem scan..."
-                    trivy fs --exit-code 0 --severity HIGH,CRITICAL \
+                    ~/bin/trivy fs --exit-code 0 --severity HIGH,CRITICAL \
                         --format table --output trivy-report.txt \
                         --skip-dirs node_modules \
                         . || true
 
                     echo "=== Trivy Scan Results ==="
-                    cat trivy-report.txt
+                    cat trivy-report.txt || true
                 '''
             }
             post {
