@@ -53,8 +53,13 @@ output "public_subnet_ids" {
 # ALB Outputs
 #------------------------------------------------------------------------------
 output "alb_dns_name" {
-  description = "Application Load Balancer DNS name (use this to access the frontend)"
-  value       = "http://${aws_lb.app.dns_name}"
+  description = "Application Load Balancer DNS name"
+  value       = aws_lb.app.dns_name
+}
+
+output "application_url" {
+  description = "Primary application URL (HTTPS via custom domain)"
+  value       = "https://fms.theenuka.xyz"
 }
 
 #------------------------------------------------------------------------------
