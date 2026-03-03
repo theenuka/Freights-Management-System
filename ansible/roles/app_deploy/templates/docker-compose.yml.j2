@@ -10,6 +10,13 @@ services:
       - mongo_data:/data/db
     networks:
       - fms-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 300M
+        reservations:
+          memory: 100M
 
   backend:
     image: {{ images.backend }}:{{ deploy_tag }}
@@ -26,6 +33,13 @@ services:
       - "{{ ports.backend }}:8000"
     networks:
       - fms-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 250M
+        reservations:
+          memory: 64M
 
   frontend:
     image: {{ images.frontend }}:{{ deploy_tag }}
@@ -37,6 +51,13 @@ services:
       - "{{ ports.frontend }}:80"
     networks:
       - fms-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 64M
+        reservations:
+          memory: 32M
 
   admin:
     image: {{ images.admin }}:{{ deploy_tag }}
@@ -48,6 +69,13 @@ services:
       - "{{ ports.admin }}:80"
     networks:
       - fms-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 64M
+        reservations:
+          memory: 32M
 
   background:
     image: {{ images.background }}:{{ deploy_tag }}
@@ -65,6 +93,13 @@ services:
       - mongo
     networks:
       - fms-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+        reservations:
+          memory: 32M
 
 networks:
   fms-network:

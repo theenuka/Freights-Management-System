@@ -37,6 +37,44 @@ output "application_urls" {
 }
 
 #------------------------------------------------------------------------------
+# VPC Outputs
+#------------------------------------------------------------------------------
+output "vpc_id" {
+  description = "VPC ID"
+  value       = aws_vpc.main.id
+}
+
+output "public_subnet_ids" {
+  description = "Public subnet IDs"
+  value       = [aws_subnet.public_a.id, aws_subnet.public_b.id]
+}
+
+#------------------------------------------------------------------------------
+# ALB Outputs
+#------------------------------------------------------------------------------
+output "alb_dns_name" {
+  description = "Application Load Balancer DNS name (use this to access the frontend)"
+  value       = "http://${aws_lb.app.dns_name}"
+}
+
+#------------------------------------------------------------------------------
+# CloudWatch Outputs
+#------------------------------------------------------------------------------
+output "cloudwatch_alarms" {
+  description = "CloudWatch alarm names"
+  value = {
+    app_cpu         = aws_cloudwatch_metric_alarm.app_cpu_high.alarm_name
+    jenkins_cpu     = aws_cloudwatch_metric_alarm.jenkins_cpu_high.alarm_name
+    app_status      = aws_cloudwatch_metric_alarm.app_status_check.alarm_name
+  }
+}
+
+output "sns_topic_arn" {
+  description = "SNS topic ARN for CloudWatch alarm notifications"
+  value       = aws_sns_topic.alerts.arn
+}
+
+#------------------------------------------------------------------------------
 # Jenkins Outputs
 #------------------------------------------------------------------------------
 output "jenkins_public_ip" {

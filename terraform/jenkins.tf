@@ -7,6 +7,7 @@
 resource "aws_security_group" "jenkins_sg" {
   name        = "${local.name_prefix}-jenkins-sg"
   description = "Security group for Jenkins server"
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     description = "Jenkins Web UI"
@@ -48,6 +49,7 @@ resource "aws_instance" "jenkins_server" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.jenkins_instance_type
   key_name               = var.key_name
+  subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.jenkins_sg.id]
   monitoring             = false
 

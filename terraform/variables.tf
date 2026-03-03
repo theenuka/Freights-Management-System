@@ -73,3 +73,9 @@ variable "jenkins_instance_type" {
   type        = string
   default     = "t3.small"
 }
+
+variable "alert_email" {
+  description = "Email address for CloudWatch alarm notifications (leave empty to skip email subscription)"
+  type        = string
+  default     = ""
+}
