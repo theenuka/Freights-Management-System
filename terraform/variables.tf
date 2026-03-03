@@ -4,7 +4,7 @@
 variable "aws_region" {
   description = "AWS region for resource deployment"
   type        = string
-  default     = "us-east-1"
+  default     = "us-east-2"
 
   validation {
     condition     = can(regex("^[a-z]{2}-[a-z]+-[0-9]$", var.aws_region))
@@ -37,7 +37,7 @@ variable "environment" {
 variable "instance_type" {
   description = "EC2 instance type (t2.micro is free tier eligible)"
   type        = string
-  default     = "t3.micro"
+  default     = "t2.micro"
 }
 
 variable "key_name" {
@@ -52,9 +52,9 @@ variable "ssh_allowed_cidr" {
 }
 
 variable "root_volume_size" {
-  description = "Size of the root EBS volume in GB"
+  description = "Size of the root EBS volume in GB (keep both instances at 15 GB to stay within 30 GB free tier)"
   type        = number
-  default     = 20
+  default     = 15
 
   validation {
     condition     = var.root_volume_size >= 8 && var.root_volume_size <= 30
@@ -69,7 +69,7 @@ variable "enable_monitoring" {
 }
 
 variable "jenkins_instance_type" {
-  description = "EC2 instance type for Jenkins server"
+  description = "EC2 instance type for Jenkins server (t2.micro is free tier eligible)"
   type        = string
-  default     = "m7i-flex.large"  # Free tier eligible with 8GB RAM
+  default     = "t2.micro"
 }

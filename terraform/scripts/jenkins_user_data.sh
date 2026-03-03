@@ -7,6 +7,17 @@ exec > >(tee /var/log/jenkins-setup.log) 2>&1
 
 echo "=== Starting Jenkins Server Setup ==="
 
+# ── Swap space (essential for t2.micro / 1 GB RAM) ──────────────────────────
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+# Reduce swap aggressiveness so RAM is preferred
+echo 'vm.swappiness=10' >> /etc/sysctl.conf
+sysctl -p
+echo "=== Swap enabled (2 GB) ==="
+
 # Update system
 apt-get update -y
 apt-get upgrade -y
@@ -21,6 +32,14 @@ echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkin
 # Install Jenkins
 apt-get update -y
 apt-get install -y jenkins
+
+# Limit Jenkins JVM heap for t2.micro (1 GB RAM)
+mkdir -p /etc/systemd/system/jenkins.service.d
+cat > /etc/systemd/system/jenkins.service.d/override.conf <<'EOF'
+[Service]
+Environment="JAVA_OPTS=-Xms256m -Xmx512m -XX:+UseG1GC -Djava.awt.headless=true"
+EOF
+systemctl daemon-reload
 
 # Start Jenkins
 systemctl enable jenkins

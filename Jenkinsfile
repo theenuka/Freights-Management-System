@@ -19,10 +19,10 @@ pipeline {
 
     environment {
         DOCKERHUB_USERNAME = 'theenukabandara'
-        IMAGE_BACKEND = "${DOCKERHUB_USERNAME}/freights-backend"
-        IMAGE_FRONTEND = "${DOCKERHUB_USERNAME}/freights-frontend"
-        IMAGE_ADMIN = "${DOCKERHUB_USERNAME}/freights-admin"
-        IMAGE_BACKGROUND = "${DOCKERHUB_USERNAME}/freights-background"
+        IMAGE_BACKEND      = "${DOCKERHUB_USERNAME}/freights-backend"
+        IMAGE_FRONTEND     = "${DOCKERHUB_USERNAME}/freights-frontend"
+        IMAGE_ADMIN        = "${DOCKERHUB_USERNAME}/freights-admin"
+        IMAGE_BACKGROUND   = "${DOCKERHUB_USERNAME}/freights-background"
     }
 
     stages {
@@ -31,8 +31,8 @@ pipeline {
                 checkout scm
                 script {
                     env.GIT_COMMIT_SHORT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-                    env.GIT_BRANCH_NAME = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
-                    env.IMAGE_TAG = "${env.GIT_COMMIT_SHORT}"
+                    env.GIT_BRANCH_NAME  = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+                    env.IMAGE_TAG        = "${env.GIT_COMMIT_SHORT}"
 
                     echo "==================================="
                     echo "Build Information:"
@@ -47,9 +47,7 @@ pipeline {
         stage('Login to DockerHub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh '''
-                        echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
-                    '''
+                    sh 'echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin'
                 }
             }
         }
@@ -115,8 +113,14 @@ pipeline {
         stage('Deploy with Ansible') {
             steps {
                 withCredentials([
-                    sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY'),
-                    usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')
+                    sshUserPrivateKey(credentialsId: 'ec2-ssh-key',           keyFileVariable:  'SSH_KEY'),
+                    usernamePassword(credentialsId:  'dockerhub-credentials', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS'),
+                    string(credentialsId: 'app-server-ip',      variable: 'SERVER_IP'),
+                    string(credentialsId: 'vault-db-string',    variable: 'VAULT_DB'),
+                    string(credentialsId: 'vault-backend-pass', variable: 'VAULT_PASS'),
+                    string(credentialsId: 'vault-backend-jwt',  variable: 'VAULT_JWT'),
+                    string(credentialsId: 'vault-email-user',   variable: 'VAULT_EMAIL_USER'),
+                    string(credentialsId: 'vault-email-pass',   variable: 'VAULT_EMAIL_PASS')
                 ]) {
                     sh '''
                         echo "==================================="
@@ -131,16 +135,18 @@ pipeline {
                         # Disable host key checking for automation
                         export ANSIBLE_HOST_KEY_CHECKING=False
 
-                        # Run Ansible playbook with variables passed directly
+                        # Run Ansible playbook - all secrets come from Jenkins credentials
                         cd ansible
                         ansible-playbook -i inventories/dev/hosts.yml site.yml \
-                            -e "server_ip=54.83.112.87" \
+                            -e "server_ip=${SERVER_IP}" \
                             -e "ssh_key_path=~/.ssh/deploy_key.pem" \
                             -e "image_tag=${IMAGE_TAG}" \
                             -e "vault_dockerhub_password=${DH_PASS}" \
-                            -e "vault_db_string=mongodb://mongo:27017/fms" \
-                            -e "vault_backend_pass=devpass123" \
-                            -e "vault_backend_jwt=devjwtsecret456"
+                            -e "vault_db_string=${VAULT_DB}" \
+                            -e "vault_backend_pass=${VAULT_PASS}" \
+                            -e "vault_backend_jwt=${VAULT_JWT}" \
+                            -e "vault_email_user=${VAULT_EMAIL_USER}" \
+                            -e "vault_email_pass=${VAULT_EMAIL_PASS}"
 
                         # Cleanup sensitive files
                         rm -f ~/.ssh/deploy_key.pem
@@ -152,18 +158,20 @@ pipeline {
 
     post {
         success {
-            echo "==================================="
-            echo "CI/CD Pipeline Completed Successfully!"
-            echo "Application deployed to: http://54.83.112.87"
-            echo "Admin: http://54.83.112.87:3000"
-            echo "API: http://54.83.112.87:8000"
-            echo "==================================="
+            withCredentials([string(credentialsId: 'app-server-ip', variable: 'SERVER_IP')]) {
+                echo "==================================="
+                echo "CI/CD Pipeline Completed Successfully!"
+                echo "Application deployed to: http://${SERVER_IP}"
+                echo "Admin:                   http://${SERVER_IP}:3000"
+                echo "API:                     http://${SERVER_IP}:8000"
+                echo "==================================="
+            }
         }
         failure {
             echo 'Pipeline failed. Check the logs for details.'
         }
         always {
-            sh 'rm -f /tmp/vault_pass.txt ~/.ssh/deploy_key.pem 2>/dev/null || true'
+            sh 'rm -f ~/.ssh/deploy_key.pem 2>/dev/null || true'
         }
     }
 }
