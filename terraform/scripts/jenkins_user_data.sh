@@ -7,7 +7,7 @@ exec > >(tee /var/log/jenkins-setup.log) 2>&1
 
 echo "=== Starting Jenkins Server Setup ==="
 
-# ── Swap space (essential for t2.micro / 1 GB RAM) ──────────────────────────
+# ── Swap space (extra buffer for t3.small / 2 GB RAM) ───────────────────────
 fallocate -l 2G /swapfile
 chmod 600 /swapfile
 mkswap /swapfile
@@ -25,19 +25,21 @@ apt-get upgrade -y
 # Install Java (required for Jenkins)
 apt-get install -y fontconfig openjdk-17-jre
 
-# Add Jenkins repository
-curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+# Add Jenkins repository (current key as of 2025)
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | \
+  gpg --dearmor -o /usr/share/keyrings/jenkins-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/" | \
+  tee /etc/apt/sources.list.d/jenkins.list > /dev/null
 
 # Install Jenkins
 apt-get update -y
 apt-get install -y jenkins
 
-# Limit Jenkins JVM heap for t2.micro (1 GB RAM)
+# Jenkins JVM heap for t3.small (2 GB RAM) — give Jenkins 1 GB, leave 1 GB for OS/Docker
 mkdir -p /etc/systemd/system/jenkins.service.d
 cat > /etc/systemd/system/jenkins.service.d/override.conf <<'EOF'
 [Service]
-Environment="JAVA_OPTS=-Xms256m -Xmx512m -XX:+UseG1GC -Djava.awt.headless=true"
+Environment="JAVA_OPTS=-Xms256m -Xmx1g -XX:+UseG1GC -Djava.awt.headless=true"
 EOF
 systemctl daemon-reload
 
