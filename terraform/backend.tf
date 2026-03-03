@@ -14,7 +14,7 @@
 
 terraform {
   backend "s3" {
-    bucket         = "freights-tf-state-268539558877"
+    bucket         = "freights-tf-state-837644358356"
     key            = "freights-management/terraform.tfstate"
     region         = "us-east-2"
     encrypt        = true

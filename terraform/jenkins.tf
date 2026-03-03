@@ -52,7 +52,7 @@ resource "aws_instance" "jenkins_server" {
   monitoring             = false
 
   root_block_device {
-    volume_size           = 25
+    volume_size           = var.root_volume_size
     volume_type           = "gp3"
     encrypted             = true
     delete_on_termination = true
