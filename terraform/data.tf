@@ -1,10 +1,6 @@
-# terraform/data.tf
-# Data sources for dynamic resource lookups
-
-# Get the latest Ubuntu 24.04 LTS AMI
 data "aws_ami" "ubuntu" {
   most_recent = true
-  owners      = ["099720109477"]  # Canonical
+  owners      = ["099720109477"]
 
   filter {
     name   = "name"
@@ -15,18 +11,9 @@ data "aws_ami" "ubuntu" {
     name   = "virtualization-type"
     values = ["hvm"]
   }
-
+  
   filter {
     name   = "architecture"
     values = ["x86_64"]
   }
-}
-
-# Get current AWS account ID and region
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
-
-# Get available AZs
-data "aws_availability_zones" "available" {
-  state = "available"
 }
