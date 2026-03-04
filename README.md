@@ -23,7 +23,7 @@
 
 > Click the thumbnail below to watch the full demo
 
-[![Demo Video](./docs/screenshots/live-app-admin.png)](https://github.com/theenuka/Freights-Management-System/raw/main/Screen%20Recording%202026-03-04%20at%2004.37.05.mov)
+[![Demo Video](./docs/screenshots/live-app-admin.png)](https://github.com/theenuka/Freights-Management-System/raw/main/docs/demo.mp4)
 
 ---
 
