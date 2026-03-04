@@ -21,7 +21,7 @@
 
 ## Demo
 
-<video src="https://github.com/theenuka/Freights-Management-System/raw/main/docs/demo.mp4" controls width="100%"></video>
+[![Demo Video](./docs/screenshots/live-app-admin.png)](https://github.com/theenuka/Freights-Management-System/raw/main/docs/demo.mp4)
 
 ---
 
