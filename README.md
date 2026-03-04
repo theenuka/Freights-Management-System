@@ -21,9 +21,7 @@
 
 ## Demo
 
-> Click the thumbnail below to watch the full demo
-
-[![Demo Video](./docs/screenshots/live-app-admin.png)](https://github.com/theenuka/Freights-Management-System/raw/main/docs/demo.mp4)
+<video src="https://github.com/theenuka/Freights-Management-System/raw/main/docs/demo.mp4" controls width="100%"></video>
 
 ---
 
