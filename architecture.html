@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Freights Management System — Architecture</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 1920px; height: 1080px;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  background: #f1f5f9;
+  color: #0f172a;
+}
+body {
+  background-color: #f1f5f9;
+  background-image: radial-gradient(circle, #94a3b8 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ══ CANVAS ══ */
+.canvas { width: 1920px; height: 1080px; display: flex; flex-direction: column; padding: 14px 20px 10px; gap: 9px; }
+
+/* ══ HEADER ══ */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #fff; border: 1.5px solid #e2e8f0; border-radius: 14px;
+  padding: 11px 22px; box-shadow: 0 2px 8px rgba(0,0,0,.07); flex-shrink: 0;
+}
+.hdr-left { display: flex; align-items: center; gap: 14px; }
+.hdr-left img { height: 30px; object-fit: contain; }
+.hdr-left h1 { font-size: 1.4rem; font-weight: 800; color: #0f172a; letter-spacing: -.4px; }
+.hdr-left p  { font-size: .73rem; color: #64748b; font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+.live-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #f0fdf4; border: 1.5px solid #86efac; color: #15803d;
+  border-radius: 20px; padding: 4px 12px; font-size: .72rem; font-weight: 600;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; animation: blink 1.8s ease-in-out infinite; }
+.dot-g { background: #22c55e; }
+.dot-b { background: #3b82f6; animation-delay: .4s; }
+.dot-o { background: #f97316; animation-delay: .8s; }
+@keyframes blink { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+.hdr-urls { display: flex; gap: 8px; align-items: center; }
+.upill {
+  display: flex; align-items: center; gap: 6px; border-radius: 9px;
+  padding: 6px 14px; font-size: .74rem; font-family: 'JetBrains Mono', monospace;
+  font-weight: 500; border: 1.5px solid;
+}
+.upill-g { background: #f0fdf4; border-color: #86efac; color: #15803d; }
+.upill-b { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
+.upill-o { background: #fff7ed; border-color: #fdba74; color: #c2410c; }
+
+/* ══ BODY 4-col ══ */
+.body {
+  flex: 1; display: grid;
+  grid-template-columns: 218px 1fr 1fr 232px;
+  gap: 9px; min-height: 0;
+}
+
+/* ══ SECTION ══ */
+.sec {
+  border-radius: 13px; border: 1.5px solid; position: relative;
+  display: flex; flex-direction: column; gap: 7px; padding: 14px 11px 9px;
+}
+.sec-lbl {
+  position: absolute; top: -10px; left: 11px;
+  font-size: .61rem; font-weight: 700; letter-spacing: 1.1px;
+  text-transform: uppercase; padding: 2px 9px; border-radius: 5px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.s-gray { background: #fafafa; border-color: #e2e8f0; }
+.s-gray .sec-lbl { background: #e2e8f0; color: #475569; }
+.s-amber { background: #fffcf0; border-color: #fde68a; }
+.s-amber .sec-lbl { background: #fef9c3; color: #854d0e; }
+.s-orange { background: #fff7ed; border-color: #fed7aa; }
+.s-orange .sec-lbl { background: #ffedd5; color: #9a3412; }
+.s-blue { background: #f0f9ff; border-color: #bae6fd; }
+.s-blue .sec-lbl { background: #dbeafe; color: #1e40af; }
+
+/* ══ CARD ══ */
+.card {
+  background: #fff; border: 1.5px solid #e2e8f0; border-radius: 10px;
+  padding: 9px 10px; display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06); transition: all .18s;
+}
+.card:hover { border-color: #94a3b8; box-shadow: 0 4px 14px rgba(0,0,0,.11); transform: translateY(-1px); }
+.ci { width: 38px; height: 38px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.ci img { width: 100%; height: 100%; object-fit: contain; }
+.cinfo { flex: 1; min-width: 0; }
+.cname { font-size: .82rem; font-weight: 700; color: #0f172a; }
+.cdtl  { font-size: .65rem; color: #64748b; font-family: 'JetBrains Mono', monospace; margin-top: 2px; line-height: 1.45; }
+
+/* ══ BADGE ══ */
+.bdg {
+  display: inline-block; font-size: .61rem; font-weight: 600;
+  padding: 2px 9px; border-radius: 10px; border: 1px solid;
+  margin-top: 4px; font-family: 'JetBrains Mono', monospace;
+}
+.b-g { background:#f0fdf4; color:#166534; border-color:#86efac; }
+.b-b { background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; }
+.b-o { background:#fff7ed; color:#c2410c; border-color:#fdba74; }
+.b-p { background:#faf5ff; color:#5b21b6; border-color:#ddd6fe; }
+.b-r { background:#fff1f2; color:#be123c; border-color:#fecdd3; }
+.b-s { background:#f8fafc; color:#334155; border-color:#cbd5e1; }
+.b-t { background:#f0fdfa; color:#0f766e; border-color:#99f6e4; }
+.b-y { background:#fefce8; color:#713f12; border-color:#fef08a; }
+
+/* ══ PIPELINE ══ */
+.pipeline { display: flex; align-items: center; gap: 4px; flex: 1; }
+.pstage {
+  flex: 1; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 10px;
+  padding: 9px 5px 7px; text-align: center; position: relative; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05); transition: all .2s;
+}
+.pstage::after {
+  content: ''; position: absolute; top: 0; left: -80%; width: 55%; height: 3px;
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+  animation: sweep 2.8s linear infinite;
+}
+.pstage:nth-child(2)::after  { animation-delay: .4s; }
+.pstage:nth-child(4)::after  { animation-delay: .8s; }
+.pstage:nth-child(6)::after  { animation-delay: 1.2s; }
+.pstage:nth-child(8)::after  { animation-delay: 1.6s; }
+.pstage:nth-child(10)::after { animation-delay: 2.0s; }
+.pstage:nth-child(12)::after { animation-delay: 2.4s; }
+@keyframes sweep { 0%{transform:translateX(-100%)} 100%{transform:translateX(350%)} }
+.pstage::after { left: 0; transform: translateX(-100%); }
+
+.pimg { width: 32px; height: 32px; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; }
+.pimg img { width: 32px; height: 32px; object-fit: contain; }
+.pname { font-size: .65rem; font-weight: 700; color: #334155; line-height: 1.35; }
+.psub  { font-size: .57rem; color: #94a3b8; font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+.parr  { color: #94a3b8; font-size: 1.1rem; font-weight: 700; flex-shrink: 0; }
+
+/* ══ VPC BOX ══ */
+.vpc-box {
+  border: 2px dashed #93c5fd; border-radius: 12px;
+  background: rgba(239,246,255,.6); padding: 9px 9px 8px;
+  position: relative; flex: 1; display: flex; flex-direction: column; gap: 7px;
+}
+.vpc-lbl {
+  position: absolute; top: -10px; left: 10px;
+  background: #dbeafe; color: #1e40af;
+  font-size: .61rem; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; padding: 1px 10px; border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.subnet-row { display: flex; gap: 7px; flex: 1; }
+.subnet {
+  flex: 1; border: 1px dashed #94a3b8; border-radius: 9px;
+  background: rgba(248,250,252,.85); padding: 7px 8px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.snlbl { font-size: .59rem; font-family: 'JetBrains Mono', monospace; color: #94a3b8; font-weight: 500; margin-bottom: 2px; }
+
+/* ══ DOCKER CONTAINERS ══ */
+.ctr-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; }
+.ctr {
+  background: #fff; border: 1.5px solid #e2e8f0; border-radius: 10px;
+  padding: 10px 6px 8px; text-align: center; position: relative; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05); transition: all .2s;
+}
+.ctr:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.1); border-color: #94a3b8; }
+.ctr::before { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; border-radius:0 0 10px 10px; }
+.ctr-mongo::before   { background: #4db33d; }
+.ctr-back::before    { background: #3b82f6; }
+.ctr-front::before   { background: #6366f1; }
+.ctr-admin::before   { background: #8b5cf6; }
+.ctr-worker::before  { background: #f97316; }
+.ctr img  { width: 36px; height: 36px; object-fit: contain; margin: 0 auto; display: block; }
+.ctr-name { font-size: .71rem; font-weight: 700; color: #0f172a; margin-top: 5px; }
+.ctr-port { font-size: .59rem; color: #64748b; font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+.ctr-res  { font-size: .55rem; color: #94a3b8; font-family: 'JetBrains Mono', monospace; margin-top: 1px; }
+
+/* ══ ALB ROUTES ══ */
+.rrow  { display: flex; align-items: center; gap: 5px; font-size: .65rem; font-family: 'JetBrains Mono', monospace; }
+.rsrc  { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 4px; color: #475569; font-weight: 500; }
+.rarr  { color: #94a3b8; font-weight: 700; }
+.rdst  { padding: 2px 8px; border-radius: 4px; font-weight: 600; border: 1px solid; }
+.rd-b  { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
+.rd-g  { background: #f0fdf4; color: #15803d; border-color: #86efac; }
+.rd-p  { background: #faf5ff; color: #5b21b6; border-color: #ddd6fe; }
+
+/* ══ TF STATE ══ */
+.tf-state {
+  background: linear-gradient(135deg,#f5f0ff,#ede9fe);
+  border: 1.5px solid #c4b5fd; border-radius: 10px; padding: 10px 11px;
+}
+.tf-title {
+  font-size: .64rem; font-weight: 700; color: #5b21b6;
+  text-transform: uppercase; letter-spacing: .9px;
+  font-family: 'JetBrains Mono', monospace; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.tf-title img { width: 18px; height: 18px; object-fit: contain; }
+.tf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+.tf-row  { display: flex; align-items: center; justify-content: space-between; font-size: .64rem; padding: 3px 0; }
+.tf-key  { color: #475569; }
+.tf-val  { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #5b21b6; }
+
+/* ══ METRIC CARD ══ */
+.mcrd { background: #fff; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 9px 11px; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+.mcrd-title {
+  font-size: .64rem; font-weight: 700; color: #475569;
+  text-transform: uppercase; letter-spacing: .8px;
+  font-family: 'JetBrains Mono', monospace; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.mcrd-title img { width: 17px; height: 17px; object-fit: contain; }
+.mrow { display: flex; align-items: center; justify-content: space-between; font-size: .65rem; padding: 3px 0; border-bottom: 1px solid #f1f5f9; }
+.mrow:last-child { border-bottom: none; }
+.mkey { color: #334155; font-weight: 500; }
+.mval { font-family: 'JetBrains Mono', monospace; color: #22c55e; font-weight: 600; }
+.mval-b { color: #3b82f6; }
+.mval-p { color: #5b21b6; }
+
+/* ══ FLOW BOX ══ */
+.flow-box {
+  background: #f8fafc; border: 1.5px solid #e2e8f0;
+  border-radius: 9px; padding: 8px 10px;
+}
+.flow-title { font-size: .62rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .8px; font-family: 'JetBrains Mono', monospace; margin-bottom: 5px; }
+.flow-step { font-size: .66rem; line-height: 1.9; color: #334155; font-family: 'JetBrains Mono', monospace; }
+
+/* ══ STACK CARDS ══ */
+.stack-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.scard {
+  background: #fff; border: 1.5px solid #e2e8f0; border-radius: 10px;
+  padding: 10px 7px; display: flex; flex-direction: column; align-items: center;
+  gap: 5px; box-shadow: 0 1px 3px rgba(0,0,0,.05); text-align: center;
+  transition: all .18s;
+}
+.scard:hover { border-color: #94a3b8; box-shadow: 0 4px 12px rgba(0,0,0,.09); transform: translateY(-1px); }
+.scard img   { width: 40px; height: 40px; object-fit: contain; }
+.scard-name  { font-size: .74rem; font-weight: 700; color: #0f172a; }
+.scard-dtl   { font-size: .61rem; color: #64748b; font-family: 'JetBrains Mono', monospace; line-height: 1.4; }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+<!-- ════════ HEADER ════════ -->
+<div class="header">
+  <div class="hdr-left">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/1200px-Amazon_Web_Services_Logo.svg.png" alt="AWS">
+    <div>
+      <h1>Freights Management System - DevSecOps Architecture</h1>
+      <p>Jenkins CI/CD · Docker · Terraform IaC · Ansible · AWS VPC · ALB · CloudWatch · ACM HTTPS · us-east-2 Ohio</p>
+    </div>
+  
+  </div>
+  <div class="hdr-urls">
+    <div class="upill upill-g"><span class="dot dot-g"></span>https://fms.theenuka.xyz → Frontend :80</div>
+    <div class="upill upill-b"><span class="dot dot-b"></span>https://fms.theenuka.xyz/admin → Admin Panel :3000</div>
+    <div class="upill upill-o"><span class="dot dot-o"></span>http://3.141.19.185:8080 → Jenkins CI/CD</div>
+  </div>
+</div>
+
+<!-- ════════ BODY ════════ -->
+<div class="body">
+
+<!-- ══ COL 1: DEV TOOLS ══ -->
+<div style="display:flex;flex-direction:column;gap:8px">
+
+  <div class="sec s-gray" style="flex-shrink:0;padding-top:18px">
+    <span class="sec-lbl">Developer</span>
+    <div class="card">
+      <div class="ci"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Visual_Studio_Code_1.35_icon.svg/2048px-Visual_Studio_Code_1.35_icon.svg.png" alt="VSCode"></div>
+      <div class="cinfo">
+        <div class="cname">Developer</div>
+        <div class="cdtl">VSCode · macOS · Git</div>
+        <span class="bdg b-b">git push origin main</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec s-gray" style="flex-shrink:0;padding-top:18px">
+    <span class="sec-lbl">Source Control</span>
+    <div class="card">
+      <div class="ci"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub"></div>
+      <div class="cinfo">
+        <div class="cname">GitHub</div>
+        <div class="cdtl">theenuka/Freights-MS<br>main branch · Webhook</div>
+        <span class="bdg b-o">Webhook → Jenkins :8080</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec s-gray" style="flex-shrink:0;padding-top:18px">
+    <span class="sec-lbl">Container Registry</span>
+    <div class="card">
+      <div class="ci"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original.svg" alt="Docker"></div>
+      <div class="cinfo">
+        <div class="cname">Docker Hub</div>
+        <div class="cdtl">theenukabandara/*<br>:latest + :git-sha tags</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+      <span class="bdg b-b" style="text-align:center">freights-backend</span>
+      <span class="bdg b-g" style="text-align:center">freights-frontend</span>
+      <span class="bdg b-p" style="text-align:center">freights-admin</span>
+      <span class="bdg b-o" style="text-align:center">freights-background</span>
+    </div>
+  </div>
+
+  <div class="sec s-gray" style="flex:1;padding-top:18px">
+    <span class="sec-lbl">DevSecOps Tools</span>
+    <div class="card">
+      <div class="ci"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/terraform/terraform-original.svg" alt="Terraform"></div>
+      <div class="cinfo">
+        <div class="cname">Terraform</div>
+        <div class="cdtl">IaC · 20 AWS resources<br>VPC · EC2 · ALB · CW</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ci"><img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Ansible_logo.svg" alt="Ansible"></div>
+      <div class="cinfo">
+        <div class="cname">Ansible</div>
+        <div class="cdtl">Server automation<br>Docker deploy + config</div>
+        <span class="bdg b-r">Vault · AES-256 secrets</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ci" style="background:#e8f9f7;border-radius:8px;padding:4px">
+        <img src="https://raw.githubusercontent.com/aquasecurity/trivy/main/docs/imgs/logo.png" alt="Trivy">
+      </div>
+      <div class="cinfo">
+        <div class="cname">Trivy</div>
+        <div class="cdtl">Filesystem security scan<br>HIGH + CRITICAL vulns</div>
+        <span class="bdg b-t">report archived per build</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /col1 -->
+
+
+<!-- ══ COL 2: CI/CD + NETWORKING ══ -->
+<div style="display:flex;flex-direction:column;gap:8px">
+
+  <!-- Jenkins CI/CD -->
+  <div class="sec s-orange" style="flex-shrink:0;padding-top:20px">
+    <span class="sec-lbl">CI/CD — Jenkins EC2 t3.small · 3.141.19.185 :8080</span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <img src="https://www.jenkins.io/images/logos/jenkins/jenkins.png" alt="Jenkins"
+           style="width:52px;height:52px;object-fit:contain;flex-shrink:0">
+      <div class="pipeline">
+        <div class="pstage">
+          <div class="pimg"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="Checkout"></div>
+          <div class="pname">Checkout</div><div class="psub">+ git SHA</div>
+        </div>
+        <span class="parr">›</span>
+        <div class="pstage">
+          <div class="pimg"><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original.svg" alt="Docker"></div>
+          <div class="pname">Login</div><div class="psub">DockerHub</div>
+        </div>
+        <span class="parr">›</span>
+        <div class="pstage">
+          <div class="pimg" style="font-size:1.5rem;line-height:1">🧪</div>
+          <div class="pname">Test</div><div class="psub">npm audit</div>
+        </div>
+        <span class="parr">›</span>
+        <div class="pstage">
+          <div class="pimg" style="background:#e8f9f7;border-radius:6px;padding:2px">
+            <img src="https://raw.githubusercontent.com/aquasecurity/trivy/main/docs/imgs/logo.png" alt="Trivy">
+          </div>
+          <div class="pname">Security</div><div class="psub">Trivy scan</div>
+        </div>
+        <span class="parr">›</span>
+        <div class="pstage">
+          <div class="pimg" style="font-size:1.5rem;line-height:1">🏗️</div>
+          <div class="pname">Build+Push</div><div class="psub">4 images</div>
+        </div>
+        <span class="parr">›</span>
+        <div class="pstage">
+          <div class="pimg" style="font-size:1.5rem;line-height:1">🧹</div>
+          <div class="pname">Cleanup</div><div class="psub">docker prune</div>
+        </div>
+        <span class="parr">›</span>
+        <div class="pstage">
+          <div class="pimg"><img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Ansible_logo.svg" alt="Ansible"></div>
+          <div class="pname">Deploy</div><div class="psub">Ansible</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:2px">
+      <span class="bdg b-o">pollSCM H/5 * * * *</span>
+      <span class="bdg b-g">GitHub Webhook trigger</span>
+      <span class="bdg b-b">Node.js 20 · Docker 29</span>
+      <span class="bdg b-s">Declarative Pipeline</span>
+      <span class="bdg b-t">trivy-report.txt archived</span>
+    </div>
+  </div>
+
+  <!-- DNS + ACM + ALB -->
+  <div class="sec s-amber" style="flex-shrink:0;padding-top:20px">
+    <span class="sec-lbl">DNS · TLS · Load Balancing</span>
+    <div style="display:flex;gap:8px">
+
+      <div class="card" style="flex:1">
+        <div class="ci">
+          <!-- GoDaddy: use a globe SVG inline since logo URL rate-limits -->
+          <svg width="38" height="38" viewBox="0 0 38 38">
+            <rect width="38" height="38" rx="8" fill="#1bdbdb" opacity=".12"/>
+            <text x="19" y="14" text-anchor="middle" font-size="7" font-weight="800" fill="#1bdbdb" font-family="Arial">Go</text>
+            <text x="19" y="23" text-anchor="middle" font-size="7" font-weight="800" fill="#1bdbdb" font-family="Arial">Daddy</text>
+            <circle cx="19" cy="19" r="16" fill="none" stroke="#1bdbdb" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="cinfo">
+          <div class="cname">GoDaddy DNS</div>
+          <div class="cdtl">CNAME: fms.theenuka.xyz<br>→ ALB DNS name</div>
+          <span class="bdg b-g">TTL 30min · Active</span>
+        </div>
+      </div>
+
+      <div class="card" style="flex:1">
+        <div class="ci"><img src="https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/Certificate-Manager.svg" alt="ACM"></div>
+        <div class="cinfo">
+          <div class="cname">AWS ACM</div>
+          <div class="cdtl">*.theenuka.xyz wildcard<br>TLS 1.3 · DNS validated</div>
+          <span class="bdg b-g">Issued ✓</span>
+        </div>
+      </div>
+
+      <div class="card" style="flex:1.5;flex-direction:column;align-items:flex-start;gap:6px">
+        <div style="display:flex;align-items:center;gap:10px;width:100%">
+          <div class="ci"><img src="https://icon.icepanel.io/AWS/svg/Networking-Content-Delivery/Elastic-Load-Balancing.svg" alt="ALB"></div>
+          <div class="cinfo">
+            <div class="cname">Application Load Balancer</div>
+            <div class="cdtl">Internet-facing · Multi-AZ · HTTPS</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px;width:100%;padding-left:3px">
+          <div class="rrow"><span class="rsrc">:80 HTTP</span><span class="rarr">→</span><span class="rdst rd-b">301 HTTPS Redirect</span></div>
+          <div class="rrow"><span class="rsrc">:443 /</span><span class="rarr">→</span><span class="rdst rd-g">Frontend :80</span></div>
+          <div class="rrow"><span class="rsrc">:443 /admin*</span><span class="rarr">→</span><span class="rdst rd-p">Admin :3000</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VPC -->
+  <div class="vpc-box" style="margin-top:1px">
+    <span class="vpc-lbl">VPC · 10.0.0.0/16 · 2 Public Subnets · Internet Gateway · us-east-2</span>
+    <div class="subnet-row" style="margin-top:7px">
+
+      <div class="subnet">
+        <div class="snlbl">◆ Public Subnet A · us-east-2a · 10.0.1.0/24</div>
+        <div class="card">
+          <div class="ci"><img src="https://icon.icepanel.io/AWS/svg/Compute/EC2.svg" alt="EC2"></div>
+          <div class="cinfo">
+            <div class="cname">Jenkins Server</div>
+            <div class="cdtl">EC2 t3.small · 3.141.19.185<br>Java · Docker · Ansible · Node.js</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ci"><img src="https://icon.icepanel.io/AWS/svg/Compute/EC2.svg" alt="EC2"></div>
+          <div class="cinfo">
+            <div class="cname">App Server</div>
+            <div class="cdtl">EC2 t3.micro · 3.145.19.118<br>Docker Compose · 5 containers</div>
+            <span class="bdg b-g">Healthy ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="subnet" style="flex:0.65">
+        <div class="snlbl">◆ Public Subnet B · us-east-2b · 10.0.2.0/24</div>
+        <div class="card">
+          <div class="ci"><img src="https://icon.icepanel.io/AWS/svg/Networking-Content-Delivery/Elastic-Load-Balancing.svg" alt="ALB-B"></div>
+          <div class="cinfo">
+            <div class="cname">ALB Standby AZ</div>
+            <div class="cdtl">High Availability<br>Auto failover</div>
+          </div>
+        </div>
+        <div class="card">
+          <!-- IGW: use Transit Gateway icon as closest available -->
+          <div class="ci"><img src="https://icon.icepanel.io/AWS/svg/Networking-Content-Delivery/Transit-Gateway.svg" alt="IGW"></div>
+          <div class="cinfo">
+            <div class="cname">Internet Gateway</div>
+            <div class="cdtl">0.0.0.0/0 route<br>Inbound + Outbound</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ci"><img src="https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/Shield.svg" alt="SG"></div>
+          <div class="cinfo">
+            <div class="cname">Security Groups</div>
+            <div class="cdtl">ALB-SG · App-SG<br>Jenkins-SG</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /col2 -->
+
+
+<!-- ══ COL 3: DOCKER + STORAGE + STACK ══ -->
+<div style="display:flex;flex-direction:column;gap:8px">
+
+  <!-- Docker Containers -->
+  <div class="sec s-blue" style="flex-shrink:0;padding-top:20px">
+    <span class="sec-lbl">🐳 Docker Compose — App Server 3.145.19.118 · Resource Limits Enforced</span>
+    <div class="ctr-grid">
+      <div class="ctr ctr-mongo">
+        <img src="https://www.vectorlogo.zone/logos/mongodb/mongodb-icon.svg" alt="MongoDB">
+        <div class="ctr-name">fms-mongo</div>
+        <div class="ctr-port">:27017</div>
+        <div class="ctr-res">mem 300M · cpu 0.5</div>
+      </div>
+      <div class="ctr ctr-back">
+        <img src="https://nodejs.org/static/logos/nodejsStackedDark.svg" alt="Node.js">
+        <div class="ctr-name">fms-backend</div>
+        <div class="ctr-port">:8000 (REST API)</div>
+        <div class="ctr-res">mem 250M · cpu 0.5</div>
+      </div>
+      <div class="ctr ctr-front">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/2300px-React-icon.svg.png" alt="React">
+        <div class="ctr-name">fms-frontend</div>
+        <div class="ctr-port">nginx :80</div>
+        <div class="ctr-res">mem 64M · cpu 0.25</div>
+      </div>
+      <div class="ctr ctr-admin">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/2300px-React-icon.svg.png" alt="React Admin">
+        <div class="ctr-name">fms-admin</div>
+        <div class="ctr-port">nginx :3000</div>
+        <div class="ctr-res">mem 64M · cpu 0.25</div>
+      </div>
+      <div class="ctr ctr-worker">
+        <img src="https://nodejs.org/static/logos/nodejsStackedDark.svg" alt="Worker">
+        <div class="ctr-name">fms-worker</div>
+        <div class="ctr-port">background job</div>
+        <div class="ctr-res">mem 128M · cpu 0.25</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:2px">
+      <span class="bdg b-b">Docker Compose v2</span>
+      <span class="bdg b-s">fms-network bridge</span>
+      <span class="bdg b-g">resource limits enforced</span>
+      <span class="bdg b-o">EBS 20GB gp3 volume</span>
+    </div>
+  </div>
+
+  <!-- EBS -->
+  <div class="sec s-gray" style="flex-shrink:0;padding-top:18px">
+    <span class="sec-lbl">Persistent Storage</span>
+    <div style="display:flex;gap:7px">
+      <div class="card" style="flex:1">
+        <div class="ci"><img src="https://icon.icepanel.io/AWS/svg/Storage/Elastic-Block-Store.svg" alt="EBS"></div>
+        <div class="cinfo">
+          <div class="cname">EBS Volume</div>
+          <div class="cdtl">App Server · 20GB gp3<br>MongoDB data persistence</div>
+          <span class="bdg b-g">Attached ✓</span>
+        </div>
+      </div>
+      <div class="card" style="flex:1">
+        <div class="ci"><img src="https://icon.icepanel.io/AWS/svg/Storage/Elastic-Block-Store.svg" alt="EBS"></div>
+        <div class="cinfo">
+          <div class="cname">EBS Volume</div>
+          <div class="cdtl">Jenkins · 20GB gp3<br>Build cache / workspace</div>
+          <span class="bdg b-g">Attached ✓</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terraform State -->
+  <div class="tf-state">
+    <div class="tf-title">
+      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/terraform/terraform-original.svg" alt="Terraform">
+      Terraform Infrastructure State
+    </div>
+    <div class="tf-grid">
+      <div class="tf-row"><span class="tf-key">VPC</span><span class="tf-val">vpc-01327e ✓</span></div>
+      <div class="tf-row"><span class="tf-key">Subnets</span><span class="tf-val">2 public ✓</span></div>
+      <div class="tf-row"><span class="tf-key">EC2 app</span><span class="tf-val">t3.micro ✓</span></div>
+      <div class="tf-row"><span class="tf-key">EC2 jenkins</span><span class="tf-val">t3.small ✓</span></div>
+      <div class="tf-row"><span class="tf-key">ALB</span><span class="tf-val">active ✓</span></div>
+      <div class="tf-row"><span class="tf-key">TG frontend</span><span class="tf-val">healthy ✓</span></div>
+      <div class="tf-row"><span class="tf-key">TG admin</span><span class="tf-val">healthy ✓</span></div>
+      <div class="tf-row"><span class="tf-key">Total</span><span class="tf-val">20 resources</span></div>
+    </div>
+    <div style="margin-top:5px;display:flex;gap:5px;flex-wrap:wrap">
+      <span class="bdg b-p">terraform.tfstate · local</span>
+      <span class="bdg b-p">us-east-2 · dev env</span>
+    </div>
+  </div>
+
+  <!-- App Stack -->
+  <div class="sec s-gray" style="flex:1;padding-top:18px">
+    <span class="sec-lbl">Application Stack</span>
+    <div class="stack-grid">
+      <div class="scard">
+        <img src="https://nodejs.org/static/logos/nodejsStackedDark.svg" alt="Node.js">
+        <div class="scard-name">Node.js</div>
+        <div class="scard-dtl">Express REST API<br>v20 LTS</div>
+      </div>
+      <div class="scard">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/2300px-React-icon.svg.png" alt="React">
+        <div class="scard-name">React</div>
+        <div class="scard-dtl">Vite · TailwindCSS<br>SPA + Admin Panel</div>
+      </div>
+      <div class="scard">
+        <img src="https://www.vectorlogo.zone/logos/mongodb/mongodb-icon.svg" alt="MongoDB">
+        <div class="scard-name">MongoDB</div>
+        <div class="scard-dtl">NoSQL · EBS<br>persistent data</div>
+      </div>
+      <div class="scard">
+        <img src="https://nginx.org/nginx.png" alt="Nginx">
+        <div class="scard-name">Nginx</div>
+        <div class="scard-dtl">Reverse proxy<br>/admin routing</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /col3 -->
+
+
+<!-- ══ COL 4: MONITORING + SECURITY ══ -->
+<div style="display:flex;flex-direction:column;gap:8px">
+
+  <!-- CloudWatch -->
+  <div class="sec s-gray" style="flex-shrink:0;padding-top:18px">
+    <span class="sec-lbl">Monitoring</span>
+    <div class="card">
+      <div class="ci"><img src="https://icon.icepanel.io/AWS/svg/Management-Governance/CloudWatch.svg" alt="CloudWatch"></div>
+      <div class="cinfo">
+        <div class="cname">AWS CloudWatch</div>
+        <div class="cdtl">CPU alarms · 2 EC2 instances<br>5-min periods · SNS notify</div>
+      </div>
+    </div>
+    <div class="mcrd">
+      <div class="mcrd-title">
+        <img src="https://icon.icepanel.io/AWS/svg/Management-Governance/CloudWatch.svg" alt="">
+        CPU Alarms — Threshold 80%
+      </div>
+      <div class="mrow"><span class="mkey">App Server CPU</span><span class="mval">● OK</span></div>
+      <div class="mrow"><span class="mkey">Jenkins CPU</span><span class="mval">● OK</span></div>
+      <div class="mrow"><span class="mkey">Eval period</span><span class="mval">2 × 5min</span></div>
+      <div class="mrow"><span class="mkey">Action</span><span class="mval">SNS alert</span></div>
+    </div>
+  </div>
+
+  <!-- SNS -->
+  <div class="sec s-gray" style="flex-shrink:0;padding-top:18px">
+    <span class="sec-lbl">Notifications</span>
+    <div class="card">
+      <div class="ci"><img src="https://icon.icepanel.io/AWS/svg/App-Integration/Simple-Notification-Service.svg" alt="SNS"></div>
+      <div class="cinfo">
+        <div class="cname">AWS SNS</div>
+        <div class="cdtl">fms-alerts topic<br>Email subscription</div>
+        <span class="bdg b-o">CloudWatch → SNS → Email</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Security -->
+  <div class="sec s-gray" style="flex-shrink:0;padding-top:18px">
+    <span class="sec-lbl">Security</span>
+    <div class="card">
+      <div class="ci" style="background:#e8f9f7;border-radius:8px;padding:4px">
+        <img src="https://raw.githubusercontent.com/aquasecurity/trivy/main/docs/imgs/logo.png" alt="Trivy">
+      </div>
+      <div class="cinfo">
+        <div class="cname">Trivy Scanner</div>
+        <div class="cdtl">Filesystem scan per build<br>HIGH + CRITICAL severity</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ci"><img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Ansible_logo.svg" alt="Vault"></div>
+      <div class="cinfo">
+        <div class="cname">Ansible Vault</div>
+        <div class="cdtl">AES-256 encrypted vars<br>Docker creds · DB secrets</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ci"><img src="https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/Shield.svg" alt="SG"></div>
+      <div class="cinfo">
+        <div class="cname">Security Groups</div>
+        <div class="cdtl">Port 80 → ALB SG only<br>SSH restricted by CIDR</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IAM -->
+  <div class="sec s-gray" style="flex-shrink:0;padding-top:18px">
+    <span class="sec-lbl">Identity &amp; Access</span>
+    <div class="card">
+      <div class="ci"><img src="https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/Identity-and-Access-Management.svg" alt="IAM"></div>
+      <div class="cinfo">
+        <div class="cname">AWS IAM</div>
+        <div class="cdtl">EC2 key pairs · SSH access<br>Least-privilege SG rules</div>
+        <span class="bdg b-s">ssh_allowed_cidr var</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats + Deploy Flow -->
+  <div class="sec s-gray" style="flex:1;padding-top:18px">
+    <span class="sec-lbl">Pipeline Stats</span>
+    <div class="mcrd">
+      <div class="mrow"><span class="mkey">Pipeline Stages</span><span class="mval mval-b">7 stages</span></div>
+      <div class="mrow"><span class="mkey">Docker Images</span><span class="mval mval-b">4 built</span></div>
+      <div class="mrow"><span class="mkey">Containers</span><span class="mval">5 running</span></div>
+      <div class="mrow"><span class="mkey">AWS Resources</span><span class="mval mval-p">20 total</span></div>
+      <div class="mrow"><span class="mkey">Region</span><span class="mval mval-b">us-east-2</span></div>
+      <div class="mrow"><span class="mkey">TLS</span><span class="mval">TLS 1.3 ✓</span></div>
+    </div>
+
+    <div class="flow-box">
+      <div class="flow-title">End-to-End Deploy Flow</div>
+      <div class="flow-step">
+        git push → GitHub webhook<br>
+        → Jenkins pipeline (7 stages)<br>
+        → Trivy security scan<br>
+        → Docker build + push to Hub<br>
+        → Ansible SSH deploy<br>
+        → docker-compose up -d<br>
+        → ALB health check ✓<br>
+        → Live: fms.theenuka.xyz
+      </div>
+    </div>
+  </div>
+
+</div><!-- /col4 -->
+
+</div><!-- /body -->
+</div><!-- /canvas -->
+
+<script>
+  // Animate pipeline stages sequentially
+  const stages = document.querySelectorAll('.pstage');
+  let active = 0;
+  setInterval(() => {
+    stages.forEach(s => { s.style.borderColor = ''; s.style.boxShadow = ''; });
+    stages[active].style.borderColor = '#3b82f6';
+    stages[active].style.boxShadow = '0 0 0 3px #bfdbfe';
+    active = (active + 1) % stages.length;
+  }, 550);
+</script>
+</body>
+</html>

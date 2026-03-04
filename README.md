@@ -1,284 +1,239 @@
 <div align="center">
-	<img src="./assets/logo.png" alt="FMS Logo" height="72" />
-	<h1>Freights Management System (FMS)</h1>
-	<p>End‑to‑end freight & parcel tracking platform – Admin control, Customer visibility, Background automation.</p>
-	<p>
-		<a href="#getting-started"><strong>Getting Started »</strong></a> ·
-		<a href="#deployment">Deployment</a> ·
-		<a href="#roadmap">Roadmap</a> ·
-		<a href="#contributing">Contribute</a>
-	</p>
-	<img src="https://img.shields.io/badge/status-active-brightgreen" />
-	<img src="https://img.shields.io/badge/backend-node%20%2F%20express-blue" />
-	<img src="https://img.shields.io/badge/frontend-react%20%2B%20vite-ff69b4" />
-	<img src="https://img.shields.io/badge/license-ISC-lightgrey" />
+
+<h1>Freights Management System</h1>
+<p>Full-stack freight & parcel tracking platform with a complete DevSecOps pipeline on AWS</p>
+
+[![Live](https://img.shields.io/badge/Live-fms.theenuka.xyz-22c55e?style=flat-square&logo=amazonaws)](https://fms.theenuka.xyz)
+[![Jenkins](https://img.shields.io/badge/CI%2FCD-Jenkins-D24939?style=flat-square&logo=jenkins&logoColor=white)](http://3.141.19.185:8080)
+[![Docker](https://img.shields.io/badge/Docker-Hub-2496ED?style=flat-square&logo=docker&logoColor=white)](https://hub.docker.com/u/theenukabandara)
+[![Terraform](https://img.shields.io/badge/IaC-Terraform-7B42BC?style=flat-square&logo=terraform&logoColor=white)](./terraform)
+[![AWS](https://img.shields.io/badge/Cloud-AWS%20us--east--2-FF9900?style=flat-square&logo=amazonaws&logoColor=white)](https://aws.amazon.com)
+
 </div>
 
 ---
 
-## ✨ Overview
+## Architecture
 
-FMS is a full‑stack logistics web application built to manage parcels from creation to delivery. It provides:
-
-- Real‑time parcel status & shipment visibility
-- Role‑based access (Admin vs User)
-- Secure authentication (JWT + AES encrypted passwords)
-- Automated background email notifications (welcome, pending, delivered)
-- Clean, responsive UI (React + Tailwind)
-
-The repo hosts **four** actively cooperating parts:
-
-| Layer | Path | Purpose |
-|-------|------|---------|
-| Frontend | `Frontend/` | Customer portal: login, view & track parcels |
-| Admin | `Admin/` | Management dashboard: create parcels, manage users |
-| Backend API | `Backend/` | REST API (Express/MongoDB) auth, users, parcels |
-| Background Services | `BackgroundServices/` | Out‑of‑band email jobs & templates |
-
-> Screenshots (add yours):
-> - `docs/screenshots/frontend-login.png`
-> - `docs/screenshots/admin-dashboard.png`
-> - `docs/screenshots/parcel-detail.png`
+![Architecture Diagram](./docs/architecture-diagram.png)
 
 ---
-## 🧱 Architecture
 
-```
-Browser (React SPA: Frontend / Admin)
-				|  Fetch / Axios (JWT in Authorization header)
-				v
-Express API (Auth, Parcels, Users) ----> MongoDB
-				|
-				+--> BackgroundServices (scheduled / event-driven emails)
-```
+## Demo
 
-### Tech Stack
-- **Frontend / Admin:** React + Vite, React Router, Redux Toolkit, Tailwind CSS, React Icons, Toast notifications
-- **Backend:** Node.js, Express, Mongoose (MongoDB), JWT, CryptoJS AES
-- **Background Services:** Node + nodemailer (via helper), EJS templates
-- **Dev Tooling:** Nodemon, kill-port (dev convenience), PostCSS, dotenv
-- **Infra / CI:** Docker, AWS ECR, Terraform (VPC + EC2), Ansible (roles), Jenkins Pipeline
+> Click the thumbnail below to watch the full demo
 
-### Security
-- Passwords AES encrypted at rest using `PASS` secret.
-- JWT access tokens signed with `JWT_SEC`, 10 day validity.
-- CORS enabled for frontend origins.
-- Error responses normalized (401, 404, 500) for consistent client handling.
- - Ansible installs `python3-docker` (not pip) to avoid PEP 668 issues on Ubuntu.
+[![Demo Video](./docs/screenshots/live-app-admin.png)](https://github.com/theenuka/Freights-Management-System/raw/main/Screen%20Recording%202026-03-04%20at%2004.37.05.mov)
 
 ---
-## 🚀 Getting Started
 
-### 1. Clone
+## Overview
+
+FMS is a full-stack logistics web application built to manage parcels from creation to delivery. Originally built as a 4th Semester Web Development project, it was extended in 5th Semester DevOps Engineering into a production-grade DevSecOps deployment on AWS.
+
+| Layer | Path | Description |
+|-------|------|-------------|
+| Frontend | `Frontend/` | Customer portal — parcel tracking |
+| Admin Panel | `Admin/` | Management dashboard — create parcels, manage users |
+| Backend API | `Backend/` | REST API (Node.js + Express + MongoDB) |
+| Background Worker | `BackgroundServices/` | Automated email notifications |
+
+---
+
+## DevSecOps Pipeline
+
+Every `git push` to `main` triggers the full pipeline automatically:
+
+```
+GitHub Webhook
+    → Jenkins (7 stages)
+        → Checkout + git SHA tag
+        → Login to Docker Hub
+        → Test (npm audit — Backend + Frontend)
+        → Security Scan (Trivy — HIGH/CRITICAL vulnerabilities)
+        → Build & Push 4 Docker images
+        → Cleanup (docker system prune)
+        → Ansible Deploy to EC2
+            → docker-compose up -d
+            → ALB health check ✅
+            → Live at https://fms.theenuka.xyz
+```
+
+### Pipeline Stages — Jenkins Blue Ocean
+
+![Jenkins Pipeline](./docs/screenshots/jenkins-pipeline-stages.png)
+
+### Build History
+
+![Jenkins Build History](./docs/screenshots/jenkins-build-history.png)
+
+---
+
+## Infrastructure (Terraform — 20 AWS Resources)
+
+| Resource | Details |
+|----------|---------|
+| VPC | 10.0.0.0/16 — custom network |
+| Subnets | 2 public subnets (us-east-2a, us-east-2b) |
+| EC2 — App Server | t3.micro · Docker Compose · 5 containers |
+| EC2 — Jenkins | t3.small · CI/CD server |
+| ALB | Internet-facing · path-based routing |
+| ALB Listener | :80 → 301 HTTPS redirect |
+| ALB Listener | :443 → frontend :80 / /admin* → admin :3000 |
+| ACM Certificate | *.theenuka.xyz wildcard · TLS 1.3 |
+| CloudWatch Alarms | CPU > 80% on both EC2s |
+| SNS Topic | Email alerts on alarm |
+| Security Groups | Port 80 restricted to ALB SG only |
+| EBS Volumes | 20GB gp3 — MongoDB persistence + Jenkins workspace |
+
+### EC2 Instances — AWS Console
+
+![EC2 Instances](./docs/screenshots/aws-ec2-instances.png)
+
+---
+
+## Docker — 5 Containers with Resource Limits
+
+| Container | Image | Port | CPU | Memory |
+|-----------|-------|------|-----|--------|
+| fms-mongo | mongo | 27017 | 0.5 | 300M |
+| fms-backend | theenukabandara/freights-backend | 8000 | 0.5 | 250M |
+| fms-frontend | theenukabandara/freights-frontend | 80 | 0.25 | 64M |
+| fms-admin | theenukabandara/freights-admin | 3000 | 0.25 | 64M |
+| fms-worker | theenukabandara/freights-background | — | 0.25 | 128M |
+
+### Docker Hub — 4 Public Repositories
+
+![Docker Hub](./docs/screenshots/dockerhub-repositories.png)
+
+---
+
+## Tech Stack
+
+**Application**
+- Node.js + Express — REST API
+- React + Vite + Tailwind CSS — Frontend & Admin SPA
+- MongoDB + Mongoose — Database
+- Nginx — Reverse proxy with `/admin` path routing
+- JWT — Authentication
+- Nodemailer — Background email notifications
+
+**DevOps / Infrastructure**
+- Jenkins — CI/CD (Declarative Pipeline, 7 stages)
+- Docker + Docker Compose — Containerisation with resource limits
+- Terraform — Infrastructure as Code (AWS provisioning)
+- Ansible + Ansible Vault — Configuration management + AES-256 encrypted secrets
+- Trivy — Security scanning (filesystem, HIGH/CRITICAL)
+- AWS ALB — Load balancing + path-based routing
+- AWS ACM — Wildcard SSL certificate
+- AWS CloudWatch + SNS — Monitoring + alerting
+- GoDaddy DNS — CNAME → ALB
+
+---
+
+## Security
+
+- **Trivy** scans every build for HIGH and CRITICAL vulnerabilities — report archived as Jenkins artifact
+- **Ansible Vault** encrypts all secrets at rest (Docker credentials, DB connection strings)
+- **Security Groups** restrict port 80 to ALB SG only — app server not directly accessible
+- **TLS 1.3** enforced via AWS ACM wildcard certificate
+- **SSH** access restricted by CIDR variable in Terraform
+- **Passwords** AES-encrypted at rest in MongoDB
+- **JWT** tokens signed with secret, 10-day validity
+
+---
+
+## Project Structure
+
+```
+├── Jenkinsfile                  # 7-stage declarative pipeline
+├── docker-compose.yml           # Local development compose
+├── Backend/                     # Node.js REST API
+├── Frontend/                    # React customer portal
+├── Admin/                       # React admin dashboard
+├── BackgroundServices/          # Email worker
+├── ansible/                     # Ansible roles + Vault secrets
+│   └── roles/
+│       ├── app_deploy/          # Docker Compose deployment
+│       └── jenkins/             # Jenkins server setup
+├── terraform/                   # AWS infrastructure
+│   ├── main.tf                  # EC2 instances + security groups
+│   ├── vpc.tf                   # VPC + subnets + IGW
+│   ├── alb.tf                   # ALB + target groups + listeners
+│   ├── cloudwatch.tf            # CPU alarms + SNS
+│   └── variables.tf
+└── docs/
+    ├── architecture-diagram.png
+    └── screenshots/
+```
+
+---
+
+## Local Setup
+
+### Prerequisites
+- Docker Desktop
+- Node.js 20+
+
+### Run locally with Docker Compose
+
 ```bash
 git clone https://github.com/theenuka/Freights-Management-System.git
 cd Freights-Management-System
-```
-
-### 2. Install Dependencies
-```bash
-cd Backend && npm install && cd ..
-cd Frontend && npm install && cd ..
-cd Admin && npm install && cd ..
-cd BackgroundServices && npm install && cd ..
-```
-
-### 3. Environment Variables
-Create a `.env` file in `Backend/`:
-```
-PORT=8000            # optional; auto-fallback if busy
-DB=mongodb+srv://<user>:<pass>@cluster/sample
-PASS=<aes_encryption_secret>
-JWT_SEC=<jwt_signing_secret>
-```
-For **BackgroundServices** (if separate):
-```
-DB=mongodb+srv://<user>:<pass>@cluster/sample
-EMAIL_USER=<smtp_user>
-EMAIL_PASS=<smtp_password_or_app_password>
-```
-
-### 4. Run Backend
-```bash
-cd Backend
-npm run dev
-```
-Dynamic port finder will pick the first free port ≥ 8000.
-
-### 5. Run Frontend & Admin (separate terminals)
-```bash
-cd Frontend && npm run dev
-cd Admin && npm run dev
-```
-
-### 6. Background Email Service (optional)
-```bash
-cd BackgroundServices
-npm run start
-```
-
-### 7. Login Flow
-1. Register user via API or Admin UI
-2. Backend stores encrypted password
-3. User logs in, receives JWT
-4. JWT attached on future protected requests
-
----
-## 🐳 Run with Docker
-
-### Prerequisites
-- Docker Desktop or Docker Engine + Compose v2
-
-### 1) Copy env file
-```bash
-cp .env.example .env
-# then edit .env to set PASS / JWT_SEC (and EMAIL_USER/PASS if using emails)
-```
-
-### 2) Build and start all services
-```bash
+cp .env.example .env        # fill in DB, JWT_SEC, PASS, EMAIL_USER, EMAIL_PASS
 docker compose up --build
 ```
 
-### 3) Access (local compose)
-- Frontend: http://localhost:5173
-- Admin: http://localhost:5174
-- API: http://localhost:8000/api/v1
-- MongoDB: mongodb://localhost:27017 (DB name: fms)
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| Admin | http://localhost:5174 |
+| API | http://localhost:8000/api/v1 |
 
-Containers include health checks for Mongo and Backend.
+### Run without Docker
 
-To stop:
 ```bash
-docker compose down
-```
-
-To start detached:
-```bash
-docker compose up -d
+cd Backend && npm install && npm run dev
+cd Frontend && npm install && npm run dev
+cd Admin && npm install && npm run dev
+cd BackgroundServices && npm install && npm start
 ```
 
 ---
-## 🔌 API Summary
 
-Base URL: `http://localhost:<PORT>/api/v1`
+## API Reference
+
+Base URL: `/api/v1`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/auth/register` | Create new user |
-| POST | `/auth/login` | Authenticate (email, password) |
+| POST | `/auth/register` | Register new user |
+| POST | `/auth/login` | Login — returns JWT |
 | GET | `/users` | List users (protected) |
 | GET | `/parcels` | List parcels (protected) |
 | POST | `/parcels` | Create parcel (admin) |
 | PUT | `/parcels/:id` | Update parcel status |
 
-> Add more endpoints here as they evolve.
+---
 
-### Auth Notes
-- 401: wrong credentials
-- 404: user not found
-- 500: internal server error (generic message)
+## Live URLs
+
+| Service | URL |
+|---------|-----|
+| Frontend | https://fms.theenuka.xyz |
+| Admin Panel | https://fms.theenuka.xyz/admin |
+| Jenkins | http://3.141.19.185:8080 |
 
 ---
-## 🧪 Development Utilities
-- `npm run reset-password -- <email> <newPassword>` (Backend) – Re-encrypt a user password with current AES key.
-- Auto port fallback prevents local clash loops (no more manual kill). 
+
+## Troubleshooting
+
+| Issue | Fix |
+|-------|-----|
+| 401 on login | Wrong `PASS` key — run `npm run reset-password` in Backend |
+| Emails not sending | Set `EMAIL_USER` / `EMAIL_PASS` in `.env` |
+| Port already in use | Dynamic port fallback handles this automatically |
 
 ---
-## � Deployment
 
-This repo ships with an opinionated CI/CD pipeline targeting AWS EC2:
-
-1) Jenkins Pipeline (`Jenkinsfile`)
-- Stages: Checkout → Login to ECR → Build & Push 4 images (Backend, Frontend, Admin, Background) → Terraform Apply → Ansible Deploy.
-- Credentials expected in Jenkins:
-	- `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (string credentials)
-	- `freights-app-ssh-key` (SSH private key for ubuntu@EC2)
-- ECR repositories: defined via env `ECR_*_URI` in Jenkinsfile.
-
-2) Terraform (`terraform/`)
-- Provisions VPC, public subnet, IGW, route table, security group (22, 80, 3000, 8000), and an Ubuntu EC2 instance.
-- Outputs `server_public_ip` consumed by Jenkins to build the Ansible inventory.
-
-3) Ansible (`ansible/`)
-- Roles: `common` (base pkgs + venv), `docker` (Docker engine + python3-docker), `aws_cli` (installs AWS CLI v2), `app_deploy`.
-- Deploys 4 containers on a user-defined docker network:
-	- backend → publishes 8000:8000
-	- frontend → publishes 80:80
-	- admin → publishes 3000:80
-	- background → internal only
-- ECR auth passed from Jenkins as `ecr_password` variable.
-
-4) Production Access
-- Frontend (user portal): http://<ec2-public-ip>/
-- Admin: http://<ec2-public-ip>:3000/
-- Backend API: http://<ec2-public-ip>:8000/api/v1
-
-Notes
-- We fixed Ubuntu 24.04 PEP 668 issues by installing `python3-docker` via apt (no system pip writes).
-- For security, move DB/JWT secrets from `ansible/site.yml` to Jenkins credentials or Ansible Vault before real deployments.
-
----
-## �📂 Folder Structure (Root excerpt)
-```
-Backend/
-	controllers/   # auth, parcel, user logic
-	models/        # Mongoose schemas
-	routes/        # Express routers
-	scripts/       # maintenance utilities
-Frontend/
-	src/components # Shared UI components
-	src/pages      # User-facing pages (Login, Parcels, MyParcels)
-Admin/
-	src/pages      # Admin pages (Login, Users, Parcels, Dashboard)
-BackgroundServices/
-	EmailService/  # EJS templates + mail helpers
-```
-
----
-## 🧭 Roadmap
-- [ ] Parcel timeline / tracking events
-- [ ] File uploads (invoices / proof of delivery)
-- [ ] Role-based granular permissions (super-admin, dispatcher)
-- [ ] Refresh token flow & token revocation list
-- [ ] Metrics dashboard (daily parcels, delivery SLA)
-- [x] Dockerization & CI pipeline (ECR + Terraform + Ansible + Jenkins)
-- [ ] Internationalization (i18n)
-
----
-## 🤝 Contributing
-1. Fork the repo
-2. Create a feature branch: `git checkout -b feat/awesome`
-3. Commit changes: `git commit -m "feat: add awesome"`
-4. Push: `git push origin feat/awesome`
-5. Open a Pull Request
-
-Please keep changes scoped and include screenshots for UI updates.
-
----
-## 🐞 Troubleshooting
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| 401 on login | Wrong PASS key / old password | Run reset-password script or re-register |
-| Port already in use | Ghost process on 8000 | Dynamic port fallback or manually kill with `lsof -ti:8000 | xargs kill` |
-| Red toast but success earlier | Old frontend code always toasted success | Pull latest, ensure structured login result used |
-| Emails not sending | Missing SMTP vars | Set EMAIL_USER / EMAIL_PASS in .env |
-| Ansible pip error (PEP 668) | System Python is externally managed | We install `python3-docker` from apt instead |
-| npm ci EUSAGE in Docker | package-lock out of sync | Commit updated lockfiles before running the pipeline |
-
----
-## 📄 License
-ISC License – feel free to use, learn, extend.
-
----
-##  Acknowledgements
-- React + Vite ecosystem
-- Tailwind CSS
-- MongoDB & Mongoose
-- Contributors & testers improving FMS usability
-
-> Built for clarity, speed and operational visibility in modern freight workflows.
-
-
-
-# CI/CD Pipeline Test - Auto-triggered via GitHub Webhook
+> 5th Semester DevOps Engineering module project — University of Plymouth (NSBM Green University)
